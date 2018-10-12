@@ -13,7 +13,7 @@ public class Constance {
 
     public static String action_returnRoom="action_returnRoom";    //是否自己动收红包
     public static String text="text";
-
+    public static String action_settings="action_settings";    //是否自己动收红包
     public static String action_verify_friend="action_verify_friend";  //是否自动通过好友
     public static String action_hookmessagefail="action_hookmessagefail";  //信息保存失败的时候
     public static String action_canseewxno="action_canseewxno";  //是否能看见微信号

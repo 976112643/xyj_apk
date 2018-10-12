@@ -98,6 +98,16 @@ public class ImLoginBean {
         private boolean passNewFriend;  //是否自动通过好友添加
         private boolean showWxno;       //是否能看好友微信号
         private boolean  scan;               //是否打开扫一扫
+        private boolean  setting;       // 设置
+        public boolean isSetting() {
+            return setting;
+        }
+
+        public void setSetting(boolean setting) {
+            this.setting = setting;
+        }
+
+
 
 
         public boolean isScan() {

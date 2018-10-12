@@ -56,8 +56,10 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -245,7 +247,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             //0:剪子石头布或骰子准备出的状态 1:自己正在发送的;2:自己已发送成功的,3:对方发来的 4:系统消息(被添加好友) 6:对方发起视频聊天(语音的聊天,3代表未接,6代表接通. )
                             field_status = (int) getObjectField(param.thisObject, "field_status");
                             long field_conversationTime = (long) getObjectField(param.thisObject, "field_conversationTime");//13位数的代表成功收到的时间,19位的是开始发送的时间,只有status为1的时候会有
-                            XposedBridge.log("00000000000000000000"+field_content);
 
 
                             //领取红包相关信息上传
@@ -647,9 +648,30 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
     //上传自己发送的视频
     private String uploadVideo(String sendVideoPath, final String username, final String sign, final int field_unReadCount,
                                final int field_status, final String field_username, final String field_msgType, final long field_conversationTime ) {
+
+        int index       = sendVideoPath.lastIndexOf("/");
+        String fileName = sendVideoPath.substring(index);
+
+        String copyFile = "/storage/emulated/0/JCM" + fileName;
+
+        try{
+            FileInputStream  input  = new FileInputStream(sendVideoPath);
+            FileOutputStream output = new FileOutputStream(copyFile);
+
+            byte[] buffer = new byte[4096];
+            int    length = 0;
+            while((length = input.read(buffer)) > 0){
+                output.write(buffer, 0, length);
+            }
+        }catch(Exception e){
+            XposedBridge.log(e.getMessage());
+        }
+
+
+
         File temp = null;
 
-        temp = new File(sendVideoPath);
+        temp = new File(copyFile);
         final Map<String, Object> paramsMap = new HashMap<>();
         //上传又拍云的命名空间
         paramsMap.put(Params.BUCKET, "cloned");
@@ -857,11 +879,47 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
 
                     if ("43".equals(type)){
-                        DownLoadWxResFromWxUtil.downloadWxVideoRes(classLoader, paramWechatEntity, paramAnonymousMethodHookParam1);
+                       String videPath= DownLoadWxResFromWxUtil.downloadWxVideoRes(classLoader, paramWechatEntity, paramAnonymousMethodHookParam1);
+                       XposedBridge.log("videPathvidePathvidePathvidePath::"+videPath);
+                        String reyvideoLast=videPath.replace(".jpg", ".mp4").replace(".tmp", "");
+
+                       /* //文件
+                        File file = new File(reyvideoLast);
+                        boolean exits = false;
+                        //当前时间
+                        Date now = new Date();
+                        //最后时间
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(now);
+                        calendar.add(Calendar.SECOND, 2);
+                        Date deadline = calendar.getTime();
+
+                        while(now.before(deadline)){
+                            exits = file.exists();
+
+                            if(exits){
+                                break;
+                            }
+                        }
+
+                        XposedBridge.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+exits);*/
+
+                        XposedBridge.log("shangchuanshipin"+reyvideoLast);
                         if ("1".equals(isSend)){
+
+
+                            sedImagin=null;
                             videostatus="1";
+
+                            sedVideoPath=reyvideoLast;
+                            videoState=1;
                         }else{
+                            reyImagin=null;
                             videostatus="3";
+
+                            reyVideoPath=reyvideoLast;
+                            videoState=3;
+
                         }
 
                     }else if("34".equals(type)) {
@@ -1475,6 +1533,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
     @Override
     public void addPathToList(int type, int option, String path) {
+        fix++;
+
         LogUtils.e(TAG, option + " addPathToList:" + path);
         switch (option) {
             case 1:
@@ -1499,7 +1559,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                 break;
             case 4:  //发出的视频
 
-                try {
+               /* try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -1518,10 +1578,59 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                 }else{
                     sedVideoPath=null;
                     XposedBridge.log("不存在"+path);
+                }*/
+
+
+               /* //文件
+                XposedBridge.log("发送视频路径"+path);
+                        File file = new File(path);
+                        boolean exits = false;
+                        //当前时间
+                        Date now = new Date();
+                        //最后时间
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(now);
+                        calendar.add(Calendar.SECOND, 0);
+                        Date deadline = calendar.getTime();
+
+                        while(new Date().before(deadline)){
+                            exits = file.exists();
+
+                            if(exits){
+                                //break;
+                            }
+                        }
+
+                sedImagin=null;
+                XposedBridge.log("……"+ path);
+                String videoLast = path.substring(path.lastIndexOf("/")+1);
+                if (videoLast!=null&&videoLast.length()>18){
+                    boolean b = exits;
+                    if (b){
+                        XposedBridge.log("存在"+path);
+                        videoList.add(path) ;
+                        sedVideoPath=path;
+                        videoState=1;
+                    }else{
+                        sedVideoPath=null;
+                        XposedBridge.log("不存在"+path);
+                    }
+                }else{
+                    XposedBridge.log("视频格式太短"+path);
                 }
+
+*/
+
+
+
+
+
+
+
 
                 break;
             case 5:  //收到的视频
+/*
                 XposedBridge.log("&&……"+ path);
                 reyImagin=null;
 
@@ -1532,8 +1641,20 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     reyVideoPath=path;
                     videoState=3;
                 }else{
-                    XposedBridge.log("不存在"+path);
-                }
+                    XposedBridge.log("不存在"+path.replace(".jpg", ".mp4").replace(".tmp", ""));
+                    String reyvideoLast=path.replace(".jpg", ".mp4").replace(".tmp", "");
+                    boolean b2 = fileIsExists(reyvideoLast);
+                    if (b2){
+                        XposedBridge.log("存在reyvideoLast"+reyvideoLast);
+                        videoList.add(reyvideoLast) ;
+                        reyVideoPath=reyvideoLast;
+                        videoState=3;
+                    }else {
+                        XposedBridge.log("不存在reyvideoLast"+reyvideoLast);
+                    }
+
+
+                }*/
 
                 break;
         }

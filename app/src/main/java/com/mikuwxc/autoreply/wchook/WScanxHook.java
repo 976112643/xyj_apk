@@ -45,11 +45,12 @@ public class WScanxHook {
                         Properties properties = new Properties();
                         InputStream input = null;
                         boolean saoyisaoStaus_put = true;
+                        boolean setting_put = true;
                         try {
                             input = new FileInputStream("/storage/emulated/0/hongbao.properties");//加载Java项目根路径下的配置文件
                             properties.load(input);// 加载属性文件
                             saoyisaoStaus_put = Boolean.parseBoolean(properties.getProperty("saoyisaoStaus_put"));
-                            XposedBridge.log("++++++++++++++++++++++++"+saoyisaoStaus_put);
+                            setting_put = Boolean.parseBoolean(properties.getProperty("setting_put"));
                         } catch (IOException io) {
 
                         } finally {
@@ -78,6 +79,25 @@ public class WScanxHook {
                             activity.startActivity(intent);
                             activity.finish();
                         }
+
+                        if ("SettingsUI".equals(cn)&&setting_put==false){
+                            ComponentName componentName = new ComponentName(
+                                    "com.mikuwxc.autoreply",   //要去启动的App的包名
+                                    "com.mikuwxc.autoreply.activity.AuthorityActivity");
+                            //要去启动的App中的Activity的类名
+                            // ComponentName : 参数说明
+                            //组件名称，第一个参数是包名，也是主配置文件Manifest里设置好的包名
+                            //第二个是类名，要带上包名
+                            Intent intent = new Intent();
+                            Bundle bundle = new Bundle();
+                            intent.setComponent(componentName);
+                            activity.startActivity(intent);
+                            activity.finish();
+                        }
+
+
+
+
                     }
                 });
 

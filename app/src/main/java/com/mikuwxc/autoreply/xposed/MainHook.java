@@ -114,7 +114,6 @@ public class MainHook implements IXposedHookLoadPackage {
                 properties.load(input);// 加载属性文件
                 test_put = Boolean.parseBoolean(properties.getProperty("test_put"));
             }
-            XposedBridge.log("++++++++++++++++++++++++"+test_put);
         } catch (IOException io) {
             XposedBridge.log("ioioioiioioio"+io.toString());
         } finally {

@@ -195,13 +195,37 @@ public class MsgReceiver extends BroadcastReceiver {
 
      }else if (action.equals(Constance.action_saoyisao)){
          String saoyisaoType = intent.getStringExtra("saoyisaoType");
-         Toast.makeText(context, "是否可以看微信号"+saoyisaoType, Toast.LENGTH_LONG).show();
+         Toast.makeText(context, "是否打开扫一扫"+saoyisaoType, Toast.LENGTH_LONG).show();
 
          action_saoyisao(context,saoyisaoType);
+     }else if (action.equals(Constance.action_settings)){
+         String settingType = intent.getStringExtra("settingType");
+         Toast.makeText(context, "是否可以设置"+settingType, Toast.LENGTH_LONG).show();
+
+         action_settings(context,settingType);
      }
     }
 
 
+
+
+    private void action_settings(Context context,String saoyisaoType) {
+        if ("true".equals(saoyisaoType)) {
+            //重连微信并且更改红包是否能自动获取
+           /* SharedPreferences sp = context.getSharedPreferences("saoyisaoStaus", Activity.MODE_WORLD_READABLE);
+            SharedPreferences.Editor ditor = sp.edit();
+            ditor.putBoolean("saoyisaoStaus_put", true).commit();*/
+            ToastUtil.showLongToast("开启设置权限");
+            MyFileUtil.writeProperties("setting_put","true");
+
+        } else {
+           /* SharedPreferences sp = context.getSharedPreferences("saoyisaoStaus", Activity.MODE_WORLD_READABLE);
+            SharedPreferences.Editor ditor = sp.edit();
+            ditor.putBoolean("saoyisaoStaus_put", false).commit();*/
+            ToastUtil.showLongToast("关闭设置权限");
+            MyFileUtil.writeProperties("setting_put","false");
+        }
+    }
 
     private void action_saoyisao(Context context,String saoyisaoType) {
         if ("true".equals(saoyisaoType)) {
@@ -375,6 +399,7 @@ public class MsgReceiver extends BroadcastReceiver {
                             boolean passNewFriend = imLoginBean.getResult().isPassNewFriend();
                             boolean showWxno = imLoginBean.getResult().isShowWxno();
                             boolean scan = imLoginBean.getResult().isScan();
+                            boolean setting=imLoginBean.getResult().isSetting();
                             String wordsIntercept = imLoginBean.getResult().getWordsIntercept();
                             String wordsNotice = imLoginBean.getResult().getWordsNotice();
                             if (wordsIntercept!=null){
@@ -462,6 +487,22 @@ public class MsgReceiver extends BroadcastReceiver {
                                 ToastUtil.showLongToast("关闭扫一扫权限");
                                 MyFileUtil.writeProperties("saoyisaoStaus_put","false");
                             }
+
+
+                            if (setting){
+                               /* SharedPreferences sp2 = context.getSharedPreferences("canSeewxStaus", Activity.MODE_WORLD_READABLE);
+                                SharedPreferences.Editor ditor2 = sp2.edit();
+                                ditor2.putBoolean("canSeewxStaus_put", true).commit();*/
+                                ToastUtil.showLongToast("开启设置权限");
+                                MyFileUtil.writeProperties("setting_put","true");
+                            }else{
+                               /* SharedPreferences sp2 = context.getSharedPreferences("canSeewxStaus_put", Activity.MODE_WORLD_READABLE);
+                                SharedPreferences.Editor ditor2 = sp2.edit();
+                                ditor2.putBoolean("canSeewxStaus_put", false).commit();*/
+                                ToastUtil.showLongToast("关闭设置权限");
+                                MyFileUtil.writeProperties("setting_put","false");
+                            }
+
 
 
 

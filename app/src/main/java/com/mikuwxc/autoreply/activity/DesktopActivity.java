@@ -37,6 +37,8 @@ import com.mikuwxc.autoreply.service.MyReceiver;
 import com.mikuwxc.autoreply.utils.Global;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,6 +54,16 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     private ArrayList<ApphttpBean.ResultBean> resultBean;
     private ArrayList<ApphttpBean.ResultBean> newBean;
     private String tac;
+
+
+    private String[] search = {
+            //  "input keyevent 3",// 返回到主界面，数值与按键的对应关系可查阅KeyEvent
+            // "sleep 1",// 等待1秒
+            // 打开微信的启动界面，am命令的用法可自行百度、Google// 等待3秒
+            "pm disable " + "com.android.settings",
+            // "am  start  service  com.mikuwxc.autoreply.AutoReplyService"// 打开微信的搜索
+            // 像搜索框中输入123，但是input不支持中文，蛋疼，而且这边没做输入法处理，默认会自动弹出输入法
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +171,30 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
                                 e.printStackTrace();
                             }
 
+                        }
+                    }
+
+                    if(newBean != null && !newBean.isEmpty()){
+                        if(newBean.contains(new ApphttpBean.ResultBean("com.android.settings"))){
+                            // 获取Runtime对象  获取root权限
+                            Runtime runtime = Runtime.getRuntime();
+                            try {
+                                Process process = runtime.exec("su");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            search[0]=chineseToUnicode("pm enable " + "com.android.settings");
+                            execShell(search);
+                        }else{
+                            // 获取Runtime对象  获取root权限
+                            Runtime runtime = Runtime.getRuntime();
+                            try {
+                                Process process = runtime.exec("su");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            search[0]=chineseToUnicode("pm disable " + "com.android.settings");
+                            execShell(search);
                         }
                     }
 
@@ -301,5 +337,52 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
             ToastUtil.showLongToast("检查到您手机没有安装微信，请安装后使用该功能");
         }
 
+    }
+
+
+
+    public String chineseToUnicode(String str){
+        String result="";
+        for (int i = 0; i < str.length(); i++){
+            int chr1 = (char) str.charAt(i);
+            if(chr1>=19968&&chr1<=171941){//汉字范围 \u4e00-\u9fa5 (中文)
+                result+="\\u" + Integer.toHexString(chr1);
+            }else{
+                result+=str.charAt(i);
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     30      * 执行Shell命令
+     31      *
+     32      * @param commands
+     33      *            要执行的命令数组
+     34      */
+    public void execShell(String[] commands) {
+        // 获取Runtime对象
+        Runtime runtime = Runtime.getRuntime();
+
+        DataOutputStream os = null;
+        try {
+            // 获取root权限
+            Process process = runtime.exec("su");
+            os = new DataOutputStream(process.getOutputStream());
+            for (String command : commands) {
+                if (command == null) {
+                    continue;
+                }
+                os.write(command.getBytes());
+                os.writeBytes("\n");
+                os.flush();
+            }
+            os.writeBytes("exit\n");
+            os.flush();
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

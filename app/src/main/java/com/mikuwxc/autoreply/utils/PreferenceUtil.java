@@ -24,7 +24,7 @@ public class PreferenceUtil {
     public static SharedPreferences getPreference(Context context) {
         SharedPreferences preferences = null;
         if (context != null) {
-            preferences = context.getSharedPreferences(PREFERENCE, Activity.MODE_WORLD_READABLE);
+            preferences = context.getSharedPreferences(PREFERENCE, Context.MODE_MULTI_PROCESS);
         }
         return preferences;
     }

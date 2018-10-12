@@ -1,5 +1,7 @@
 package com.mikuwxc.autoreply.bean;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 public class ApphttpBean {
@@ -67,6 +69,10 @@ public class ApphttpBean {
         private int addDevice;
         private String id;
 
+        public ResultBean(String packageName){
+            this.packageName = packageName;
+        }
+
         public String getName() {
             return name;
         }
@@ -121,6 +127,21 @@ public class ApphttpBean {
 
         public void setId(String id) {
             this.id = id;
+        }
+
+        @Override
+        public boolean equals(Object object){
+            if (this == object) {
+                return true;
+            }
+
+            if(object != null &&  this.getClass() == object.getClass()){
+                ResultBean entity = (ResultBean) object;
+
+                return this.packageName.equals(entity.packageName);
+            }
+
+            return false;
         }
     }
 }

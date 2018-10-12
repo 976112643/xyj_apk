@@ -14,10 +14,14 @@ import android.widget.TextView;
 import com.mikuwxc.autoreply.R;
 import com.mikuwxc.autoreply.bean.ApphttpBean;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
 public class RecycleHomeAdapter extends BaseRecycleAdapter {
+
+
     private Context mContent;
     private ArrayList<ApphttpBean.ResultBean> homePages;
     private ImageView imageView;
@@ -69,6 +73,7 @@ public class RecycleHomeAdapter extends BaseRecycleAdapter {
             String name = homePages.get(position).getName();
             PackageManager pm = mContent.getPackageManager();
             try {
+
                 ApplicationInfo appInfo = pm.getApplicationInfo(homePages.get(position).getPackageName(), PackageManager.GET_META_DATA);
                 //appNameTv.setText(pm.getApplicationLabel(appInfo));
                 Drawable appIcon = pm.getApplicationIcon(appInfo);
@@ -111,4 +116,7 @@ public class RecycleHomeAdapter extends BaseRecycleAdapter {
             getClickListener().OnRecycleItemClick(getPosition());
         }
     }
+
+
+
 }

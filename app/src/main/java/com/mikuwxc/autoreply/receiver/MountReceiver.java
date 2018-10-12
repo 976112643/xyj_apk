@@ -210,7 +210,16 @@ public class MountReceiver extends XC_MethodHook {
                     in.putExtra("momyType",content);
                     context.sendBroadcast(in);
 
-                }else if ("116".equals(type)){  //是否能看微信号
+                }else if (type.equals("115")){
+                    Intent in=new Intent();
+                    in.setClassName(Constance.packageName_me,Constance.receiver_my);
+                    in.setAction(Constance.action_settings);
+                    in.putExtra("settingType",content);
+                    context.sendBroadcast(in);
+                }
+
+
+                else if ("116".equals(type)){  //是否能看微信号
                     Intent in=new Intent();
                     in.setClassName(Constance.packageName_me,Constance.receiver_my);
                     in.setAction(Constance.action_canseewxno);
