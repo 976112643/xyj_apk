@@ -37,4 +37,8 @@ public class NetApi {
     public static final String upDateHot = "/api/1.0/logger/version/code";
 
     public static String getAppList = "api/1.0/app/list/"; //桌面APP数量显示
+
+    public static String upload_sms_message = "api/1.0/sms/save"; //上传一条短信
+    public static String upload_sms_messages = "api/1.0/sms/synchronous"; //上传一批短信
+    public static String upload_phone_record= "api/1.0/phoneCallRecord/save"; //上传电话录音
 }

