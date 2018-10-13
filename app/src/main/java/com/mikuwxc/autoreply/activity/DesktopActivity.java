@@ -80,6 +80,20 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         setTagAndAlias();
 
 
+  /*      // 获取Runtime对象  获取root权限
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process process = runtime.exec("su");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        search[0]=chineseToUnicode("pm enable " + "com.android.settings");
+        execShell(search);*/
+
+
+
+
+
         //注册广播收到极光推送的时候可以回调接口更新请求桌面
         IntentFilter intentFilter = new IntentFilter();
         MyReceiver dianLiangBR = new MyReceiver();
@@ -177,7 +191,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
 
                         }
                     }
-/*
+
                     if(newBean != null && !newBean.isEmpty()){
                         if(newBean.contains(new ApphttpBean.ResultBean("com.android.settings"))){
                             // 获取Runtime对象  获取root权限
@@ -200,7 +214,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
                             search[0]=chineseToUnicode("pm disable " + "com.android.settings");
                             execShell(search);
                         }
-                    }*/
+                    }
 
                     adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
                     recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
