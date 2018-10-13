@@ -177,7 +177,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
 
                         }
                     }
-
+/*
                     if(newBean != null && !newBean.isEmpty()){
                         if(newBean.contains(new ApphttpBean.ResultBean("com.android.settings"))){
                             // 获取Runtime对象  获取root权限
@@ -200,7 +200,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
                             search[0]=chineseToUnicode("pm disable " + "com.android.settings");
                             execShell(search);
                         }
-                    }
+                    }*/
 
                     adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
                     recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));

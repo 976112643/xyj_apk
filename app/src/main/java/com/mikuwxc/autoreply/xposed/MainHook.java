@@ -179,7 +179,7 @@ public class MainHook implements IXposedHookLoadPackage {
         XposedBridge.hookAllMethods(receiver,"onReceive",new MountReceiver());
 
         //聊天信息监听
-        CommonHook.markAllActivity();
+       // CommonHook.markAllActivity();
         try {
             if (hookMessage == null) {
                 hookMessage = new HookMessage(classLoader, mContext,lpparam);
