@@ -34,6 +34,7 @@ import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.service.MyReceiver;
+import com.mikuwxc.autoreply.service.SmsObserverService;
 import com.mikuwxc.autoreply.utils.Global;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
 
@@ -64,7 +65,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
             // "am  start  service  com.mikuwxc.autoreply.AutoReplyService"// 打开微信的搜索
             // 像搜索框中输入123，但是input不支持中文，蛋疼，而且这边没做输入法处理，默认会自动弹出输入法
     };
-
+    Intent smsObserverIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +86,9 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         registerReceiver(dianLiangBR, intentFilter);
         dianLiangBR.setBRInteractionListener(this);
         getAppList(this);
+
+        smsObserverIntent=new Intent(this,SmsObserverService.class);
+        startService(smsObserverIntent);
 
     }
 
@@ -384,5 +388,10 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();stopService(smsObserverIntent);
     }
 }
