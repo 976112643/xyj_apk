@@ -13,13 +13,21 @@ import android.os.Message;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.mikuwxc.autoreply.bean.SmsObserverBean;
 import com.mikuwxc.autoreply.common.MyApp;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.utils.SystemUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -180,12 +188,15 @@ public class SmsObserverService extends Service {
                         if("200".equals(smsSuccessBean.getCode())){
                             //上传成功
                             //Toast.makeText(SmsObserverService.this, "短信上传成功", Toast.LENGTH_SHORT).show();
+                        }else{
+                            String sms_list_data = SPHelper.getInstance().getString("SMS_LIST_DATA");
                         }
                     }
 
                     @Override
                     public void onError(Call call, Response response, Exception e) {
                         super.onError(call, response, e);
+
                     }
                 });
     }
