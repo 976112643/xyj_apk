@@ -698,4 +698,15 @@ public abstract class WechatEntity {
     public String sns_state_notify_class1 = "com.tencent.mm.modelmulti.o";
     public String sns_state_notify_method1 = "a";
 
+
+    public String no_friends_deleted_class="com.tencent.mm.plugin.profile.ui.NormalUserFooterPreference$a$1$1$2";  //禁止删除好友
+    public String delete_friend_chat_record_class="com.tencent.mm.ui.SingleChatInfoUI$8";  //禁止微信里面删除好友聊天记录
+    public String delete_single_friend_chat_record_class="com.tencent.mm.ui.conversation.b$2";  //禁止删除会话聊天记录
+    public String delete_selected_friend_chat_record_class="com.tencent.mm.ui.chatting.viewitems.b$c$a";  //禁止删除单个聊天记录
+
+    public String no_friends_deleted_method="onClick";  //禁止删除好友
+    public String delete_friend_chat_record_method="onClick";  //禁止微信里面删除好友聊天记录
+    public String delete_single_friend_chat_record_method="onClick";  //禁止删除会话聊天记录
+    public String delete_selected_friend_chat_record_method="onMMMenuItemSelected";  //禁止删除单个聊天记录
+
 }

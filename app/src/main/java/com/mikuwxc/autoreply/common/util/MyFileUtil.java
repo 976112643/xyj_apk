@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -189,6 +190,31 @@ public class MyFileUtil {
                 return 1;
             }
         }
+    }
+
+
+
+
+    public static boolean readProperties(String key){
+        Properties properties = new Properties();
+        InputStream input = null;
+        try {
+            input = new FileInputStream("/storage/emulated/0/hongbao.properties");//加载Java项目根路径下的配置文件
+            properties.load(input);// 加载属性文件
+           boolean staus_put = Boolean.parseBoolean(properties.getProperty(key));
+            return staus_put;
+        } catch (IOException io) {
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return false;
     }
 
 

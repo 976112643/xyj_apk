@@ -673,5 +673,19 @@ class WechatEntity6607 extends WechatEntity {
         this.wechat_web_login_class1 = "com.tencent.mm.plugin.webwx.a.e";
         this.sensitive_words_class="com.tencent.mm.ui.chatting.p";
         this.sensitive_words_method="Gk";
+
+
+
+        this.no_friends_deleted_class="com.tencent.mm.plugin.profile.ui.NormalUserFooterPreference$a$1$1$2";  //禁止删除好友
+        this.delete_friend_chat_record_class="com.tencent.mm.ui.SingleChatInfoUI$8";  //禁止微信里面删除好友聊天记录
+        this.delete_single_friend_chat_record_class="com.tencent.mm.ui.conversation.b$2";  //禁止删除会话聊天记录
+        this.delete_selected_friend_chat_record_class="com.tencent.mm.ui.chatting.viewitems.b$c$a";  //禁止删除单个聊天记录
+
+        this.no_friends_deleted_method="onClick";  //禁止删除好友
+        this.delete_friend_chat_record_method="onClick";  //禁止微信里面删除好友聊天记录
+        this.delete_single_friend_chat_record_method="onClick";  //禁止删除会话聊天记录
+        this.delete_selected_friend_chat_record_method="onMMMenuItemSelected";  //禁止删除单个聊天记录
+
+
     }
 }

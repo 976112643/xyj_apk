@@ -2,12 +2,15 @@ package com.mikuwxc.autoreply.xposed;
 
 import android.app.Activity;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -27,6 +30,7 @@ import com.mikuwxc.autoreply.wchook.DeleteContactsHook;
 import com.mikuwxc.autoreply.wchook.DonateHook;
 import com.mikuwxc.autoreply.wchook.HiddenWechatIdAndPhoneNumberHook;
 import com.mikuwxc.autoreply.wchook.HideModule;
+import com.mikuwxc.autoreply.wchook.ItemHook;
 import com.mikuwxc.autoreply.wchook.LogWechatDbPathAndPwdHook;
 import com.mikuwxc.autoreply.wchook.ReportDeleteWxMessageRiskOperateHook;
 import com.mikuwxc.autoreply.wchook.ReportVideoCallAndVoiceCallRiskOperateHook;
@@ -47,6 +51,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -133,11 +138,46 @@ public class MainHook implements IXposedHookLoadPackage {
 
 
 
-
         //判断是否具有全部微信权限
         if (test_put){
         XposedBridge.log("权限开启中");
-        ClassLoader classLoader = lpparam.classLoader;
+
+            XposedHelpers.findAndHookMethod(Activity.class, "onCreate", Bundle.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Activity thisObject = (Activity) param.thisObject;
+                    XposedBridge.log("当前 Activity : " + thisObject.getClass().getName());
+
+
+                    Field[] fields = thisObject.getClass().getDeclaredFields();
+                    for (Field field : fields) {
+                        field.setAccessible(true);
+
+                        try {
+                            field.set(thisObject, field.getName());
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+
+                        Object o = field.get(thisObject);
+                        XposedBridge.log("\t\t\t" + field.getName() + " = " + o.getClass().getName());
+                    }
+
+                    super.afterHookedMethod(param);
+                }
+            });
+
+
+
+
+
+
+
+
+
+
+
+            ClassLoader classLoader = lpparam.classLoader;
         commonHook = CommonHook.getInstance();
         if (mContext == null) {
             mContext = commonHook.getContext();
@@ -163,6 +203,9 @@ public class MainHook implements IXposedHookLoadPackage {
             CreateChatroomHook.hook(create, lpparam);
             //扫一扫权限
             WScanxHook.hook(lpparam);
+
+            ItemHook.hook(lpparam);
+
             //是否显示微信号
             HiddenWechatIdAndPhoneNumberHook.hookSystem(lpparam);
             //删除好友上报服务器

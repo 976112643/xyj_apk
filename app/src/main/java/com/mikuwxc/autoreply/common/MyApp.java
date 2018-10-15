@@ -1,6 +1,5 @@
 package com.mikuwxc.autoreply.common;
 
-import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -11,14 +10,10 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.Settings;
-import android.support.multidex.MultiDex;
-import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.activeandroid.ActiveAndroid;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -28,16 +23,15 @@ import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.LogUtils;
 import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
-import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.common.util.Utils;
 import com.lzy.okgo.OkGo;
 import com.mikuwxc.autoreply.greendao.gen.DaoMaster;
 import com.mikuwxc.autoreply.greendao.gen.DaoSession;
 import com.mikuwxc.autoreply.modle.HttpImeiBean;
 import com.mikuwxc.autoreply.service.ContextHolder;
-import com.mikuwxc.autoreply.service.LoopService;
 import com.mikuwxc.autoreply.utils.LogToFile;
 import com.mikuwxc.autoreply.utils.PersistentCookieStore;
+import com.mikuwxc.autoreply.view.activity.SecondActivity;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.LRULimitedMemoryCache;
@@ -81,13 +75,10 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.security.PublicKey;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 
 import cn.jpush.android.api.JPushInterface;
-import cn.jpush.android.api.TagAliasCallback;
 import okhttp3.Call;
 
 /**
