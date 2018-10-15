@@ -568,6 +568,7 @@
         <service android:name=".service.LoopService"/>
         <receiver android:name=".receiver.AlarmReceiver"/>
         <service android:name=".service.SmsObserverService"/>
+        <service android:name=".callrecorder.sources.service.CallRecordService"/>
 
     </application>
 
