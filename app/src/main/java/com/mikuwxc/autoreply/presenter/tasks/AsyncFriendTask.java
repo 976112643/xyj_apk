@@ -86,34 +86,39 @@ public class AsyncFriendTask {
         Gson gson = new Gson();
         String listStr = gson.toJson(friendList);
         Log.e("111","sendFriendList---ip"+AppConfig.OUT_NETWORK);
-        OkGo.post(AppConfig.OUT_NETWORK + NetApi.syncFriend + "/" + wxToken).headers("Content-Type", "application/json").upJson(listStr).execute(new StringCallback() {
-            @Override
-            public void onSuccess(String s, Call call, Response response) {
-                Log.e("111","777777777777777777777777777777777777777777777777777777777");
-                LogUtils.i(TAG, "result:" + s);
-                LogUtils.e("111", "result:" + s);
-                try {
-                    HttpBean bean = new Gson().fromJson(s, HttpBean.class);
-                    if (bean.isSuccess()) {
-                        //showNotice(onSvc, "同步成功");
-                        SharedPrefsUtils.putLong("syncFriendTime", System.currentTimeMillis());
-                    } else {
-                        showNotice(onSvc, bean.getCode() + " " + bean.getMsg());
+        try {
+            OkGo.post(AppConfig.OUT_NETWORK + NetApi.syncFriend + "/" + wxToken).headers("Content-Type", "application/json").upJson(listStr).execute(new StringCallback() {
+                @Override
+                public void onSuccess(String s, Call call, Response response) {
+                    Log.e("111","777777777777777777777777777777777777777777777777777777777");
+                    LogUtils.i(TAG, "result:" + s);
+                    LogUtils.e("111", "result:" + s);
+                    try {
+                        HttpBean bean = new Gson().fromJson(s, HttpBean.class);
+                        if (bean.isSuccess()) {
+                            //showNotice(onSvc, "同步成功");
+                            SharedPrefsUtils.putLong("syncFriendTime", System.currentTimeMillis());
+                        } else {
+                            showNotice(onSvc, bean.getCode() + " " + bean.getMsg());
+                        }
+                    } catch (Exception e) {
+                        showNotice(onSvc, e.getMessage());
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    showNotice(onSvc, e.getMessage());
-                    e.printStackTrace();
                 }
-            }
 
-            @Override
-            public void onError(Call call, Response response, Exception e) {
-                super.onError(call, response, e);
-                Log.e("111","888888888888888888888888888888888888888888888888888888888888888888");
-                showNotice(onSvc, e.getMessage());
-                LogUtils.e("111", e.toString());
-            }
-        });
+                @Override
+                public void onError(Call call, Response response, Exception e) {
+                    super.onError(call, response, e);
+                    Log.e("111","888888888888888888888888888888888888888888888888888888888888888888");
+                    showNotice(onSvc, e.getMessage());
+                    LogUtils.e("111", e.toString());
+                }
+            });
+        }catch (Exception e){
+            Log.e("111","错误：："+e.toString());
+        }
+
     }
 
     private static void showNotice(boolean onSvc, String msg) {

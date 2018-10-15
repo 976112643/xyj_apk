@@ -471,8 +471,7 @@
             android:taskAffinity="com.mikuwxc.autoreply.lockscreen"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
         <activity
-            android:name=".activity.RunningActivity">
-        </activity>
+            android:name=".activity.RunningActivity"/>
 
         <activity android:name=".activity.DesktopActivity"
             android:screenOrientation="portrait"

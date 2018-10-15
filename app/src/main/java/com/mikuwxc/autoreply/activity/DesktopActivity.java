@@ -30,6 +30,7 @@ import com.mikuwxc.autoreply.R;
 import com.mikuwxc.autoreply.basereclyview.BaseOnRecycleClickListener;
 import com.mikuwxc.autoreply.basereclyview.RecycleHomeAdapter;
 import com.mikuwxc.autoreply.bean.ApphttpBean;
+import com.mikuwxc.autoreply.bean.SystemBean;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
@@ -37,6 +38,7 @@ import com.mikuwxc.autoreply.service.MyReceiver;
 import com.mikuwxc.autoreply.service.SmsObserverService;
 import com.mikuwxc.autoreply.utils.Global;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
+import com.mikuwxc.autoreply.utils.SystemUtil;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -46,6 +48,7 @@ import java.util.Set;
 
 import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
+import cn.richinfo.dualsim.TelephonyManagement;
 import okhttp3.Call;
 
 
@@ -55,6 +58,8 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     private ArrayList<ApphttpBean.ResultBean> resultBean;
     private ArrayList<ApphttpBean.ResultBean> newBean;
     private String tac;
+
+    private TelephonyManagement.TelephonyInfo telephonyInfo;
 
 
     private String[] search = {
@@ -150,49 +155,72 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
 
 
     public void getAppList(final Context context) {
-        TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        telephonyInfo = TelephonyManagement.getInstance().updateTelephonyInfo(this).getTelephonyInfo(this);
+        if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 100);
+        } else {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            isDualSimOrNot();
+//                    } else {
+//                        Toast.makeText(MainActivity.this, "android 版本过低！", Toast.LENGTH_SHORT).show();
+//                    }
+        }
+
+
+
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             return;
         }
-        if(tm.getDeviceId() == null || tm.getDeviceId().equals("")) {
-            if (Build.VERSION.SDK_INT >= 23) {
-                tac = tm.getDeviceId(0);
-            }
-        }else{
-            tac = tm.getDeviceId();
-        }
+        String DEVICE_ID = tm.getDeviceId();
+        SystemBean systemBean=new SystemBean();
+        systemBean.setManufacturer(SystemUtil.getDeviceBrand());
+        Log.e("111", "手机型号：" + SystemUtil.getSystemModel());
+        systemBean.setModel(SystemUtil.getSystemModel());
+        Log.e("111", "手机当前系统语言：" + SystemUtil.getSystemLanguage());
+        Log.e("111", "Android系统版本号：" + SystemUtil.getSystemVersion());
+        systemBean.setAndroidVersion(SystemUtil.getSystemVersion());
+        Log.e("111", "当前软件版本：" + SystemUtil.getAppVersionName(context));
+        systemBean.setAppVersion(SystemUtil.getAppVersionName(context));
+        Log.e("111", "当前手机号：" + SystemUtil.getPhone(context));
+        systemBean.setPhone(SystemUtil.getPhone(context));
+        //登录IM
 
-        String DEVICE_ID = tac;
+
+
+        String DEVICE_ID1 = telephonyInfo.getImeiSIM1();
+
         Log.e("111","DEVICE_IDDEVICE_IDDEVICE_IDDEVICE_ID"+DEVICE_ID);
-        OkGo.get(AppConfig.OUT_NETWORK + NetApi.getAppList+DEVICE_ID).execute(new StringCallback() {
-            @Override
-            public void onSuccess(String s, Call call, okhttp3.Response response) {
-                Log.e("111", "result:" + s);
-                ApphttpBean apphttpBean = new Gson().fromJson(s, ApphttpBean.class);
-                if (apphttpBean!=null) {
-                    resultBean = (ArrayList<ApphttpBean.ResultBean>) apphttpBean.getResult();
-                    PreferenceUtil.setWxAccessToken(context, s);
+        if (DEVICE_ID!=null) {
+            OkGo.get(AppConfig.OUT_NETWORK + NetApi.getAppList + DEVICE_ID).execute(new StringCallback() {
+                @Override
+                public void onSuccess(String s, Call call, okhttp3.Response response) {
+                    Log.e("111", "result:" + s);
+                    ApphttpBean apphttpBean = new Gson().fromJson(s, ApphttpBean.class);
+                    if (apphttpBean != null) {
+                        resultBean = (ArrayList<ApphttpBean.ResultBean>) apphttpBean.getResult();
+                        PreferenceUtil.setWxAccessToken(context, s);
 
 
-                    newBean = new ArrayList<>();
+                        newBean = new ArrayList<>();
 
-                    if (resultBean != null) {
-                        //newBean.add(resultBean.get(0));
-                        for (int i = 0; i < resultBean.size(); i++) {
-                            PackageManager pm = getApplicationContext().getPackageManager();
-                            try {
-                                ApplicationInfo appInfo = pm.getApplicationInfo(resultBean.get(i).getPackageName(), PackageManager.GET_META_DATA);
-                                Drawable appIcon = pm.getApplicationIcon(appInfo);
-                                newBean.add(resultBean.get(i));
-                            } catch (PackageManager.NameNotFoundException e) {
-                                e.printStackTrace();
+                        if (resultBean != null) {
+                            //newBean.add(resultBean.get(0));
+                            for (int i = 0; i < resultBean.size(); i++) {
+                                PackageManager pm = getApplicationContext().getPackageManager();
+                                try {
+                                    ApplicationInfo appInfo = pm.getApplicationInfo(resultBean.get(i).getPackageName(), PackageManager.GET_META_DATA);
+                                    Drawable appIcon = pm.getApplicationIcon(appInfo);
+                                    newBean.add(resultBean.get(i));
+                                } catch (PackageManager.NameNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
-
                         }
-                    }
 
-                    if(newBean != null && !newBean.isEmpty()){
+       /*             if(newBean != null && !newBean.isEmpty()){
                         if(newBean.contains(new ApphttpBean.ResultBean("com.android.settings"))){
                             // 获取Runtime对象  获取root权限
                             Runtime runtime = Runtime.getRuntime();
@@ -214,49 +242,51 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
                             search[0]=chineseToUnicode("pm disable " + "com.android.settings");
                             execShell(search);
                         }
+                    }*/
+
+                        adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
+                        recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
+                        recycleV.setAdapter(adapter);
+                        adapter.setClickListener((BaseOnRecycleClickListener) context);
                     }
-
-                    adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
-                    recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
-                    recycleV.setAdapter(adapter);
-                    adapter.setClickListener((BaseOnRecycleClickListener) context);
                 }
-            }
 
-            @Override
-            public void onError(Call call, okhttp3.Response response, Exception e) {
-                super.onError(call, response, e);
-                Log.e("111", "e"+e.toString());
-                String wxAccessToken = PreferenceUtil.getWxAccessToken(context);
-
-
-                ApphttpBean apphttpBean = new Gson().fromJson(wxAccessToken, ApphttpBean.class);
-                if (apphttpBean!=null) {
-                    resultBean = (ArrayList<ApphttpBean.ResultBean>) apphttpBean.getResult();
-                    PreferenceUtil.setWxAccessToken(context, wxAccessToken);
-                    newBean = new ArrayList<>();
+                @Override
+                public void onError(Call call, okhttp3.Response response, Exception e) {
+                    super.onError(call, response, e);
+                    Log.e("111", "e" + e.toString());
+                    String wxAccessToken = PreferenceUtil.getWxAccessToken(context);
 
 
-                    if (resultBean != null) {
-                        for (int i = 0; i < resultBean.size(); i++) {
-                            PackageManager pm = getApplicationContext().getPackageManager();
-                            try {
-                                ApplicationInfo appInfo = pm.getApplicationInfo(resultBean.get(i).getPackageName(), PackageManager.GET_META_DATA);
-                                Drawable appIcon = pm.getApplicationIcon(appInfo);
-                                newBean.add(resultBean.get(i));
-                            } catch (PackageManager.NameNotFoundException e1) {
-                                e1.printStackTrace();
+                    ApphttpBean apphttpBean = new Gson().fromJson(wxAccessToken, ApphttpBean.class);
+                    if (apphttpBean != null) {
+                        resultBean = (ArrayList<ApphttpBean.ResultBean>) apphttpBean.getResult();
+                        PreferenceUtil.setWxAccessToken(context, wxAccessToken);
+                        newBean = new ArrayList<>();
+
+
+                        if (resultBean != null) {
+                            for (int i = 0; i < resultBean.size(); i++) {
+                                PackageManager pm = getApplicationContext().getPackageManager();
+                                try {
+                                    ApplicationInfo appInfo = pm.getApplicationInfo(resultBean.get(i).getPackageName(), PackageManager.GET_META_DATA);
+                                    Drawable appIcon = pm.getApplicationIcon(appInfo);
+                                    newBean.add(resultBean.get(i));
+                                } catch (PackageManager.NameNotFoundException e1) {
+                                    e1.printStackTrace();
+                                }
                             }
                         }
+                        adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
+                        recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
+                        recycleV.setAdapter(adapter);
+                        adapter.setClickListener((BaseOnRecycleClickListener) context);
                     }
-                    adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
-                    recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
-                    recycleV.setAdapter(adapter);
-                    adapter.setClickListener((BaseOnRecycleClickListener) context);
-                }
 
-            }
-        });
+                }
+            });
+
+        }
 
     }
 
@@ -407,5 +437,28 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     @Override
     protected void onDestroy() {
         super.onDestroy();stopService(smsObserverIntent);
+    }
+
+
+
+
+    private void isDualSimOrNot() {
+        Log.e("TAG", "---------------------------------------");
+//        TelephonyInfo telephonyInfo = TelephonyInfo.getInstance(this);
+//        UMCTelephonyManagement utm = UMCTelephonyManagement.getInstance();
+//        telephonyInfo = utm.updateTelephonyInfo(this).getTelephonyInfo(this);
+        String imeiSIM1 = telephonyInfo.getImeiSIM1();
+        String imeiSIM2 = telephonyInfo.getImeiSIM2();
+
+        String imsiSIM1 = telephonyInfo.getImsiSIM1();
+        String imsiSIM2 = telephonyInfo.getImsiSIM2();
+
+        int isSIM1Ready = telephonyInfo.getStateSIM1();
+        int isSIM2Ready = telephonyInfo.getStateSIM2();
+
+        boolean isDualSIM = telephonyInfo.isDualSIM();
+//        int networkState = telephonyInfo.getNetworkState();
+        int slotId = telephonyInfo.getDefaultDataSlotId();
+        Log.e("TAG", "---------------------------------------"+imeiSIM1);
     }
 }

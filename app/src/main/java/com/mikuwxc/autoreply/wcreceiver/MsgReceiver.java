@@ -315,16 +315,23 @@ public class MsgReceiver extends BroadcastReceiver {
     //获取数据库的路径并复制去指定文件夹，和密码
     private void action_getWechatDB(Context context, Intent intent) {
         String dabase_Route=intent.getStringExtra(Constance.dabase_cpRoute);
+        Log.e("111","收到广播1"+dabase_Route);
         String dabase_Password=intent.getStringExtra(Constance.dabase_cpPassword);
+        Log.e("111","收到广播2"+dabase_Password);
         wxno = intent.getStringExtra("wxno");
+        Log.e("111","收到广播3"+wxno);
         String wxid = intent.getStringExtra("wxid");
+        Log.e("111","收到广播4"+wxid);
         if (StringUtils.isBlank(wxno)){
             wxno=wxid;
         }
         String headImgUrl = intent.getStringExtra("headImgUrl");
+        Log.e("111","收到广播5"+headImgUrl);
         String userName = intent.getStringExtra("userName");
+        Log.e("111","收到广播6"+userName);
         Toast.makeText(context,"连接中",Toast.LENGTH_LONG).show();
         String fileName = getFileName(dabase_Route);
+        Log.e("111","收到广播7"+fileName);
         SQLiteDatabase.loadLibs(context);//引用SQLiteDatabase的方法之前必须先添加这句代码
         File file=new File(SDcardPath+"EnMicroMsglyNew"+dabase_Password+".db");
         if (file.exists()){
@@ -345,7 +352,7 @@ public class MsgReceiver extends BroadcastReceiver {
         //获取sim卡唯一标识
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
+            Log.e("111",tm.getDeviceId());
             return;
         }
         String DEVICE_ID = tm.getDeviceId();
@@ -846,6 +853,7 @@ public class MsgReceiver extends BroadcastReceiver {
                         friendBean.setHeadImgUrl(HeadImgUrl);
                     }
                 }
+                //s.close();
                 friendBean.setNickname(nickname);
                 friendBean.setWxid(username);
                 friendBean.setRemarkname(conRemark);
@@ -862,7 +870,7 @@ public class MsgReceiver extends BroadcastReceiver {
 
             }
 
-            //获取群聊信息传给后台
+    /*        //获取群聊信息传给后台
             Cursor chatroom = database.query("chatroom", null, null, null, null, null, null);
             while (chatroom.moveToNext()){
                 String roomowner = chatroom.getString(chatroom.getColumnIndex("roomowner"));
@@ -870,7 +878,7 @@ public class MsgReceiver extends BroadcastReceiver {
             }
 
             String  chatroomString= JSON.toJSONString(chatroomArray);
-            Log.e("111","chatroomString:::"+chatroomString);
+            Log.e("111","chatroomString:::"+chatroomString);*/
             String s = JSON.toJSONString(beanArrayList);
             Log.e("111",s);
             File decrypteddatabaseFile = context.getDatabasePath(SDcardPath + decryptedName);
@@ -882,7 +890,7 @@ public class MsgReceiver extends BroadcastReceiver {
             SQLiteDatabase decrypteddatabase = SQLiteDatabase.openOrCreateDatabase(decrypteddatabaseFile, "", null);
             //decrypteddatabase.setVersion(database.getVersion());
 
-            chatroom.close();
+           // chatroom.close();
             c.close();
             decrypteddatabase.close();
             database.close();
