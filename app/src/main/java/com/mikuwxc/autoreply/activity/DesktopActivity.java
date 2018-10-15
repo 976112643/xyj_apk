@@ -10,6 +10,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +32,7 @@ import com.mikuwxc.autoreply.basereclyview.BaseOnRecycleClickListener;
 import com.mikuwxc.autoreply.basereclyview.RecycleHomeAdapter;
 import com.mikuwxc.autoreply.bean.ApphttpBean;
 import com.mikuwxc.autoreply.bean.SystemBean;
+import com.mikuwxc.autoreply.callrecorder.sources.CallRecord;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
@@ -71,6 +73,8 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
             // 像搜索框中输入123，但是input不支持中文，蛋疼，而且这边没做输入法处理，默认会自动弹出输入法
     };
     Intent smsObserverIntent;
+    private CallRecord callRecord;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,11 +112,22 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
 
         smsObserverIntent=new Intent(this,SmsObserverService.class);
         startService(smsObserverIntent);
+        startRecordService();
 
     }
 
+    private void startRecordService() {
+         callRecord = new CallRecord.Builder(this)
+                .setRecordFileName("CallRecorderTestFile")
+                .setRecordDirName("CallRecorderTest")
+                .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+                .setShowSeed(true)
+                .build();
+         callRecord.startCallReceiver();
+    }
 
-   // app启动时禁用返回键以防闪屏处理
+
+    // app启动时禁用返回键以防闪屏处理
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -437,6 +452,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     @Override
     protected void onDestroy() {
         super.onDestroy();stopService(smsObserverIntent);
+        callRecord.stopCallReceiver();
     }
 
 
