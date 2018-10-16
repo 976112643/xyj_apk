@@ -67,6 +67,8 @@ import com.tencent.imsdk.ext.sns.TIMUserConfigSnsExt;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
+import org.xutils.x;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -119,6 +121,7 @@ public class MyApp extends Application {
 
         //设置极光推送的别名
         //setTagAndAlias();
+        x.Ext.init(this);
 
         ContextHolder.initial(this);
         // 获取Runtime对象  获取root权限

@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         applicationId 'com.mikuwxc.autoreply'
-        minSdkVersion 22
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -145,6 +145,7 @@ dependencies {
     implementation files('libs/wup-1.0.0-SNAPSHOT.jar')
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.jakewharton:butterknife:7.0.1'
+    implementation 'org.xutils:xutils:3.5.0'
     // 依赖注入框架
     implementation 'com.lzy.net:okgo:2.1.4'
     //网络框架
@@ -202,7 +203,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'org.greenrobot:greendao:3.2.0'
     implementation 'com.bfy:dualsim:1.0.1'
-    implementation 'org.xutils:xutils:3.5.0'
+
 }
 
 

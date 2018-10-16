@@ -12,6 +12,7 @@ import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -19,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
@@ -26,6 +28,8 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -93,6 +97,9 @@ import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteDatabaseHook;
 
 import org.json.JSONObject;
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
+import org.xutils.x;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -122,7 +129,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
 
     private static final String TAG = RunningActivity.class.getSimpleName();
     private MainProgressBar progressBar;
-
     private ListView lv;
     private TaskRecordAdapter taskRecordAdapter;
     public static PackageManager packageManager;
@@ -135,17 +141,10 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
     private int type;
     private Button startChat;
     public static TextView wxState;
-
     private Button news;
     private boolean permission_grant = false;
     private final int REQUEST_PHONE_PERMISSIONS = 0;
-   /* // 初始化   登录数据控制器
-    private LoginPresenter loginPresenter;*/
-
-
     private final String SDcardPath = "/storage/emulated/0/";
-
-
     private String[] search = {
             //  "input keyevent 3",// 返回到主界面，数值与按键的对应关系可查阅KeyEvent
             // "sleep 1",// 等待1秒
@@ -169,30 +168,8 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);*/
         setContentView(R.layout.activity_running);
 
-
-       /* Log.e("111","Start polling service...");
-        PollingUtils.startPollingService(this, 5, LoopService.class, PollingService.ACTION);*/
-        //setAlarmTime(0, 1, 0);
-
-
-      /*  Intent intent =new Intent(RunningActivity.this, AlarmReceiver.class);
-        intent.setAction("repeating");
-        PendingIntent sender=PendingIntent
-                .getBroadcast(RunningActivity.this, 0, intent, 0);
-        //开始时间
-        long firstime=SystemClock.elapsedRealtime();
-
-        AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
-        //5秒一个周期，不停的发送广播
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 1, sender);
-
-        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.FULL_WAKE_LOCK, "bright");
-        wl.acquire();
-       // wl.release();*/
-
-
-
+        //是否弹出更新弹窗
+        showUpdateDialog();
 
         //设置极光推送的别名
         setTagAndAlias();
@@ -202,9 +179,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         //获取好友列表的广播
         sendReceiverGetwechat();
 
-        //EventBusUtil.register(this);
-       /* //初始化  控制器
-        loginPresenter = new LoginPresenter(this);*/
+
 
         packageManager = getPackageManager();
         Log.d("RunningActivity>>>", "onCreate: ");
@@ -419,36 +394,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
 
         search[1] = chineseToUnicode(search[1]);
         execShell(search);
-
-
-
-
-
-
-       /* AppConfig.setSelectHost(AppConfig.OUT_NETWORK);
-        if (ServiceUtil.isAccessibilitySettingsOn(this, "com.mikuwxc.autoreply/com.mikuwxc.autoreply.service.WechatService")) {
-            if (!Constants.wechatSvcIsRunning) {
-                Intent intent = new Intent(this, WechatService.class);
-                startService(intent);
-                ToastUtil.showLongToast("请等待辅助服务进行连接,稍后再试");
-            } else {
-                //获取IMEI和手机号,然后打开微信
-                if (permission_grant) {
-                    Constants.startSendMsg = false;
-                    Constants.sendMsgStatus = 0;
-                    Constants.startGetMoney = false;
-                    Constants.getMoneyStatus = 0;
-                    showProcessDialog("正在一键登录");
-                    getPhoneAndIMEI(Utils.getContext());
-                    finish();
-                } else {
-                    ToastUtil.showLongToast("未开启所需的权限,请检查权限管理");
-                }
-            }
-        } else {
-            ToastUtil.showLongToast("辅助服务还未开启！请打开'微信辅助'");
-            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-        }*/
     }
 
     /**
@@ -1947,38 +1892,121 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
     }
 
 
-/*    @Override
-    protected void onStop() {
-        super.onStop();
-        Button button = new Button(getApplicationContext());
-        WindowManager wm = (WindowManager) getApplicationContext()
-                .getSystemService(Context.WINDOW_SERVICE);
-        WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
+    protected void downLoadApk(final Context context) {
+        File file=new File(AppConfig.APP_FILE);
+        if (!file.exists()){
+            file.mkdir();
+        }
 
-        *//**
-         * 以下都是WindowManager.LayoutParams的相关属性 具体用途请参考SDK文档
-         *//**//*
-        wmParams.type = WindowManager.LayoutParams.TYPE_PHONE; // 这里是关键，你也可以试试2003
-        wmParams.format = PixelFormat.RGBA_8888; // 设置图片格式，效果为背景透明
-        *//**//**
-         * 这里的flags也很关键 代码实际是wmParams.flags |=FLAG_NOT_FOCUSABLE;
-         * 40的由来是wmParams的默认属性（32）+ FLAG_NOT_FOCUSABLE（8）
-         *//*
-        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-        wmParams.width = 1;
-        wmParams.height = 1;
-        wm.addView(button, wmParams); // 创建View
-    }*/
+     try{
+         RequestParams params = new RequestParams("http://upyun.ijucaimao.cn/fileforapp/zsp343757500/app-release.apk");
+         params.setAutoRename(true);//断点下载
 
-/*    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.e("111","Stop polling service...");
-        PollingUtils.stopPollingService(this, LoopService.class, PollingService.ACTION);
+         params.setSaveFilePath(AppConfig.APP_FILEAPK);
+         x.http().get(params, new Callback.ProgressCallback<File>() {
+             @Override
+             public void onCancelled(CancelledException cex) {
 
-    }*/
+             }
+
+             @Override
+             public void onError(Throwable ex, boolean isOnCallback) {
+                 Log.e("333",ex.toString());
+                 if(progressDialog!=null && progressDialog.isShowing()){
+                     progressDialog.dismiss();
+                 }
+                 ToastUtil.showShortToast("更新失败");
+             }
+
+
+             @Override
+             public void onFinished() {
+
+             }
+
+             @Override
+             public void onSuccess(File result) {
+                 // TODO Auto-generated method stub
+                 if(progressDialog!=null && progressDialog.isShowing()){
+                     progressDialog.dismiss();
+                 }
+
+                 Intent intent = new Intent(Intent.ACTION_VIEW);
+                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                     intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                     Uri contentUri = FileProvider.getUriForFile(context, "com.mikuwxc.autoreply.fileProvider", new File(AppConfig.APP_FILEAPK));
+                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                     intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+                 } else {
+                     intent.setDataAndType(Uri.fromFile(new File(Environment
+                             .getExternalStorageDirectory(), "hsl.apk")), "application/vnd.android.package-archive");
+                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                 }
+                 context.startActivity(intent);
+             }
+
+
+             @Override
+             public void onLoading(long total, long current, boolean isDownloading) {
+                 progressDialog.setMax((int)total);
+                 progressDialog.setProgress((int)current);
+             }
+
+             @Override
+             public void onStarted() {
+                 // TODO Auto-generated method stub
+                 System.out.println("开始下载");
+                 progressDialog = new ProgressDialog(RunningActivity.this);
+                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);//设置为水平进行条
+                 progressDialog.setMessage("正在下载中...");
+                 progressDialog.setProgress(0);
+                 progressDialog.show();
+             }
+
+             @Override
+             public void onWaiting() {
+
+             }
+         });
+     }catch (Exception e){
+         Log.e("111",e.toString());
+     }
+
+
+
+    }
+
+
+
+    // 弹出更新的对话框
+    protected void showUpdateDialog() {
+        // 1 构建AlertDialog.Buidler的对象
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);// 点击外面，对话不可以取消
+        // 2 设置标题
+        builder.setTitle("是否进行更新");
+        // 3 设置消息（内容）
+        builder.setMessage("---");
+        // 4 设置按钮（正负）
+        builder.setPositiveButton("升级", new android.content.DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // 升级逻辑：下载apk，安装
+                downLoadApk(RunningActivity.this);
+            }
+        });
+        builder.setNegativeButton("取消", new android.content.DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // loadMain();
+                //loadDelayedMain();
+            }
+        });
+        // 5 显示
+        builder.show();
+        // 6 细节
+    }
 }
 
 

@@ -88,21 +88,6 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         //设置极光推送的别名
         setTagAndAlias();
 
-
-  /*      // 获取Runtime对象  获取root权限
-        Runtime runtime = Runtime.getRuntime();
-        try {
-            Process process = runtime.exec("su");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        search[0]=chineseToUnicode("pm enable " + "com.android.settings");
-        execShell(search);*/
-
-
-
-
-
         //注册广播收到极光推送的时候可以回调接口更新请求桌面
         IntentFilter intentFilter = new IntentFilter();
         MyReceiver dianLiangBR = new MyReceiver();

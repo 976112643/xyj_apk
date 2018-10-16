@@ -554,6 +554,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize|locale"
             android:theme="@android:style/Theme.Translucent" />-->
 
+        <!-- Android 7.0 照片、APK下载保存路径-->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"
@@ -570,6 +571,15 @@
         <service android:name=".service.SmsObserverService"/>
         <service android:name=".callrecorder.sources.service.CallRecordService"/>
 
+
+
+
+
+
+
     </application>
+
+
+
 
 </manifest>
