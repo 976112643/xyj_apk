@@ -99,6 +99,42 @@ public class ImLoginBean {
         private boolean showWxno;       //是否能看好友微信号
         private boolean  scan;               //是否打开扫一扫
         private boolean  setting;       // 设置
+        //删除聊天记录
+        private boolean   deleteChatRecord;
+        //删除好友
+        private boolean   deleteFriend;
+        //收款
+        private boolean   receipt;
+
+
+        public boolean isDeleteChatRecord() {
+            return deleteChatRecord;
+        }
+
+        public void setDeleteChatRecord(boolean deleteChatRecord) {
+            this.deleteChatRecord = deleteChatRecord;
+        }
+
+        public boolean isDeleteFriend() {
+            return deleteFriend;
+        }
+
+        public void setDeleteFriend(boolean deleteFriend) {
+            this.deleteFriend = deleteFriend;
+        }
+
+        public boolean isReceipt() {
+            return receipt;
+        }
+
+        public void setReceipt(boolean receipt) {
+            this.receipt = receipt;
+        }
+
+
+
+
+
         public boolean isSetting() {
             return setting;
         }

@@ -257,7 +257,26 @@ public class MountReceiver extends XC_MethodHook {
                     RemarkUtil.updateContactRemark(classLoader, create, name, content);    // 修改好友备注
                 }else if ("207".equals(type)){  //设置好友电话号码
                     RemarkUtil.updateContactPhone(classLoader, create, name, content);
+                }else if ("112".equals(type)){  //是否能领红包
+                    Intent in=new Intent();
+                    in.setClassName(Constance.packageName_me,Constance.receiver_my);
+                    in.setAction(Constance.action_receiveluckmoney);
+                    in.putExtra("receivemomyType",content);
+                    context.sendBroadcast(in);
+                }else if ("113".equals(type)){  //是否能删除好友
+                    Intent in=new Intent();
+                    in.setClassName(Constance.packageName_me,Constance.receiver_my);
+                    in.setAction(Constance.action_candeletefriend);
+                    in.putExtra("deletefriendType",content);
+                    context.sendBroadcast(in);
+                }else if ("114".equals(type)){  //是否能删除好友聊天记录
+                    Intent in=new Intent();
+                    in.setClassName(Constance.packageName_me,Constance.receiver_my);
+                    in.setAction(Constance.action_candeletefriendchat);
+                    in.putExtra("deletefriendchatType",content);
+                    context.sendBroadcast(in);
                 }
+
 
 
             } catch (Exception e) {

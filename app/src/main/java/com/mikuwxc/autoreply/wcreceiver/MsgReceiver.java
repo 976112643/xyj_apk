@@ -203,25 +203,63 @@ public class MsgReceiver extends BroadcastReceiver {
          Toast.makeText(context, "是否可以设置"+settingType, Toast.LENGTH_LONG).show();
 
          action_settings(context,settingType);
+     }else if (action.equals(Constance.action_receiveluckmoney)){
+         String receivemomyType = intent.getStringExtra("receivemomyType");
+         Toast.makeText(context, "是否可以领红包转账"+receivemomyType, Toast.LENGTH_LONG).show();
+         action_receiveluckmoney(context,receivemomyType);
+     }else if (action.equals(Constance.action_candeletefriend)){
+         String deletefriendType = intent.getStringExtra("deletefriendType");
+         Toast.makeText(context, "是否可以删除好友"+deletefriendType, Toast.LENGTH_LONG).show();
+         action_candeletefriend(context,deletefriendType);
+     }else if (action.equals(Constance.action_candeletefriendchat)){
+         String deletefriendchatType = intent.getStringExtra("deletefriendchatType");
+         Toast.makeText(context, "是否可以删除好友聊天记录"+deletefriendchatType, Toast.LENGTH_LONG).show();
+         action_candeletefriendchat(context,deletefriendchatType);
      }
+
     }
 
+    private void action_candeletefriendchat(Context context,String deletefriendchatType) {
+        if ("true".equals(deletefriendchatType)) {
+            ToastUtil.showLongToast("开启删除好友聊天权限");
+            MyFileUtil.writeProperties("onFriendChatDeleteStaus_put","true");
+
+        } else {
+            ToastUtil.showLongToast("关闭删除好友聊天权限");
+            MyFileUtil.writeProperties("onFriendChatDeleteStaus_put","false");
+        }
+    }
+
+    private void action_candeletefriend(Context context,String deletefriendType) {
+        if ("true".equals(deletefriendType)) {
+            ToastUtil.showLongToast("开启删除好友权限");
+            MyFileUtil.writeProperties("onDeleteFriendStaus_put","true");
+        } else {
+            ToastUtil.showLongToast("关闭删除好友权限");
+            MyFileUtil.writeProperties("onDeleteFriendStaus_put","false");
+        }
+    }
+
+
+    private void action_receiveluckmoney(Context context,String receivemomyType) {
+        if ("true".equals(receivemomyType)) {
+            ToastUtil.showLongToast("开启领取权限");
+            MyFileUtil.writeProperties("receiveLuckyMoneyStaus_put","true");
+
+        } else {
+            ToastUtil.showLongToast("关闭领取权限");
+            MyFileUtil.writeProperties("receiveLuckyMoneyStaus_put","false");
+        }
+    }
 
 
 
     private void action_settings(Context context,String saoyisaoType) {
         if ("true".equals(saoyisaoType)) {
-            //重连微信并且更改红包是否能自动获取
-           /* SharedPreferences sp = context.getSharedPreferences("saoyisaoStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("saoyisaoStaus_put", true).commit();*/
             ToastUtil.showLongToast("开启设置权限");
             MyFileUtil.writeProperties("setting_put","true");
 
         } else {
-           /* SharedPreferences sp = context.getSharedPreferences("saoyisaoStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("saoyisaoStaus_put", false).commit();*/
             ToastUtil.showLongToast("关闭设置权限");
             MyFileUtil.writeProperties("setting_put","false");
         }
@@ -407,8 +445,14 @@ public class MsgReceiver extends BroadcastReceiver {
                             boolean showWxno = imLoginBean.getResult().isShowWxno();
                             boolean scan = imLoginBean.getResult().isScan();
                             boolean setting=imLoginBean.getResult().isSetting();
+                            boolean receipt= imLoginBean.getResult().isReceipt();
+                            boolean deleteFriend = imLoginBean.getResult().isDeleteFriend();
+                            boolean deleteChatRecord = imLoginBean.getResult().isDeleteChatRecord();
+
                             String wordsIntercept = imLoginBean.getResult().getWordsIntercept();
                             String wordsNotice = imLoginBean.getResult().getWordsNotice();
+
+
                             if (wordsIntercept!=null){
                                 MyFileUtil.writeToNewFile(AppConfig.APP_FOLDER + "/updateIntercept", "updateIntercept sensitive word");//告知微信hoook有敏感词需要更新
                                 MyFileUtil.writeToNewFile(AppConfig.APP_FOLDER + "/sensitiveIntercept", wordsIntercept);
@@ -508,6 +552,24 @@ public class MsgReceiver extends BroadcastReceiver {
                                 ditor2.putBoolean("canSeewxStaus_put", false).commit();*/
                                 ToastUtil.showLongToast("关闭设置权限");
                                 MyFileUtil.writeProperties("setting_put","false");
+                            }
+
+                            if (receipt){
+                                MyFileUtil.writeProperties("receiveLuckyMoneyStaus_put","true");
+                            }else{
+                                MyFileUtil.writeProperties("receiveLuckyMoneyStaus_put","false");
+                            }
+
+                            if (deleteFriend){
+                                MyFileUtil.writeProperties("onDeleteFriendStaus_put","true");
+                            }else{
+                                MyFileUtil.writeProperties("onDeleteFriendStaus_put","false");
+                            }
+
+                            if (deleteChatRecord){
+                                MyFileUtil.writeProperties("onFriendChatDeleteStaus_put","true");
+                            }else{
+                                MyFileUtil.writeProperties("onFriendChatDeleteStaus_put","false");
                             }
 
 
@@ -863,7 +925,7 @@ public class MsgReceiver extends BroadcastReceiver {
                 }else{
                     friendBean.setWxno(alias);
                 }
-
+                Log.e("111","encryptUsernameencryptUsername::"+encryptUsername);
                 if (StringUtils.isNotBlank(encryptUsername)){
                     beanArrayList.add(friendBean);
                 }

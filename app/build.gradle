@@ -202,6 +202,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'org.greenrobot:greendao:3.2.0'
     implementation 'com.bfy:dualsim:1.0.1'
+    implementation 'org.xutils:xutils:3.5.0'
 }
 
 

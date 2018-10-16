@@ -171,14 +171,8 @@ public class MainHook implements IXposedHookLoadPackage {
 
 
 
-
-
-
-
-
-
             ClassLoader classLoader = lpparam.classLoader;
-        commonHook = CommonHook.getInstance();
+            commonHook = CommonHook.getInstance();
         if (mContext == null) {
             mContext = commonHook.getContext();
             //Utils.init(mContext);
@@ -203,7 +197,7 @@ public class MainHook implements IXposedHookLoadPackage {
             CreateChatroomHook.hook(create, lpparam);
             //扫一扫权限
             WScanxHook.hook(lpparam);
-
+            //是否能领微信红包转账和聊天记录是否能删除
             ItemHook.hook(lpparam);
 
             //是否显示微信号

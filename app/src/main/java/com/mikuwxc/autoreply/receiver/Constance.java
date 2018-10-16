@@ -18,7 +18,9 @@ public class Constance {
     public static String action_hookmessagefail="action_hookmessagefail";  //信息保存失败的时候
     public static String action_canseewxno="action_canseewxno";  //是否能看见微信号
     public static String action_saoyisao="action_saoyisao";  //是否开启扫一扫
-
+    public static String action_receiveluckmoney="action_receiveluckmoney";    //是否可以领红包
+    public static String action_candeletefriend="action_candeletefriend";    //是否可以删除好友
+    public static String action_candeletefriendchat="action_candeletefriendchat";    //是否可以删除好友聊天记录
     public static String action_getWechatDb="action_getWechatDb";
     public static String action_getcpWechatDb="action_getcpWechatDb";
     public static String dabase_Route="dabase_Route";
