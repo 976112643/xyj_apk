@@ -100,7 +100,7 @@ public class NetworkChangeReceiver  extends BroadcastReceiver {
     private void uploadPhoneRecord() {
         File file = new File(Environment.getExternalStorageDirectory() + "/CallRecorderTest");
         File[] files = file.listFiles();
-        if (files.length > 0) {
+        if (files!=null&&files.length > 0) {
             for (File f : files) {
                 String name = f.getName();
                 String[] split = name.split("_");
