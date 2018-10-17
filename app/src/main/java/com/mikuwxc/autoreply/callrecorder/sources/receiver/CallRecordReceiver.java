@@ -3,11 +3,15 @@ package com.mikuwxc.autoreply.callrecorder.sources.receiver;
 import android.content.Context;
 import android.media.MediaRecorder;
 import android.util.Log;
+import android.widget.Toast;
 
 
+import com.mikuwxc.autoreply.callrecorder.CallDateUtils;
+import com.mikuwxc.autoreply.callrecorder.RecordUpload;
 import com.mikuwxc.autoreply.callrecorder.sources.CallRecord;
 import com.mikuwxc.autoreply.callrecorder.sources.helper.PrefsHelper;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
+import com.mikuwxc.autoreply.utils.SystemUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,11 +50,17 @@ public class CallRecordReceiver extends PhoneCallReceiver {
         stopRecord(context);
     }
 
+    /**
+     * 电话呼出开始回调
+     * **/
     @Override
     protected void onOutgoingCallStarted(Context context, String number, Date start) {
         startRecord(context, "outgoing", number);
     }
 
+    /**
+     * 电话呼出结束回调
+     * **/
     @Override
     protected void onOutgoingCallEnded(Context context, String number, Date start, Date end) {
         stopRecord(context);
@@ -67,6 +77,40 @@ public class CallRecordReceiver extends PhoneCallReceiver {
 
     protected void onRecordingFinished(Context context, CallRecord callRecord, File audioFile) {
 //        ToastUtil.showLongToast("完成了"+audioFile.getAbsolutePath());
+        try {
+            //       录音文件地址 /storage/emulated/0/CallRecorderTest/CallRecorderTestFile_outgoing_10086_1539664048629_727984859.amr
+            String absolutePath = audioFile.getAbsolutePath();
+            int i = absolutePath.lastIndexOf("/")+1;
+            String name=absolutePath.substring(i);
+            String[] split = name.split("_");
+
+            int amrDuration = CallDateUtils.getAmrDuration(audioFile);//时长 单位s
+            //开始时间戳
+            String startTime=split[3];
+            //结束时间戳
+            String endTime=String.valueOf(Long.valueOf(startTime)+amrDuration*1000);
+            //电话号码
+            String phoneNum=split[2];
+            String type = split[1];
+            if("outgoing".equals(type)){//呼出
+                type="true";
+            }else if("incoming".equals(type)){//呼入
+                type="false";
+            }else{
+                type="undifined";
+            }
+
+            String imei = SystemUtil.getIMEI(context);
+
+
+            Toast.makeText(context, ""+imei+"..."+type+"..."+amrDuration, Toast.LENGTH_LONG).show();
+            RecordUpload.uploadAmr(name,absolutePath,startTime,endTime,imei,type,phoneNum);
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void startRecord(Context context, String seed, String phoneNumber) {
@@ -128,18 +172,21 @@ public class CallRecordReceiver extends PhoneCallReceiver {
         }
     }
 
+    /**
+     * 拼接SD卡存放路径
+     * **/
     private boolean prepareAudioRecorder(Context context, String seed, String phoneNumber) {
         try {
-            String file_name = PrefsHelper.readPrefString(context, CallRecord.PREF_FILE_NAME);
-            String dir_path = PrefsHelper.readPrefString(context, CallRecord.PREF_DIR_PATH);
-            String dir_name = PrefsHelper.readPrefString(context, CallRecord.PREF_DIR_NAME);
+            String file_name = PrefsHelper.readPrefString(context, CallRecord.PREF_FILE_NAME);//CallRecorderTestFile
+            String dir_path = PrefsHelper.readPrefString(context, CallRecord.PREF_DIR_PATH);///storage/emulated/0
+            String dir_name = PrefsHelper.readPrefString(context, CallRecord.PREF_DIR_NAME);//CallRecorderTest
             boolean show_seed = PrefsHelper.readPrefBool(context, CallRecord.PREF_SHOW_SEED);
             boolean show_phone_number = PrefsHelper.readPrefBool(context, CallRecord.PREF_SHOW_PHONE_NUMBER);
             int output_format = PrefsHelper.readPrefInt(context, CallRecord.PREF_OUTPUT_FORMAT);
             int audio_source = PrefsHelper.readPrefInt(context, CallRecord.PREF_AUDIO_SOURCE);
             int audio_encoder = PrefsHelper.readPrefInt(context, CallRecord.PREF_AUDIO_ENCODER);
 
-            File sampleDir = new File(dir_path + "/" + dir_name);
+            File sampleDir = new File(dir_path + "/" + dir_name);// /storage/emulated/0/CallRecorderTest
 
             if (!sampleDir.exists()) {
                 sampleDir.mkdirs();
@@ -158,6 +205,10 @@ public class CallRecordReceiver extends PhoneCallReceiver {
                 fileNameBuilder.append(phoneNumber);
                 fileNameBuilder.append("_");
             }
+
+            fileNameBuilder.append(System.currentTimeMillis());
+            fileNameBuilder.append("_");
+
 
 
             file_name = fileNameBuilder.toString();
