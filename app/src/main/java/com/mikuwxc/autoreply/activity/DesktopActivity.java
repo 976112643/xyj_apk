@@ -36,6 +36,7 @@ import com.mikuwxc.autoreply.callrecorder.sources.CallRecord;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
+import com.mikuwxc.autoreply.receiver.NetworkChangeReceiver;
 import com.mikuwxc.autoreply.service.MyReceiver;
 import com.mikuwxc.autoreply.service.SmsObserverService;
 import com.mikuwxc.autoreply.utils.Global;
@@ -74,6 +75,8 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     };
     Intent smsObserverIntent;
     private CallRecord callRecord;
+    private IntentFilter netWorkIntentFilter;
+    private NetworkChangeReceiver networkChangeReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +99,17 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         getAppList(this);
 
         smsObserverIntent=new Intent(this,SmsObserverService.class);
-        startService(smsObserverIntent);
-        startRecordService();
+        startService(smsObserverIntent);//短信监听
+        startRecordService();//电话监听
+        startNetWorkBroadcastReceiver();//断网重连后短信 短话上传
 
+    }
+
+    private void startNetWorkBroadcastReceiver() {
+        netWorkIntentFilter = new IntentFilter();
+        netWorkIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        networkChangeReceiver = new NetworkChangeReceiver();
+        registerReceiver(networkChangeReceiver, netWorkIntentFilter);
     }
 
     private void startRecordService() {
@@ -438,6 +449,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     protected void onDestroy() {
         super.onDestroy();stopService(smsObserverIntent);
         callRecord.stopCallReceiver();
+        unregisterReceiver(networkChangeReceiver);
     }
 
 
