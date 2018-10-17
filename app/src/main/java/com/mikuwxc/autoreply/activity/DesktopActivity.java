@@ -33,8 +33,10 @@ import com.mikuwxc.autoreply.basereclyview.RecycleHomeAdapter;
 import com.mikuwxc.autoreply.bean.ApphttpBean;
 import com.mikuwxc.autoreply.bean.SystemBean;
 import com.mikuwxc.autoreply.callrecorder.sources.CallRecord;
+import com.mikuwxc.autoreply.common.MyApp;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.receiver.NetworkChangeReceiver;
 import com.mikuwxc.autoreply.service.MyReceiver;
@@ -97,7 +99,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         registerReceiver(dianLiangBR, intentFilter);
         dianLiangBR.setBRInteractionListener(this);
         getAppList(this);
-
+        SPHelper.init(this);
         smsObserverIntent=new Intent(this,SmsObserverService.class);
         startService(smsObserverIntent);//短信监听
         startRecordService();//电话监听
