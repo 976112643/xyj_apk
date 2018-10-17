@@ -16,17 +16,20 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
+import com.mikuwxc.autoreply.bean.SharePerSmsBean;
 import com.mikuwxc.autoreply.bean.SmsObserverBean;
 import com.mikuwxc.autoreply.common.MyApp;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.SPHelper;
+import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
@@ -46,13 +49,13 @@ public class SmsObserverService extends Service {
     private static final int SUCCESS_OK = 200;
 
     /**
-    * 短信 url监听路径
+     * 短信 url监听路径
 
-    全部短信：content://sms/
-    收件箱：content://sms/inbox
-    发件箱：content://sms/sent
-    草稿箱：content://sms/draft
-    */
+     全部短信：content://sms/
+     收件箱：content://sms/inbox
+     发件箱：content://sms/sent
+     草稿箱：content://sms/draft
+     */
 
     private Uri SMS_INBOX = Uri.parse("content://sms/");
     private SmsObserver smsObserver;
@@ -69,7 +72,7 @@ public class SmsObserverService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-           smsHandler = new Handler() {
+        smsHandler = new Handler() {
             //这里可以进行回调的操作
             @Override
             public void handleMessage(Message msg) {
@@ -162,7 +165,7 @@ public class SmsObserverService extends Service {
                     message.what=SUCCESS_OK;
                     message.obj=receiverBean;
                     smsHandler.sendMessage(message);
-                   //Toast.makeText(this, "收到短信:::::::"+number + body + type + "..." + date, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, "收到短信:::::::"+number + body + type + "..." + date, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -173,7 +176,8 @@ public class SmsObserverService extends Service {
 
 
 
-    private  void uploadSmsMessage(SmsObserverBean obj) {
+    private  void uploadSmsMessage(final SmsObserverBean obj) {
+        SPHelper.init(MyApp.getAppContext());
         String url=AppConfig.OUT_NETWORK+NetApi.upload_sms_message;
         String type="2".equals(obj.getType())?"true":"false";
         SmsBean smsBean=new SmsBean(SystemUtil.getIMEI(MyApp.getAppContext()),obj.getContent(),type,obj.getPhoneNum(),String.valueOf(obj.getTime()));
@@ -190,19 +194,60 @@ public class SmsObserverService extends Service {
                             //Toast.makeText(SmsObserverService.this, "短信上传成功", Toast.LENGTH_SHORT).show();
                         }else{
                             String sms_list_data = SPHelper.getInstance().getString("SMS_LIST_DATA");
+                            SharePerSmsBean perSmsBean = new Gson().fromJson(sms_list_data, SharePerSmsBean.class);
+                            if(perSmsBean==null){
+                                List<SharePerSmsBean.DataBean> d=new ArrayList<>();
+                                d.add(new SharePerSmsBean.DataBean(obj.getContent(),obj.getType(),obj.getPhoneNum(),String.valueOf(obj.getTime())));
+                                perSmsBean=new SharePerSmsBean("",d);
+                                String json = new Gson().toJson(perSmsBean);
+                                SPHelper.getInstance().putString("SMS_LIST_DATA",json);
+                            }else{
+                                List<SharePerSmsBean.DataBean> data = perSmsBean.getData();
+                                SharePerSmsBean.DataBean dataBean = new SharePerSmsBean.DataBean();
+                                dataBean.setContent(obj.getContent());
+                                dataBean.setPhone(obj.getPhoneNum());
+                                dataBean.setTime(String.valueOf(obj.getTime()));
+                                dataBean.setType(obj.getType());
+                                data.add(dataBean);
+
+                                perSmsBean.setData(data);
+                                String json = new Gson().toJson(perSmsBean);
+                                SPHelper.getInstance().putString("SMS_LIST_DATA",json);
+                            }
+
                         }
                     }
 
                     @Override
                     public void onError(Call call, Response response, Exception e) {
                         super.onError(call, response, e);
+                        String sms_list_data = SPHelper.getInstance().getString("SMS_LIST_DATA");
+                        SharePerSmsBean perSmsBean = new Gson().fromJson(sms_list_data, SharePerSmsBean.class);
+                        if(perSmsBean==null){
+                            List<SharePerSmsBean.DataBean> d=new ArrayList<>();
+                            d.add(new SharePerSmsBean.DataBean(obj.getContent(),obj.getType(),obj.getPhoneNum(),String.valueOf(obj.getTime())));
+                            perSmsBean=new SharePerSmsBean("",d);
+                            String json = new Gson().toJson(perSmsBean);
+                            SPHelper.getInstance().putString("SMS_LIST_DATA",json);
+                        }else{
+                            List<SharePerSmsBean.DataBean> data = perSmsBean.getData();
+                            SharePerSmsBean.DataBean dataBean = new SharePerSmsBean.DataBean();
+                            dataBean.setContent(obj.getContent());
+                            dataBean.setPhone(obj.getPhoneNum());
+                            dataBean.setTime(String.valueOf(obj.getTime()));
+                            dataBean.setType(obj.getType());
+                            data.add(dataBean);
 
+                            perSmsBean.setData(data);
+                            String json = new Gson().toJson(perSmsBean);
+                            SPHelper.getInstance().putString("SMS_LIST_DATA",json);
+                        }
                     }
                 });
     }
 
 
-    class SmsBean{
+    public class SmsBean{
         private String imei;
         private String content;
         private String type;
@@ -257,6 +302,8 @@ public class SmsObserverService extends Service {
             this.time = time;
         }
     }
+
+
 
 
     class SmsSuccessBean{

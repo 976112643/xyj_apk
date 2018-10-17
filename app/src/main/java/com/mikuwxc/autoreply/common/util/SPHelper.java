@@ -11,7 +11,7 @@ public class SPHelper {
 
     private static final String DATA_NAME = "MySharePre";
 
-    private SharedPreferences mSharedPre;
+    private static SharedPreferences mSharedPre;
 
     private static SPHelper instance = null;
 
@@ -29,7 +29,7 @@ public class SPHelper {
         return instance;
     }
 
-    public void init(Context context) {
+    public static void init(Context context) {
         mSharedPre = context.getSharedPreferences(DATA_NAME, Context.MODE_PRIVATE);
     }
 
