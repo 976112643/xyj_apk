@@ -21,6 +21,7 @@ import com.mikuwxc.autoreply.utils.SystemUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
@@ -33,7 +34,7 @@ import okhttp3.Response;
  * description : 网络状态变化监听广播
  *
  * **/
-public class NetworkChangeReceiver extends BroadcastReceiver {
+public class NetworkChangeReceiver  extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
