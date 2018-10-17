@@ -89,7 +89,6 @@ public class MountReceiver extends XC_MethodHook {
             }
         });
 
-        XposedBridge.log("正在连接微信正在连接微信正在连接微信正在连接微信正在连接微信");
         Toast.makeText(context,"正在连接微信", Toast.LENGTH_LONG).show();
         ClassLoader classLoader=context.getClassLoader();
 
@@ -111,7 +110,6 @@ public class MountReceiver extends XC_MethodHook {
         }
 
         boolean b=copyFile(dabase_Route,copyRoute);
-        XposedBridge.log("343433"+b);
 
         Intent in=new Intent();
         in.setClassName(Constance.packageName_me,Constance.receiver_my);

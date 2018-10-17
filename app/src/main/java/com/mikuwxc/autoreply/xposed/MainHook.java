@@ -198,7 +198,7 @@ public class MainHook implements IXposedHookLoadPackage {
             //扫一扫权限
             WScanxHook.hook(lpparam);
             //是否能领微信红包转账和聊天记录是否能删除
-            ItemHook.hook(lpparam);
+            ItemHook.hook(lpparam,create);
 
             //是否显示微信号
             HiddenWechatIdAndPhoneNumberHook.hookSystem(lpparam);

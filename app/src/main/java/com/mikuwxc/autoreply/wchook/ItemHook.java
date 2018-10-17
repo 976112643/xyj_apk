@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
+import com.mikuwxc.autoreply.wcentity.WechatEntity;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -16,7 +17,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 
 public class ItemHook {
-    public static void hook(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws ClassNotFoundException {
+    public static void hook(final XC_LoadPackage.LoadPackageParam loadPackageParam,WechatEntity paramWechatEntity) throws ClassNotFoundException {
 
         //是否能发起语音视频聊天
       /*  XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.voip.ui.VideoActivity", loadPackageParam.classLoader,
@@ -127,9 +128,9 @@ public class ItemHook {
 
 
         //单条聊天消息删除时
-        XposedHelpers.findAndHookMethod("com.tencent.mm.ui.chatting.viewitems.b$c$a",
+        XposedHelpers.findAndHookMethod(paramWechatEntity.delete_selected_friend_chat_record_class,
                 loadPackageParam.classLoader,
-                "onMMMenuItemSelected",
+                paramWechatEntity.delete_selected_friend_chat_record_method,
                 MenuItem.class,
                 int.class,
                 new XC_MethodHook() {
@@ -157,9 +158,9 @@ public class ItemHook {
 
 
         //删除一个好友会话记录
-        XposedHelpers.findAndHookMethod("com.tencent.mm.ui.conversation.b$2",
+        XposedHelpers.findAndHookMethod(paramWechatEntity.delete_single_friend_chat_record_class,
                 loadPackageParam.classLoader,
-                "onClick",
+                paramWechatEntity.delete_single_friend_chat_record_method,
                 DialogInterface.class,
                 int.class,
                 new XC_MethodHook() {
@@ -190,9 +191,9 @@ public class ItemHook {
 
 
         //禁止微信删除好友聊天记录
-        XposedHelpers.findAndHookMethod("com.tencent.mm.ui.SingleChatInfoUI$8",
+        XposedHelpers.findAndHookMethod(paramWechatEntity.delete_friend_chat_record_class,
                 loadPackageParam.classLoader,
-                "onClick",
+                paramWechatEntity.delete_friend_chat_record_method,
                 DialogInterface.class,
                 int.class,
                 new XC_MethodHook() {
@@ -220,9 +221,9 @@ public class ItemHook {
 
 
         //禁止删好友
-        XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.profile.ui.NormalUserFooterPreference$a$1$1$2",
+        XposedHelpers.findAndHookMethod(paramWechatEntity.no_friends_deleted_class,
                 loadPackageParam.classLoader,
-                "onClick",
+                paramWechatEntity.no_friends_deleted_method,
                 DialogInterface.class,
                 int.class,
                 new XC_MethodHook() {

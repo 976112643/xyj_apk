@@ -164,6 +164,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
     private String sedVideoPath;
     private String reyVideoPath;
+    private String sedVideopicPath;
+    private String reyVideopicPath;
 
 
     private static String str;
@@ -289,6 +291,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 boolean exists = file.exists();
                                 if(exists){
                                     XposedBridge.log("上传自己发送的视频"+exists);
+                                    XposedBridge.log("sedVideopicPathsedVideopicPathsedVideopicPath::"+sedVideopicPath);
+                                    //String newPicPathUrl= uploadPic(sedVideopicPath,field_username,"Send",field_unReadCount, videoState, field_username, field_msgType, field_conversationTime);
                                     handleMessage(field_unReadCount, videoState, field_username, "", field_msgType, field_conversationTime,msgId);
                                   String uploadVideoUrl = uploadVideo(sedVideoPath,field_username,"Send", field_unReadCount, videoState, field_username, field_msgType, field_conversationTime);
 //                                    XposedBridge.log("$$$$$$$$$"+uploadVideoUrl);
@@ -314,11 +318,9 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 boolean exists = file.exists();
                                 if (exists){
                                     XposedBridge.log("存在上传对方发送的视频123"+exists);
+                                    //String newPicPathUrl= uploadPic(reyVideopicPath,field_username,"Receive",field_unReadCount, videoState, field_username, field_msgType, field_conversationTime);
                                     handleMessage(field_unReadCount, videoState, field_username, "", field_msgType, field_conversationTime,msgId);
                                     String uploadVideoUrl =  uploadVideo(str,field_username,"Receive", field_unReadCount, videoState, field_username, field_msgType, field_conversationTime);
-//                                    XposedBridge.log("$$$$$$$$$"+uploadVideoUrl);
-//                                     handleMessage(field_unReadCount, field_status, field_username, uploadVideoUrl, field_msgType, field_conversationTime);
-//                                    XposedBridge.log("$$$$$$$$$同步上传对方发送的视频成功");
                                 }else{
                                     XposedBridge.log("不存在不上上传对方发送的视频456"+exists);
                                     //因为视频还没下载成功，所以文件会为空，此时就需要重新进这个判断方法，知道文件下载成功
@@ -329,7 +331,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                             if (newVoisePath!=null&&field_msgType.equals("34")&&newVoiseNull==null&&"1".equals(voisestatus)&&(field_conversationTime + "").length() != 19 ){
                                 XposedBridge.log("上传自己发送的语音文件");
-                                handleMessage(field_unReadCount, Integer.parseInt(voisestatus), field_username, "", field_msgType, field_conversationTime,msgId);
+                                //handleMessage(field_unReadCount, Integer.parseInt(voisestatus), field_username, "", field_msgType, field_conversationTime,msgId);
                                 String newVoisePathUrl = uploadAmr(newVoisePath,field_username,"Send",field_unReadCount, Integer.parseInt(voisestatus), field_username, field_msgType, field_conversationTime);
                                 XposedBridge.log("$$$$$$$$$"+newVoisePathUrl);
                                 //handleMessage(field_unReadCount, field_status, field_username, newVoisePathUrl, field_msgType, field_conversationTime);
@@ -337,7 +339,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 newVoiseNull=newVoisePath;
                             }else if(newVoisePath!=null&&field_msgType.equals("34")&&newVoiseNull==null&&"3".equals(voisestatus)&&(field_conversationTime + "").length() != 19 ){
                                 XposedBridge.log("上传接收到的语音文件");
-                                handleMessage(field_unReadCount, Integer.parseInt(voisestatus), field_username, "", field_msgType, field_conversationTime,msgId);
+                                //handleMessage(field_unReadCount, Integer.parseInt(voisestatus), field_username, "", field_msgType, field_conversationTime,msgId);
                                String newVoisePathUrl= uploadAmr(newVoisePath,field_username,"Receive",field_unReadCount, Integer.parseInt(voisestatus), field_username, field_msgType, field_conversationTime);
                                XposedBridge.log("$$$$$$$$$"+newVoisePathUrl);
                                 //handleMessage(field_unReadCount, field_status, field_username, newVoisePathUrl, field_msgType, field_conversationTime);
@@ -351,7 +353,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 File file=new File(newImaginPath);
                                 if (file.exists()){
                                     XposedBridge.log("上传自己发送的图片文件");
-                                    handleMessage(field_unReadCount,  Integer.parseInt(picstatus), field_username, "", field_msgType, field_conversationTime,msgId);
+                                   // handleMessage(field_unReadCount,  Integer.parseInt(picstatus), field_username, "", field_msgType, field_conversationTime,msgId);
                                     String newPicPathUrl= uploadPic(newImaginPath,field_username,"Send",field_unReadCount, Integer.parseInt(picstatus), field_username, field_msgType, field_conversationTime);
                                     XposedBridge.log("$$$$$$$$$"+userNameChatroom+newPicPathUrl);
                                     //handleMessage(field_unReadCount, Integer.parseInt(picstatus), field_username, userNameChatroom+newPicPathUrl, field_msgType, field_conversationTime,msgId);
@@ -368,7 +370,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 File file=new File(newImaginPath);
                                 if (file.exists()){
                                     XposedBridge.log("上传接收到的图片文件");
-                                    handleMessage(field_unReadCount,  Integer.parseInt(picstatus), field_username, "", field_msgType, field_conversationTime,msgId);
+                                   // handleMessage(field_unReadCount,  Integer.parseInt(picstatus), field_username, "", field_msgType, field_conversationTime,msgId);
                                     String newPicPathUrl= uploadPic(newImaginPath,field_username,"Receive",field_unReadCount, Integer.parseInt(picstatus), field_username, field_msgType, field_conversationTime);
                                     XposedBridge.log("$$$$$$$$$"+userNameChatroom+newPicPathUrl);
 
@@ -391,7 +393,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 File file=new File(sendFilePath);
                                 if (file.exists()){
                                     XposedBridge.log("上传自己发送的File文件");
-                                    handleMessage(field_unReadCount,  Integer.parseInt(filestatus), field_username, "", field_msgType, field_conversationTime,msgId);
+                                    //handleMessage(field_unReadCount,  Integer.parseInt(filestatus), field_username, "", field_msgType, field_conversationTime,msgId);
                                     String newFilePathUrl= uploadFile(sendFilePath,field_username,"Send",field_unReadCount, Integer.parseInt(filestatus), field_username, field_msgType, field_conversationTime);
                                     XposedBridge.log("$$$$$$$$$"+newFilePathUrl);
 
@@ -409,7 +411,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 File file=new File(newFilePath);
                                 if (file.exists()){
                                     XposedBridge.log("上传接收到的File文件");
-                                    handleMessage(field_unReadCount,  Integer.parseInt(filestatus), field_username, "", field_msgType, field_conversationTime,msgId);
+                                   // handleMessage(field_unReadCount,  Integer.parseInt(filestatus), field_username, "", field_msgType, field_conversationTime,msgId);
                                     String newFilePathUrl= uploadFile(newFilePath,field_username,"Receive",field_unReadCount,  Integer.parseInt(filestatus), field_username, field_msgType, field_conversationTime);
                                     XposedBridge.log("$$$$$$$$$"+newFilePathUrl);
 
@@ -503,7 +505,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
         //又拍云的保存路径，任选其中一个
         savePath="/picforapp/"+username+"/"+sign+"/"+str+"/"+newPicLast;
-
         paramsMap.put(Params.SAVE_KEY, savePath);
         //时间戳加上15秒
         paramsMap.put(Params.EXPIRATION, System.currentTimeMillis()+15);
@@ -525,6 +526,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                 XposedBridge.log(isSuccess + ":" + result);
 
                 String newSavePath=AppConfig.YOUPAIYUN+savePath;
+                XposedBridge.log("newSavePathnewSavePathnewSavePathnewSavePath:::"+savePath);
                 handleMessage(field_unReadCount, field_status, field_username, userNameChatroom+newSavePath, field_msgType, field_conversationTime,msgId);
                 userNameChatroom="";
             }
@@ -888,29 +890,10 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                     if ("43".equals(type)){
                        String videPath= DownLoadWxResFromWxUtil.downloadWxVideoRes(classLoader, paramWechatEntity, paramAnonymousMethodHookParam1);
-                       XposedBridge.log("videPathvidePathvidePathvidePath::"+videPath);
+
                         String reyvideoLast=videPath.replace(".jpg", ".mp4").replace(".tmp", "");
 
-                       /* //文件
-                        File file = new File(reyvideoLast);
-                        boolean exits = false;
-                        //当前时间
-                        Date now = new Date();
-                        //最后时间
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(now);
-                        calendar.add(Calendar.SECOND, 2);
-                        Date deadline = calendar.getTime();
-
-                        while(now.before(deadline)){
-                            exits = file.exists();
-
-                            if(exits){
-                                break;
-                            }
-                        }
-
-                        XposedBridge.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+exits);*/
+                        XposedBridge.log("videPathvidePathvidePathvidePath::"+videPath);
 
                         XposedBridge.log("shangchuanshipin"+reyvideoLast);
                         if ("1".equals(isSend)){
@@ -921,12 +904,16 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                             sedVideoPath=reyvideoLast;
                             videoState=1;
+
+                            sedVideopicPath=videPath;
                         }else{
                             reyImagin=null;
                             videostatus="3";
 
                             reyVideoPath=reyvideoLast;
                             videoState=3;
+
+                            reyVideopicPath=videPath;
 
                         }
 
@@ -1092,7 +1079,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         XposedBridge.log("content:"+content);
                         String talker =localContentValues.getAsString("talker");
                         XposedBridge.log("talker:"+talker);
-                        msgId = new Date().getTime()+localContentValues.getAsString("msgId")+"";
+                        String msgId = localContentValues.getAsString("msgId");
                         XposedBridge.log("msgId:"+ msgId);
                         int statuss =Integer.parseInt(localContentValues.getAsString("status"));
                         String isSend =localContentValues.getAsString("isSend");
