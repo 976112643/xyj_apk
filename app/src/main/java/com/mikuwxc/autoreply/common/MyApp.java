@@ -31,6 +31,7 @@ import com.mikuwxc.autoreply.modle.HttpImeiBean;
 import com.mikuwxc.autoreply.service.ContextHolder;
 import com.mikuwxc.autoreply.utils.LogToFile;
 import com.mikuwxc.autoreply.utils.PersistentCookieStore;
+import com.mikuwxc.autoreply.utils.UpdateAppUtil;
 import com.mikuwxc.autoreply.view.activity.SecondActivity;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -215,7 +216,7 @@ public class MyApp extends Application {
     }
 
     private void hotUpdate() {
-        OkGo.get(AppConfig.OUT_NETWORK + NetApi.upDateHot).execute(new StringCallback() {
+       /* OkGo.get(AppConfig.OUT_NETWORK + NetApi.upDateHot).execute(new StringCallback() {
             @Override
             public void onSuccess(String s, Call call, okhttp3.Response response) {
                 Log.e("111","result:" + s);
@@ -224,14 +225,14 @@ public class MyApp extends Application {
                     if (bean.isSuccess()) {
 
                         //获取当前app版本号与后台对比后台版本号大于本地app版本号时进行更新
-                     /*   PackageInfo packageInfo = null;
+                     *//*   PackageInfo packageInfo = null;
                         packageInfo = getApplicationContext()
                                       .getPackageManager()
-                                      .getPackageInfo(getPackageName(), 0);*/
+                                      .getPackageInfo(getPackageName(), 0);*//*
                         //Integer version = Integer.valueOf(packageInfo.versionCode);
                         if(bean.getResult() > VersionInfo.versionCode){
-                         /*queryAndLoadNewPatch不可放在attachBaseContext 中，
-                           否则无网络权限，建议放在后面任意时刻，如onCreate中*/
+                         *//*queryAndLoadNewPatch不可放在attachBaseContext 中，
+                           否则无网络权限，建议放在后面任意时刻，如onCreate中*//*
                          //去阿里看是否有补丁包
                             SophixManager.getInstance().queryAndLoadNewPatch();
                         }
@@ -250,7 +251,12 @@ public class MyApp extends Application {
                 super.onError(call, response, e);
                 Log.e("111", "获取App版本信息失败:");
             }
-        });
+        });*/
+
+
+        UpdateAppUtil.getHotAppVersion(applicationContext);  //版本热更新检查
+        UpdateAppUtil.getAppVersion(applicationContext);     //版本更新
+
     }
 
 

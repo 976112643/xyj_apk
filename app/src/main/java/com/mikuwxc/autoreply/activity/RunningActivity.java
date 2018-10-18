@@ -87,6 +87,7 @@ import com.mikuwxc.autoreply.utils.HttpUtils;
 import com.mikuwxc.autoreply.utils.LogToFile;
 import com.mikuwxc.autoreply.utils.MJSONObjectRequest;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
+import com.mikuwxc.autoreply.utils.UpdateAppUtil;
 import com.mikuwxc.autoreply.widget.MainProgressBar;
 import com.mikuwxc.autoreply.widget.UrlCircleImageView;
 import com.mikuwxc.autoreply.wxid.WxIdUtil;
@@ -159,6 +160,9 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
     private TextView tvVersion;
     public static TextView tv3;
     public static TextView tv2;
+    private Button bt_updateapp;
+    private TextView tvLastVersion;
+    private TextView tvHotVersion;
 
 
     @Override
@@ -168,8 +172,11 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);*/
         setContentView(R.layout.activity_running);
 
+
+        Toast.makeText(this, "Hello world :" + VersionInfo.versionCode, Toast.LENGTH_LONG).show();
+
         //是否弹出更新弹窗
-        showUpdateDialog();
+        //showUpdateDialog();
 
         //设置极光推送的别名
         setTagAndAlias();
@@ -201,6 +208,14 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         tv3 = (TextView) findViewById(R.id.tv3);  //服务器连接状态
         tvVersion = (TextView) findViewById(R.id.tvVersion);
         et_ip = (EditText) findViewById(R.id.et_ip);
+        bt_updateapp = (Button) findViewById(R.id.bt_updateapp);
+        tvLastVersion = (TextView) findViewById(R.id.tvLastVersion);
+        tvHotVersion = (TextView) findViewById(R.id.tvHotVersion);
+
+        tvHotVersion.setText("当前补丁版本："+VersionInfo.versionCode);
+
+        UpdateAppUtil.getAppVersionState(this,tvLastVersion);
+
 
         news = (Button) findViewById(R.id.news);
         final List<String> permissionsList = new ArrayList<>();
@@ -221,6 +236,13 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
             initVersion();
         }
 
+
+        bt_updateapp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UpdateAppUtil.getAppVersionDownLoad(RunningActivity.this);
+            }
+        });
 
         findViewById(R.id.news).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -381,7 +403,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
       /*  SharedPreferences sp = getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
         SharedPreferences.Editor ditor = sp.edit();
         ditor.putBoolean("test_put",true).commit();*/
-        ToastUtil.showLongToast("开启所有权限");
+       // ToastUtil.showLongToast("开启所有权限");
         MyFileUtil.writeProperties("test_put","true");
 
         // 获取Runtime对象  获取root权限
@@ -1874,8 +1896,8 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
             packageInfo = getApplicationContext()
                     .getPackageManager()
                     .getPackageInfo(getPackageName(), 0);
-            tvVersion.setText("当前软件版本："+ VersionInfo.versionName+"");
-            ToastUtil.showLongToast(VersionInfo.versionName+"");
+            tvVersion.setText("当前软件版本："+ packageInfo.versionName+"");
+            ToastUtil.showLongToast(VersionInfo.versionCode+"");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

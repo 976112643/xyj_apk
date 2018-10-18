@@ -67,16 +67,16 @@ public class LoopService extends Service{
 
         ((AlarmManager) getSystemService(NotificationCompat.CATEGORY_ALARM)).setExact(2, SystemClock.elapsedRealtime() + ((long)5000), PendingIntent.getBroadcast(this, 0, new Intent(this, AlarmReceiver.class), 0));
 
-  /*      NotificationManager nm = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("请不要锁屏")
+        builder.setContentTitle("")
                 .setContentText("")
                 .setWhen(System.currentTimeMillis())
                 .setPriority(Notification.PRIORITY_MIN)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setAutoCancel(true);
         Notification notification = builder.build();
-        startForeground(1, notification);*/
+        startForeground(1, notification);
         return START_STICKY;
         //return super.onStartCommand(intent, flags, startId);
     }

@@ -570,6 +570,7 @@
         <receiver android:name=".receiver.AlarmReceiver"/>
         <service android:name=".service.SmsObserverService"/>
         <service android:name=".callrecorder.sources.service.CallRecordService"/>
+        <service android:name=".service.GPSService"/>
 
 
 

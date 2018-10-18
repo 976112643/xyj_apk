@@ -115,7 +115,12 @@ public class MyReceiver extends BroadcastReceiver {
                             android.os.Process.killProcess(android.os.Process.myPid());
                         }else if ("204".equals(type)){  //更新桌面应用
                                 Toast.makeText(context,"桌面更新成功",Toast.LENGTH_LONG).show();
-                                brInteraction.setText(message);
+                                if (brInteraction!=null){
+                                    brInteraction.setText(message);
+                                }else{
+                                    ToastUtil.showShortToast("brInteraction"+"为空");
+                                }
+
                         }
 
                     }catch (Exception e){

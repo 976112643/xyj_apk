@@ -9,6 +9,7 @@ import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wx.WechatDb;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -32,6 +33,9 @@ public final class DeleteContactsHook$hook$1 extends XC_MethodHook {
         String userTalker = userEntity.getUserTalker();
         String headPic = userEntity.getHeadPic();
         String alias = userEntity.getAlias();  //微信号
+        if (StringUtils.isBlank(alias)){
+            alias = userTalker;
+        }
         XposedBridge.log("aliasaliasaliasalias::"+alias);
         handleMessageDeleteFriend(alias, param.args[0].toString());
     }

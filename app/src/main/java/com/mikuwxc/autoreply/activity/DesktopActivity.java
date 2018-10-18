@@ -8,8 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,20 +37,21 @@ import com.mikuwxc.autoreply.basereclyview.RecycleHomeAdapter;
 import com.mikuwxc.autoreply.bean.ApphttpBean;
 import com.mikuwxc.autoreply.bean.SystemBean;
 import com.mikuwxc.autoreply.callrecorder.sources.CallRecord;
-import com.mikuwxc.autoreply.common.MyApp;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.receiver.NetworkChangeReceiver;
+import com.mikuwxc.autoreply.service.GPSService;
 import com.mikuwxc.autoreply.service.MyReceiver;
 import com.mikuwxc.autoreply.service.SmsObserverService;
 import com.mikuwxc.autoreply.utils.Global;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 
+import org.xutils.common.util.LogUtil;
+
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,7 +62,7 @@ import cn.richinfo.dualsim.TelephonyManagement;
 import okhttp3.Call;
 
 
-public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleClickListener,MyReceiver.BRInteraction {
+public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleClickListener, MyReceiver.BRInteraction {
     private RecycleHomeAdapter adapter;
     private RecyclerView recycleV;
     private ArrayList<ApphttpBean.ResultBean> resultBean;
@@ -89,7 +94,7 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         // 状态栏透明
         Global.setNoStatusBarFullMode(this);
         // 状态栏设为黑包
-       // Global.setStatusBarColor(this, Color.BLUE);
+        // Global.setStatusBarColor(this, Color.BLUE);
         //设置极光推送的别名
         setTagAndAlias();
 
@@ -100,11 +105,12 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         dianLiangBR.setBRInteractionListener(this);
         getAppList(this);
         SPHelper.init(this);
-        smsObserverIntent=new Intent(this,SmsObserverService.class);
+        smsObserverIntent = new Intent(this, SmsObserverService.class);
         startService(smsObserverIntent);//短信监听
         startRecordService();//电话监听
         startNetWorkBroadcastReceiver();//断网重连后短信 短话上传
 
+        String lngAndLat = getLngAndLat(this);
     }
 
     private void startNetWorkBroadcastReceiver() {
@@ -115,13 +121,13 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     }
 
     private void startRecordService() {
-         callRecord = new CallRecord.Builder(this)
+        callRecord = new CallRecord.Builder(this)
                 .setRecordFileName("CallRecorderTestFile")
                 .setRecordDirName("CallRecorderTest")
                 .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
                 .setShowSeed(true)
                 .build();
-         callRecord.startCallReceiver();
+        callRecord.startCallReceiver();
     }
 
 
@@ -143,25 +149,23 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     public void OnRecycleItemClick(int position) {
         try {
             String packageName1 = newBean.get(position).getPackageName();
-            if ("com.mikuwxc.autoreply".equals(packageName1)){
-                Intent intent=new Intent(this,RunningActivity.class);
+            if ("com.mikuwxc.autoreply".equals(packageName1)) {
+                Intent intent = new Intent(this, RunningActivity.class);
                 this.startActivity(intent);
-            }else{
+            } else {
                 String packageName = newBean.get(position).getPackageName();
-                if ("com.android.phone".equals(packageName)){
+                if ("com.android.phone".equals(packageName)) {
                     Intent touchDialIntent = new Intent("com.android.phone.action.TOUCH_DIALER");
                     startActivity(touchDialIntent);
-                }else{
+                } else {
                     Intent resolveIntent = getPackageManager().getLaunchIntentForPackage(packageName);// 这里的packname就是从上面得到的目标apk的包名
                     startActivity(resolveIntent);// 启动目标应用
                 }
             }
 
 
-
-
-        }catch (Exception e){
-            Log.e("111",e.toString());
+        } catch (Exception e) {
+            Log.e("111", e.toString());
         }
 
     }
@@ -170,7 +174,8 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     public void getAppList(final Context context) {
         telephonyInfo = TelephonyManagement.getInstance().updateTelephonyInfo(this).getTelephonyInfo(this);
         if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 100);
+            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE, android.Manifest.permission.ACCESS_FINE_LOCATION
+                    , android.Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
         } else {
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             isDualSimOrNot();
@@ -180,14 +185,13 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         }
 
 
-
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             return;
         }
         String DEVICE_ID = tm.getDeviceId();
-        SystemBean systemBean=new SystemBean();
+        SystemBean systemBean = new SystemBean();
         systemBean.setManufacturer(SystemUtil.getDeviceBrand());
         Log.e("111", "手机型号：" + SystemUtil.getSystemModel());
         systemBean.setModel(SystemUtil.getSystemModel());
@@ -201,11 +205,14 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         //登录IM
 
 
+        Intent service = new Intent(context, GPSService.class);
+        context.startService(service);
+
 
         String DEVICE_ID1 = telephonyInfo.getImeiSIM1();
 
-        Log.e("111","DEVICE_IDDEVICE_IDDEVICE_IDDEVICE_ID"+DEVICE_ID);
-        if (DEVICE_ID!=null) {
+        Log.e("111", "DEVICE_IDDEVICE_IDDEVICE_IDDEVICE_ID" + DEVICE_ID);
+        if (DEVICE_ID != null) {
             OkGo.get(AppConfig.OUT_NETWORK + NetApi.getAppList + DEVICE_ID).execute(new StringCallback() {
                 @Override
                 public void onSuccess(String s, Call call, okhttp3.Response response) {
@@ -309,7 +316,6 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     }
 
 
-
     /**
      * 设置标签与别名
      */
@@ -329,12 +335,12 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
             return;
         }
         String DEVICE_ID = tm.getDeviceId();
-        Log.e("111",DEVICE_ID);
-        if (!TextUtils.isEmpty(DEVICE_ID)){
+        Log.e("111", DEVICE_ID);
+        if (!TextUtils.isEmpty(DEVICE_ID)) {
             tags.add(DEVICE_ID);//设置tag
         }
         //上下文、别名【Sting行】、标签【Set型】、回调
-        JPushInterface.setAliasAndTags(this,DEVICE_ID, tags,
+        JPushInterface.setAliasAndTags(this, DEVICE_ID, tags,
                 mAliasCallback);
 
     }
@@ -381,7 +387,6 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     };
 
 
-
     /**
      * 打开微信
      */
@@ -401,15 +406,14 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
     }
 
 
-
-    public String chineseToUnicode(String str){
-        String result="";
-        for (int i = 0; i < str.length(); i++){
+    public String chineseToUnicode(String str) {
+        String result = "";
+        for (int i = 0; i < str.length(); i++) {
             int chr1 = (char) str.charAt(i);
-            if(chr1>=19968&&chr1<=171941){//汉字范围 \u4e00-\u9fa5 (中文)
-                result+="\\u" + Integer.toHexString(chr1);
-            }else{
-                result+=str.charAt(i);
+            if (chr1 >= 19968 && chr1 <= 171941) {//汉字范围 \u4e00-\u9fa5 (中文)
+                result += "\\u" + Integer.toHexString(chr1);
+            } else {
+                result += str.charAt(i);
             }
         }
         return result;
@@ -449,12 +453,11 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();stopService(smsObserverIntent);
+        super.onDestroy();
+        stopService(smsObserverIntent);
         callRecord.stopCallReceiver();
         unregisterReceiver(networkChangeReceiver);
     }
-
-
 
 
     private void isDualSimOrNot() {
@@ -474,6 +477,108 @@ public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleC
         boolean isDualSIM = telephonyInfo.isDualSIM();
 //        int networkState = telephonyInfo.getNetworkState();
         int slotId = telephonyInfo.getDefaultDataSlotId();
-        Log.e("TAG", "---------------------------------------"+imeiSIM1);
+        Log.e("TAG", "---------------------------------------" + imeiSIM1);
     }
+
+
+    private String getLngAndLat(Context context) {
+        double latitude = 0.0;
+        double longitude = 0.0;
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {  //从gps获取经纬度
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return "";
+            }
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            } else {//当GPS信号弱没获取到位置的时候又从网络获取
+                return getLngAndLatWithNetwork();
+            }
+        } else {    //从网络获取经纬度
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return "";
+            }
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
+            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+            }
+        }
+        return longitude + "," + latitude;
+    }
+
+    //从网络获取经纬度
+    public String getLngAndLatWithNetwork() {
+        double latitude = 0.0;
+        double longitude = 0.0;
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return "";
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (location != null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+        }
+        return longitude + "," + latitude;
+    }
+
+
+    LocationListener locationListener = new LocationListener() {
+
+        // Provider的状态在可用、暂时不可用和无服务三个状态直接切换时触发此函数
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        // Provider被enable时触发此函数，比如GPS被打开
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        // Provider被disable时触发此函数，比如GPS被关闭
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+
+        //当坐标改变时触发此函数，如果Provider传进相同的坐标，它就不会被触发
+        @Override
+        public void onLocationChanged(Location location) {
+        }
+    };
+
+
+
+
+
+
 }
+

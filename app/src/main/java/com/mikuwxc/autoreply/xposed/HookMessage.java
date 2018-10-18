@@ -809,7 +809,11 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         String userTalker = userEntity.getUserTalker();
                         String headPic = userEntity.getHeadPic();
                         String alias = userEntity.getAlias();  //微信号
+                        if (StringUtils.isBlank(alias)){
+                            alias = userTalker;
+                        }
                         FriendBean friendBean =friendAdviceParse(autoVerifyUser);
+                        XposedBridge.log(friendBean.toString());
                         addNewFriend(alias, friendBean); //新的好友,通知后台
 
                     }
@@ -1079,7 +1083,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         XposedBridge.log("content:"+content);
                         String talker =localContentValues.getAsString("talker");
                         XposedBridge.log("talker:"+talker);
-                        String msgId = localContentValues.getAsString("msgId");
+                         msgId = localContentValues.getAsString("msgId");
                         XposedBridge.log("msgId:"+ msgId);
                         int statuss =Integer.parseInt(localContentValues.getAsString("status"));
                         String isSend =localContentValues.getAsString("isSend");
@@ -1156,7 +1160,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
     public void handleMessage(int unreadCount, int status, String username, String content, String msgType, long conversationTime,String msgId) {
         list_msg.add(new HookMessageBean(status, username, content, msgType,conversationTime,msgId));
-        XposedBridge.log("111"+ "unReadCount:" + unreadCount + " status:" + status + " username:" + username + " msgType:" + msgType + ",content=" + content + " conversationTime:" + conversationTime);
+        XposedBridge.log("111"+ "unReadCount:" + unreadCount + " status:" + status + " username:" + username + " msgType:" + msgType + ",content=" + content + " conversationTime:" + conversationTime+"msgId"+msgId);
         getToken();
         /*if (msgType.equals("34") && voiceList.size() != 0) {
             getVoiceMsg(status, content);
@@ -1282,13 +1286,16 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
         Gson gson = new Gson();
         String friendStr = gson.toJson(friend);
         LogUtils.v(TAG, "有新好友:" + friendStr);
-        if (AppConfig.getSelectHost() == null) {
+       /* if (AppConfig.getSelectHost() == null) {
             AppConfig.setHost(AppConfig.OUT_NETWORK);
-        }
-        OkGo.post(AppConfig.getSelectHost() + NetApi.addFriend + "/" + wxToken).headers("Content-Type", "application/json").upJson(friendStr).execute(new StringCallback() {
+        }*/
+       XposedBridge.log("wxTokenwxTokenwxToken:"+wxToken);
+        XposedBridge.log("friendStrfriendStrfriendStr:"+friendStr);
+        OkGo.post(AppConfig.OUT_NETWORK + NetApi.addFriend + "/" + wxToken).headers("Content-Type", "application/json").upJson(friendStr).execute(new StringCallback() {
             @Override
             public void onSuccess(String s, Call call, Response response) {
                 LogUtils.i(TAG, "result:" + s);
+                XposedBridge.log("添加好友成功添加好友成功添加好友成功添加好友成功");
                 try {
                     HttpBean bean = new Gson().fromJson(s, HttpBean.class);
                     if (bean.isSuccess()) {
@@ -1305,6 +1312,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
             @Override
             public void onError(Call call, Response response, Exception e) {
                 super.onError(call, response, e);
+                XposedBridge.log("添加好友失败");
                 sendNotice(e.getMessage());
             }
         });

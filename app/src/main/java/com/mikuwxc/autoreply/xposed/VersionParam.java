@@ -98,6 +98,12 @@ public class VersionParam {
                 con_GetCursorMethod = "d";
                 // con_ImageClass = PACKAGE_NAME + "am.l";
                 break;
+
+            case "6.7.3":
+                conversationClass = PACKAGE_NAME + ".h.c.as";
+                con_GetCursorMethod = "d";
+                // con_ImageClass = PACKAGE_NAME + "am.l";
+                break;
         }
     }
 }
