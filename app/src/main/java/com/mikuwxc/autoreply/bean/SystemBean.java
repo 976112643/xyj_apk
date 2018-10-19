@@ -6,6 +6,19 @@ public class SystemBean {
     private String androidVersion; //android版本;
     private String model;               // 型号
     private String phone; //电话号码;
+    private Integer patchCode;  //热更新需要版本
+    public Integer getPatchCode() {
+        return patchCode;
+    }
+
+    public void setPatchCode(Integer patchCode) {
+        this.patchCode = patchCode;
+    }
+
+
+
+
+
 
     public String getManufacturer() {
         return manufacturer;

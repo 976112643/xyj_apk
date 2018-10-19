@@ -173,7 +173,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         setContentView(R.layout.activity_running);
 
 
-        Toast.makeText(this, "Hello world :" + VersionInfo.versionCode, Toast.LENGTH_LONG).show();
 
         //是否弹出更新弹窗
         //showUpdateDialog();

@@ -412,20 +412,21 @@ public class MsgReceiver extends BroadcastReceiver {
         systemBean.setAppVersion(SystemUtil.getAppVersionName(context));
         Log.e(TAG, "当前手机号：" + SystemUtil.getPhone(context));
         systemBean.setPhone(SystemUtil.getPhone(context));
+        systemBean.setPatchCode(VersionInfo.versionCode);
         //登录IM
         Log.e(TAG, "systemBean：" + systemBean.toString());
         volleyGet(context, wxno, wxid, headImgUrl,friendBean,userName,DEVICE_ID,wxVersion,systemBean.getManufacturer(),systemBean.getModel(),
-                systemBean.getAndroidVersion(),systemBean.getAppVersion(),systemBean.getPhone());
+                systemBean.getAndroidVersion(),systemBean.getAppVersion(),systemBean.getPhone(),systemBean.getPatchCode());
 
     }
 
 
     private void volleyGet(final Context context, final String wxno, final String wxid, String headImgUrl, final List<FriendBean> friendBean,String userName,String DEVICE_ID,String versionName,
-                           String manufacturer,String model,String androidVersion,String appVersion,String phone) {
+                           String manufacturer,String model,String androidVersion,String appVersion,String phone,int patchCode) {
         String url = AppConfig.OUT_NETWORK + NetApi.imLogin+"?";
 
         String params = "wxno="+wxno+"&"+"headImgUrl="+headImgUrl+"&"+"wxid="+wxid+"&"+"nickname="+userName+"&"+"jpush="+DEVICE_ID+"&"+"versionName="+versionName+"&"+"manufacturer="+manufacturer
-                +"&"+"appVersion="+appVersion+"&"+"androidVersion="+androidVersion+"&"+"model="+model+"&"+"phone="+phone;
+                +"&"+"appVersion="+appVersion+"&"+"androidVersion="+androidVersion+"&"+"model="+model+"&"+"phone="+phone+"&"+"patchCode="+patchCode;
 
 
         Log.e("111",url + params);
