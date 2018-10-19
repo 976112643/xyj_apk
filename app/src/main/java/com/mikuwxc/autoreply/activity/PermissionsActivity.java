@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -55,10 +56,10 @@ public class PermissionsActivity extends AppCompatActivity {
 	 * 判断是否需要检测，防止不停的弹框
 	 */
 	private boolean isNeedCheck = true;
-	
+
 	@Override
-	protected void onResume() {
-		super.onResume();
+	protected void onCreate(Bundle bundle) {
+		super.onCreate(bundle);
 		if (Build.VERSION.SDK_INT >= 23
 				&& getApplicationInfo().targetSdkVersion >= 23) {
 			if (isNeedCheck) {
@@ -115,7 +116,7 @@ public class PermissionsActivity extends AppCompatActivity {
 	 * 检测是否所有的权限都已经授权
 	 *
 	 */
-	private boolean verifyPermissions(int[] grantResults) {
+	protected boolean verifyPermissions(int[] grantResults) {
 		for (int result : grantResults) {
 			if (result != PackageManager.PERMISSION_GRANTED) {
 				return false;
@@ -130,6 +131,7 @@ public class PermissionsActivity extends AppCompatActivity {
 		if (requestCode == PERMISSON_REQUESTCODE) {
 			if (!verifyPermissions(paramArrayOfInt)) {
 				showMissingPermissionDialog();
+				getApplistPackage();
 				isNeedCheck = false;
 			}
 		}
@@ -179,5 +181,10 @@ public class PermissionsActivity extends AppCompatActivity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-		
+
+
+	public void getApplistPackage(){
+
+	}
+
 }

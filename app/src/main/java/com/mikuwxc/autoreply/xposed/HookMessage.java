@@ -910,6 +910,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             videoState=1;
 
                             sedVideopicPath=videPath;
+
+                           // String newPicPathUrl= uploadVideo(sedVideoPath,talker,"Send",000, Integer.parseInt(videostatus), talker, type, Long.parseLong(s));
                         }else{
                             reyImagin=null;
                             videostatus="3";
@@ -918,6 +920,15 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             videoState=3;
 
                             reyVideopicPath=videPath;
+
+                           /* File file=new File(reyVideoPath);
+                            if (file.exists()){
+                                String newPicPathUrl= uploadVideo(reyVideoPath,talker,"Receive",000, Integer.parseInt(videostatus), talker, type, Long.parseLong(s));
+                            }else{
+                                XposedBridge.log("接受的视频地址还不存在");
+                            }*/
+
+
 
                         }
 
@@ -962,8 +973,11 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                                 if ("1".equals(isSend)){
                                     picstatus="1";
+
+                                    //String newPicPathUrl= uploadPic(newImaginPath,talker,"Send",000, Integer.parseInt(picstatus), talker, type, Long.parseLong(s));
                                 }else{
                                     picstatus="3";
+                                    //String newPicPathUrl= uploadPic(newImaginPath,talker,"Receive",000, Integer.parseInt(picstatus), talker, type, Long.parseLong(s));
                                 }
                                 //status = localContentValues.getAsString("status");
                                 XposedBridge.log("sssssssssssssss"+status);
