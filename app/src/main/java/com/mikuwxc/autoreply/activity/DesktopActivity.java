@@ -62,7 +62,7 @@ import cn.richinfo.dualsim.TelephonyManagement;
 import okhttp3.Call;
 
 
-public class DesktopActivity extends AppCompatActivity implements BaseOnRecycleClickListener, MyReceiver.BRInteraction {
+public class DesktopActivity extends PermissionsActivity implements BaseOnRecycleClickListener, MyReceiver.BRInteraction {
     private RecycleHomeAdapter adapter;
     private RecyclerView recycleV;
     private ArrayList<ApphttpBean.ResultBean> resultBean;
