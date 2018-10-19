@@ -833,7 +833,7 @@ class WechatEntity6703 extends WechatEntity {
 
         //发送文本的时候需要
         this.clear_black_friend_methoddemo = "dKW";
-        this.clear_black_friend_methoddemo1 = "com.tencent.mm.af.m";
+        this.clear_black_friend_methoddemo1 = "com.tencent.mm.ah.m";
 
         this.no_friends_deleted_class="com.tencent.mm.plugin.profile.ui.NormalUserFooterPreference$a$1$1$2";  //禁止删除好友
         this.delete_friend_chat_record_class="com.tencent.mm.ui.SingleChatInfoUI$8";  //禁止微信里面删除好友聊天记录

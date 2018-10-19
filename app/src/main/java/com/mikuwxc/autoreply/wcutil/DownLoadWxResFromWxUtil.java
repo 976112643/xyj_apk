@@ -73,7 +73,14 @@ public class DownLoadWxResFromWxUtil {
         }
         String obj = XposedHelpers.getObjectField(XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.download_file_class3, classLoader), wechatEntity.download_file_method4, new Object[]{objectField}), wechatEntity.download_file_field5).toString();
       //  XposedBridge.log("]]]]]]]]]"+obj.toString());
-        XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.download_file_class4, classLoader), wechatEntity.download_file_method5, new Object[]{Long.valueOf(j), objectField, null}).toString();
+        String str2 = wechatEntity.wx_version;
+        if (str2.hashCode()==51294852){ //等于6.7.3
+            XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.download_file_class4, classLoader), wechatEntity.download_file_method5, new Object[]{Long.valueOf(j), objectField}).toString();
+        }else{
+            XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.download_file_class4, classLoader), wechatEntity.download_file_method5, new Object[]{Long.valueOf(j), objectField, null}).toString();
+        }
+
+
         objectField = XposedHelpers.newInstance(XposedHelpers.findClass(wechatEntity.download_file_class5, classLoader), new Object[]{obj});
       //  XposedBridge.log("/////////"+objectField.toString());
         XposedHelpers.callMethod(XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.download_file_class6, classLoader), wechatEntity.download_file_method6, new Object[0]), wechatEntity.download_file_method7, new Object[]{objectField, Integer.valueOf(0)});

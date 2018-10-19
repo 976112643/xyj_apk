@@ -111,8 +111,13 @@ public class SendMesUtil
         XposedHelpers.setObjectField(localObject1, paramWechatEntity.sendFile_field2, ((File)localObject2).getName());
         Class localClass = XposedHelpers.findClass(paramWechatEntity.sendFile_class3, paramClassLoader);
         XposedHelpers.setObjectField(localObject1, paramWechatEntity.sendFile_field3, XposedHelpers.callStaticMethod(localClass, paramWechatEntity.sendFile_method2, new Object[] { Long.valueOf(((File)localObject2).length()) }));
-        XposedHelpers.callStaticMethod(XposedHelpers.findClass(paramWechatEntity.sendFile_class4, paramClassLoader), paramWechatEntity.sendFile_method3, new Object[] { localObject1, "", "", paramString1, Integer.valueOf(4), null });
-        saveMsgId(paramString2, Long.valueOf(paramLong));
+        try {
+            XposedHelpers.callStaticMethod(XposedHelpers.findClass(paramWechatEntity.sendFile_class4, paramClassLoader), paramWechatEntity.sendFile_method3, new Object[] { localObject1, "", "", paramString1, Integer.valueOf(4), null });
+            saveMsgId(paramString2, Long.valueOf(paramLong));
+        }catch (Exception e){
+            XposedBridge.log("eeee"+e.toString());
+        }
+
     }
 
     public static void sendLink(ClassLoader paramClassLoader, WechatEntity paramWechatEntity, String paramString1, String paramString2, String paramString3, String paramString4, String paramString5, long paramLong)
