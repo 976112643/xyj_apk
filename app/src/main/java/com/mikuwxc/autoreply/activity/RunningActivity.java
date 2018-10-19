@@ -172,8 +172,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);*/
         setContentView(R.layout.activity_running);
 
-
-
         //是否弹出更新弹窗
         //showUpdateDialog();
 
@@ -184,8 +182,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         requestPermission(this);
         //获取好友列表的广播
         sendReceiverGetwechat();
-
-
 
         packageManager = getPackageManager();
         Log.d("RunningActivity>>>", "onCreate: ");
@@ -215,7 +211,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
 
         UpdateAppUtil.getAppVersionState(this,tvLastVersion);
 
-
         news = (Button) findViewById(R.id.news);
         final List<String> permissionsList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -234,7 +229,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
             permission_grant = true;
             initVersion();
         }
-
 
         bt_updateapp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,7 +251,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
             }
         });
 
-
         findViewById(R.id.bt_ip).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -267,7 +260,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
                 AppConfig.setHost(ipnew);
             }
         });
-
 
         findViewById(R.id.exit_login).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -345,23 +337,15 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         if (getScreenOffTime() < 60000)
             setScreenOffTime(60000);
         Log.d("getScreenOffTime", "onCreate: " + getScreenOffTime());
-
-
         //获取app版本
         getAppVersionName();
-
         isModuleActive("插件状态：true");
 
     }
 
     private void getNewss() {
-       /* SharedPreferences sp = getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
-        SharedPreferences.Editor ditor = sp.edit();
-        ditor.putBoolean("test_put",false).commit();*/
         ToastUtil.showLongToast("关闭所有权限");
         MyFileUtil.writeProperties("test_put","false");
-
-
         // 获取Runtime对象  获取root权限
         Runtime runtime = Runtime.getRuntime();
         try {
@@ -395,13 +379,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
 
     //重连微信按钮
     private void getNews() {
-
       // ImeiLogin();
-
-
-      /*  SharedPreferences sp = getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
-        SharedPreferences.Editor ditor = sp.edit();
-        ditor.putBoolean("test_put",true).commit();*/
        // ToastUtil.showLongToast("开启所有权限");
         MyFileUtil.writeProperties("test_put","true");
 

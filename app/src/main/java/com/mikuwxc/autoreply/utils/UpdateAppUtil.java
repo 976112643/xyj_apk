@@ -151,11 +151,11 @@ public class UpdateAppUtil {
                          /*queryAndLoadNewPatch不可放在attachBaseContext 中，
                            否则无网络权限，建议放在后面任意时刻，如onCreate中*/
                             //去阿里看是否有补丁包
-                            Toast.makeText(context,"需要补丁更新",Toast.LENGTH_LONG).show();
+                            //Toast.makeText(context,"需要补丁更新",Toast.LENGTH_LONG).show();
                             SophixManager.getInstance().queryAndLoadNewPatch();
 
                         }else{
-                            Toast.makeText(context,"不需要补丁更新",Toast.LENGTH_LONG).show();
+                           // Toast.makeText(context,"不需要补丁更新",Toast.LENGTH_LONG).show();
                         }
 
                         Log.e("111", "获取App版本信息成功:"+bean.getResult());

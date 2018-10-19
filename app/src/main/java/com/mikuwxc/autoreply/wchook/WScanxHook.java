@@ -95,8 +95,8 @@ public class WScanxHook {
                         }
 
 
-
-                        if ("LuckyMoneyPrepareUI".equals(cn)){
+                     //是否能发红包
+                       /* if ("LuckyMoneyPrepareUI".equals(cn)){
                             param.setResult(null);
                             ComponentName componentName = new ComponentName(
                                     "com.mikuwxc.autoreply",   //要去启动的App的包名
@@ -111,7 +111,7 @@ public class WScanxHook {
                             activity.startActivity(intent);
                             activity.finish();
 
-                        }
+                        }*/
 
 
 
