@@ -294,7 +294,6 @@ public class MainHook implements IXposedHookLoadPackage {
                     input = new FileInputStream("/storage/emulated/0/hongbao.properties");//加载Java项目根路径下的配置文件
                     properties.load(input);// 加载属性文件
                     moneyStaus_put = Boolean.parseBoolean(properties.getProperty("moneyStaus_put"));
-                    XposedBridge.log("++++++++++++++++++++++++"+moneyStaus_put);
                 } catch (IOException io) {
 
                 } finally {
@@ -309,8 +308,6 @@ public class MainHook implements IXposedHookLoadPackage {
 
 
 
-               /* XSharedPreferences moneyStaus = new XSharedPreferences("com.mikuwxc.autoreply", "moneyStaus");
-                boolean moneyStaus_put = moneyStaus.getBoolean("moneyStaus_put", true);*/
                 if (moneyStaus_put){
                     //自动抢红包
                     //hookLuckyMoney(lpparam);

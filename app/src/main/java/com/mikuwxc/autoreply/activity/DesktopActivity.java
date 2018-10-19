@@ -44,6 +44,7 @@ import com.mikuwxc.autoreply.service.SmsObserverService;
 import com.mikuwxc.autoreply.utils.Global;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
+import com.mikuwxc.autoreply.utils.UpdateAppUtil;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -105,7 +106,12 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         startNetWorkBroadcastReceiver();//断网重连后短信 短话上传
 
         String lngAndLat = getLngAndLat(this);
+
+        UpdateAppUtil.removeApk(this);
     }
+
+
+
 
 
     @Override

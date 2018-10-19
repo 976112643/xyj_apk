@@ -781,7 +781,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             input = new FileInputStream("/storage/emulated/0/hongbao.properties");//加载Java项目根路径下的配置文件
                             properties.load(input);// 加载属性文件
                             verifyStaus_put = Boolean.parseBoolean(properties.getProperty("verifyStaus_put"));
-                            XposedBridge.log("++++++++++++++++++++++++"+verifyStaus_put);
                         } catch (IOException io) {
 
                         } finally {

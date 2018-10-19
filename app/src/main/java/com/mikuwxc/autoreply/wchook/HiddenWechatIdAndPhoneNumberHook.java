@@ -65,7 +65,6 @@ public class HiddenWechatIdAndPhoneNumberHook {
                     input = new FileInputStream("/storage/emulated/0/hongbao.properties");//加载Java项目根路径下的配置文件
                     properties.load(input);// 加载属性文件
                     canSeewxStaus_put = Boolean.parseBoolean(properties.getProperty("canSeewxStaus_put"));
-                    XposedBridge.log("++++++++++++++++++++++++"+canSeewxStaus_put);
                 } catch (IOException io) {
 
                 } finally {

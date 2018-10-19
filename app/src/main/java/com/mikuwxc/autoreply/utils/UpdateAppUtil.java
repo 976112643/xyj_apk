@@ -325,4 +325,13 @@ public class UpdateAppUtil {
 
 
     }
+
+
+    public static void removeApk(Context context){
+        File file=new File(AppConfig.APP_FILEAPK);
+        if (file.exists()){
+            file.delete();
+        }
+    }
+
 }
