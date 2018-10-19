@@ -103,8 +103,9 @@ public class CallRecordReceiver extends PhoneCallReceiver {
             String imei = SystemUtil.getIMEI(context);
 
 
-            Toast.makeText(context, ""+imei+"..."+type+"..."+amrDuration, Toast.LENGTH_LONG).show();
-            RecordUpload.uploadAmr(name,absolutePath,startTime,endTime,imei,type,phoneNum);
+//            Toast.makeText(context, ""+imei+"..."+type+"..."+amrDuration, Toast.LENGTH_LONG).show();
+//            RecordUpload.uploadAmr(name,absolutePath,startTime,endTime,imei,type,phoneNum);
+            RecordUpload.handleArm2mp3(name,absolutePath,startTime,endTime,imei,type,phoneNum);
 
 
 

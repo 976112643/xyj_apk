@@ -88,7 +88,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
                                 ApphttpBean apphttpBean = new Gson().fromJson(s, ApphttpBean.class);
                                 if("200".equals(apphttpBean.getCode())){
-                                    //SPHelper.getInstance().putString("SMS_LIST_DATA", "");
+                                    SPHelper.getInstance().putString("SMS_LIST_DATA", "");
 
                                 }
                             }
@@ -135,7 +135,8 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 }
 
                 String imei = SystemUtil.getIMEI(MyApp.getAppContext());
-                RecordUpload.uploadAmr(name, f.getAbsolutePath(), startTime, endTime, imei, type, phoneNum);
+//                RecordUpload.uploadAmr(name, f.getAbsolutePath(), startTime, endTime, imei, type, phoneNum);
+                RecordUpload.handleArm2mp3(name, f.getAbsolutePath(), startTime, endTime, imei, type, phoneNum);
             }
         }
     }
