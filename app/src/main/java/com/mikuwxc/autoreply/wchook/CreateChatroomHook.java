@@ -10,6 +10,8 @@ import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcutil.ChatroomUtil;
 import com.mikuwxc.autoreply.wx.WechatDb;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -40,6 +42,10 @@ public class CreateChatroomHook {
 
                 UserEntity userEntity = WechatDb.getInstance().selectSelf();
                 String alias = userEntity.getAlias();  //微信号
+                String userTalker = userEntity.getUserTalker();
+                if (StringUtils.isBlank(alias)){
+                    alias = userTalker;
+                }
                 handleMessageCreateChatroom(alias,ChatroomList);
             }
 
