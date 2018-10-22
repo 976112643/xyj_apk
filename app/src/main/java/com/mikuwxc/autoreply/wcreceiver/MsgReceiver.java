@@ -268,16 +268,10 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_saoyisao(Context context,String saoyisaoType) {
         if ("true".equals(saoyisaoType)) {
             //重连微信并且更改红包是否能自动获取
-           /* SharedPreferences sp = context.getSharedPreferences("saoyisaoStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("saoyisaoStaus_put", true).commit();*/
            // ToastUtil.showLongToast("开启微信扫一扫能权限");
             MyFileUtil.writeProperties("saoyisaoStaus_put","true");
 
         } else {
-           /* SharedPreferences sp = context.getSharedPreferences("saoyisaoStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("saoyisaoStaus_put", false).commit();*/
          //   ToastUtil.showLongToast("关闭微信扫一扫权限");
             MyFileUtil.writeProperties("saoyisaoStaus_put","false");
         }
@@ -287,16 +281,9 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_canseewxno(Context context,String canSeewxType) {
         if ("true".equals(canSeewxType)) {
             //重连微信并且更改红包是否能自动获取
-           /* SharedPreferences sp = context.getSharedPreferences("canSeewxStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("canSeewxStaus_put", true).commit();*/
-          //  ToastUtil.showLongToast("开启微信能否看微信号权限");
             MyFileUtil.writeProperties("canSeewxStaus_put","true");
 
         } else {
-           /* SharedPreferences sp = context.getSharedPreferences("canSeewxStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("canSeewxStaus_put", false).commit();*/
           //  ToastUtil.showLongToast("关闭微信能否看微信号权限");
             MyFileUtil.writeProperties("canSeewxStaus_put","false");
         }
@@ -305,16 +292,10 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_verify_friend(Context context,String verifyType) {
         if ("true".equals(verifyType)) {
             //重连微信并且更改红包是否能自动获取
-            /*SharedPreferences sp = context.getSharedPreferences("verifyStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("verifyStaus_put", true).commit();*/
            // ToastUtil.showLongToast("开启微信自动通过好友权限");
             MyFileUtil.writeProperties("verifyStaus_put","true");
 
         } else {
-           /* SharedPreferences sp = context.getSharedPreferences("verifyStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("verifyStaus_put", false).commit();*/
           //  ToastUtil.showLongToast("关闭微信自动通过好友权限");
             MyFileUtil.writeProperties("verifyStaus_put","false");
         }
@@ -329,20 +310,11 @@ public class MsgReceiver extends BroadcastReceiver {
         private void action_returnRooms(Context context,String momyType) {
         if ("true".equals(momyType)){
             //重连微信并且更改红包是否能自动获取
-          /*  SharedPreferences sp = context.getSharedPreferences("moneyStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("moneyStaus_put",true).commit();*/
           //  ToastUtil.showLongToast("开启微信自动抢红包权限");
-
-
             MyFileUtil.writeProperties("moneyStaus_put","true");
 
         }else{
-            /*SharedPreferences sp = context.getSharedPreferences("moneyStaus", Activity.MODE_WORLD_READABLE);
-            SharedPreferences.Editor ditor = sp.edit();
-            ditor.putBoolean("moneyStaus_put",false).commit();*/
           //  ToastUtil.showLongToast("关闭微信自动抢红包权限");
-
             MyFileUtil.writeProperties("moneyStaus_put","false");
         }
 
@@ -467,9 +439,7 @@ public class MsgReceiver extends BroadcastReceiver {
                             loginIM(context,wxno);
                             //登陆IM成功再同步好友
                             AsyncFriendTask.sendFriendList(wxno, friendBean, false);
-                           /* SharedPreferences sp = context.getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
-                            SharedPreferences.Editor ditor = sp.edit();
-                            ditor.putBoolean("test_put",true).commit();*/
+
                             MyFileUtil.writeProperties("test_put","true");
 
                             //服务保活加上权限会死循环，需要更改服务的状态
@@ -481,31 +451,19 @@ public class MsgReceiver extends BroadcastReceiver {
 
                             if (luckyPackage){
                                 //重连微信并且更改红包是否能自动获取
-                               /* SharedPreferences sp1 = context.getSharedPreferences("moneyStaus", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor1 = sp1.edit();
-                                ditor1.putBoolean("moneyStaus_put",true).commit();*/
                               //  ToastUtil.showLongToast("开启微信自动抢红包权限");
                                 MyFileUtil.writeProperties("moneyStaus_put","true");
                             }else{
                                 //重连微信并且更改红包是否能自动获取
-                               /* SharedPreferences sp1 = context.getSharedPreferences("moneyStaus", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor1 = sp1.edit();
-                                ditor1.putBoolean("moneyStaus_put",false).commit();*/
                               //  ToastUtil.showLongToast("开启微信自动抢红包权限");
                                 MyFileUtil.writeProperties("moneyStaus_put","false");
                             }
 
 
                             if (passNewFriend){
-                               /* SharedPreferences sp2 = context.getSharedPreferences("verifyStaus", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor2 = sp2.edit();
-                                ditor2.putBoolean("verifyStaus_put", true).commit();*/
                              //   ToastUtil.showLongToast("开启微信自动通过好友权限");
                                 MyFileUtil.writeProperties("verifyStaus_put","true");
                             }else{
-                               /* SharedPreferences sp2 = context.getSharedPreferences("verifyStaus", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor2 = sp2.edit();
-                                ditor2.putBoolean("verifyStaus_put", false).commit();*/
                            //     ToastUtil.showLongToast("开启微信自动通过好友权限");
                                 MyFileUtil.writeProperties("verifyStaus_put","false");
                             }
@@ -513,45 +471,27 @@ public class MsgReceiver extends BroadcastReceiver {
 
 
                             if (showWxno){
-                               /* SharedPreferences sp2 = context.getSharedPreferences("canSeewxStaus", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor2 = sp2.edit();
-                                ditor2.putBoolean("canSeewxStaus_put", true).commit();*/
                            //     ToastUtil.showLongToast("开启好友微信号权限");
                                 MyFileUtil.writeProperties("canSeewxStaus_put","true");
                             }else{
-                               /* SharedPreferences sp2 = context.getSharedPreferences("canSeewxStaus_put", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor2 = sp2.edit();
-                                ditor2.putBoolean("canSeewxStaus_put", false).commit();*/
                            //     ToastUtil.showLongToast("关闭好友微信号权限");
                                 MyFileUtil.writeProperties("canSeewxStaus_put","false");
                             }
 
 
                             if (scan){
-                               /* SharedPreferences sp2 = context.getSharedPreferences("canSeewxStaus", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor2 = sp2.edit();
-                                ditor2.putBoolean("canSeewxStaus_put", true).commit();*/
                             //    ToastUtil.showLongToast("开启扫一扫权限");
                                 MyFileUtil.writeProperties("saoyisaoStaus_put","true");
                             }else{
-                               /* SharedPreferences sp2 = context.getSharedPreferences("canSeewxStaus_put", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor2 = sp2.edit();
-                                ditor2.putBoolean("canSeewxStaus_put", false).commit();*/
                           //      ToastUtil.showLongToast("关闭扫一扫权限");
                                 MyFileUtil.writeProperties("saoyisaoStaus_put","false");
                             }
 
 
                             if (setting){
-                               /* SharedPreferences sp2 = context.getSharedPreferences("canSeewxStaus", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor2 = sp2.edit();
-                                ditor2.putBoolean("canSeewxStaus_put", true).commit();*/
                            //     ToastUtil.showLongToast("开启设置权限");
                                 MyFileUtil.writeProperties("setting_put","true");
                             }else{
-                               /* SharedPreferences sp2 = context.getSharedPreferences("canSeewxStaus_put", Activity.MODE_WORLD_READABLE);
-                                SharedPreferences.Editor ditor2 = sp2.edit();
-                                ditor2.putBoolean("canSeewxStaus_put", false).commit();*/
                            //     ToastUtil.showLongToast("关闭设置权限");
                                 MyFileUtil.writeProperties("setting_put","false");
                             }
@@ -580,9 +520,6 @@ public class MsgReceiver extends BroadcastReceiver {
 
                         }else {
                             //ToastUtil.showShortToast("登录IM此帐号不能授权");
-                           /* SharedPreferences sp = context.getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
-                            SharedPreferences.Editor ditor = sp.edit();
-                            ditor.putBoolean("test_put",false).commit();*/
                             MyFileUtil.writeProperties("test_put","false");
                             //服务保活加上权限会死循环，需要更改服务的状态
                             MyFileUtil.writeToNewFile(AppConfig.APP_FOLDER + "/updateAlive", "false");
@@ -601,6 +538,11 @@ public class MsgReceiver extends BroadcastReceiver {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Toast.makeText(context,volleyError.toString(),Toast.LENGTH_LONG).show();
+                        if (wxState!=null) {
+                            wxState.setText("微信连接状态：false");
+                            tv3.setText("服务器连接状态：false");
+                            MyFileUtil.writeProperties("connection_put","false");
+                        }
                     }
                 });
         //设置请求的Tag标签，可以在全局请求队列中通过Tag标签进行请求的查找
@@ -688,6 +630,7 @@ public class MsgReceiver extends BroadcastReceiver {
                         if (wxState!=null) {
                             wxState.setText("微信连接状态：true");
                             tv3.setText("服务器连接状态：true");
+                            MyFileUtil.writeProperties("connection_put","true");
                         }
                         NewMessageListener(context);
                         handler.postDelayed(runnable, 20000);//每两秒执行一次runnable.
@@ -704,6 +647,7 @@ public class MsgReceiver extends BroadcastReceiver {
                         if (wxState!=null) {
                         wxState.setText("微信连接状态：false");
                             tv3.setText("服务器连接状态：false");
+                            MyFileUtil.writeProperties("connection_put","false");
                         }
                         //错误码code和错误描述desc，可用于定位请求失败原因
                         //错误码code含义请参见错误码表
@@ -1035,29 +979,25 @@ public class MsgReceiver extends BroadcastReceiver {
                         Log.e("111","保活成功::没有缓存失败的信息");
                     }
 
-                   /* HttpImeiBean<Boolean> bean = new Gson().fromJson(s, new TypeToken<HttpImeiBean<Boolean>>(){}.getType());
-                    if (bean.getResult()) {
-                        Log.e("111", "保活信息成功:");
-                    } else {
-                        Log.e("111", "保活信息失败:");
-                        SharedPreferences sp = context.getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
-                        SharedPreferences.Editor ditor = sp.edit();
-                        ditor.putBoolean("test_put",false).commit();
-                        ToastUtil.showLongToast("关闭所有权限");
-                        //移除定时保活功能
-                        handlerAlive.removeCallbacks(runnableAlive);
-                        search[1] = chineseToUnicode(search[1]);
-                        execShell(search);
-                    }*/
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.e("111", "保活信息失败:" + e.toString());
+                    if (wxState!=null) {
+                        wxState.setText("微信连接状态：false");
+                        tv3.setText("服务器连接状态：false");
+                        MyFileUtil.writeProperties("connection_put","false");
+                    }
                 }
             }
             @Override
             public void onError(Call call, okhttp3.Response response, Exception e) {
                 super.onError(call, response, e);
                 Log.e("111", "保活信息失败:");
+                if (wxState!=null) {
+                    wxState.setText("微信连接状态：false");
+                    tv3.setText("服务器连接状态：false");
+                    MyFileUtil.writeProperties("connection_put","false");
+                }
 
             }
         });

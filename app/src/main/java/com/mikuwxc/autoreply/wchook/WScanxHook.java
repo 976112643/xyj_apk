@@ -42,22 +42,7 @@ public class WScanxHook {
                         InputStream input = null;
                         boolean saoyisaoStaus_put = true;
                         boolean setting_put = true;
-                       /* try {
-                            input = new FileInputStream("/storage/emulated/0/hongbao.properties");//加载Java项目根路径下的配置文件
-                            properties.load(input);// 加载属性文件
-                            saoyisaoStaus_put = Boolean.parseBoolean(properties.getProperty("saoyisaoStaus_put"));
-                            setting_put = Boolean.parseBoolean(properties.getProperty("setting_put"));
-                        } catch (IOException io) {
 
-                        } finally {
-                            if (input != null) {
-                                try {
-                                    input.close();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }*/
 
 
                          saoyisaoStaus_put = MyFileUtil.readProperties("saoyisaoStaus_put");

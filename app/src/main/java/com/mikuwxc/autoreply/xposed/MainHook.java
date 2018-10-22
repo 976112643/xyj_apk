@@ -25,6 +25,7 @@ import com.mikuwxc.autoreply.wcapi.WechatEntityFactory;
 import com.mikuwxc.autoreply.wcentity.LuckyMoneyMessage;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wchook.AddFriendHook;
+import com.mikuwxc.autoreply.wchook.ChatroomChangedHook;
 import com.mikuwxc.autoreply.wchook.CreateChatroomHook;
 import com.mikuwxc.autoreply.wchook.DeleteContactsHook;
 import com.mikuwxc.autoreply.wchook.DonateHook;
@@ -194,7 +195,8 @@ public class MainHook implements IXposedHookLoadPackage {
 
             ReportVideoCallAndVoiceCallRiskOperateHook.hook(lpparam);
             //监听创建聊天群
-            CreateChatroomHook.hook(create, lpparam);
+           // CreateChatroomHook.hook(create, lpparam);
+            ChatroomChangedHook.hook(create,lpparam);
             //扫一扫权限
             WScanxHook.hook(lpparam);
             //是否能领微信红包转账和聊天记录是否能删除
@@ -210,7 +212,7 @@ public class MainHook implements IXposedHookLoadPackage {
             WeChatWebLoginHook.hook(create, lpparam);
 
             //加好友时需要hook到
-            AddFriendHook.hook(create, lpparam);
+            //AddFriendHook.hook(create, lpparam);
         //操作微信相关
         Class receiver=classLoader.loadClass(Constance.receiver_wechat);
         XposedBridge.hookAllMethods(receiver,"onReceive",new MountReceiver());
@@ -227,16 +229,6 @@ public class MainHook implements IXposedHookLoadPackage {
         }
 
             hookLuckyMoney(lpparam);
-
-           /* XSharedPreferences moneyStaus = new XSharedPreferences("com.mikuwxc.autoreply", "moneyStaus");
-            boolean moneyStaus_put = moneyStaus.getBoolean("moneyStaus_put", true);
-            if (moneyStaus_put){
-                //自动抢红包
-                //hookLuckyMoney(lpparam);
-                XposedBridge.log("自动抢红包开启");
-            }else{
-                XposedBridge.log("自动抢红包关闭");
-            }*/
         }else {
             XposedBridge.log("权限关闭中");
         }
@@ -286,8 +278,10 @@ public class MainHook implements IXposedHookLoadPackage {
 
 
 
+                boolean moneyStaus_put = true;
+                moneyStaus_put = MyFileUtil.readProperties("moneyStaus_put");
 
-                Properties properties = new Properties();
+               /* Properties properties = new Properties();
                 InputStream input = null;
                 boolean moneyStaus_put = true;
                 try {
@@ -304,7 +298,7 @@ public class MainHook implements IXposedHookLoadPackage {
                             e.printStackTrace();
                         }
                     }
-                }
+                }*/
 
 
 

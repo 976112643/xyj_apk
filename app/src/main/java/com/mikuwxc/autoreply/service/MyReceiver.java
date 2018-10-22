@@ -86,15 +86,17 @@ public class MyReceiver extends BroadcastReceiver {
                 if (message != null) {
                  /*   MyFileUtil.writeToNewFile(AppConfig.APP_FOLDER + "/update", "update sensitive word");//告知微信hoook有敏感词需要更新
                     MyFileUtil.writeToNewFile(AppConfig.APP_FOLDER + "/sensitive", message);*/
-                    ToastUtil.showLongToast("更新权限");
+                    Toast.makeText(context,"更新权限",Toast.LENGTH_SHORT).show();
                     try {
                         ImMessageBean imMessageBean = new Gson().fromJson(message, ImMessageBean.class);
                         String content = imMessageBean.getContent();
                         String type = imMessageBean.getType();
                         if ("202".equals(type)) {
-                            SharedPreferences sp = context.getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
+                           /* SharedPreferences sp = context.getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
                             SharedPreferences.Editor ditor = sp.edit();
-                            ditor.putBoolean("test_put", true).commit();
+                            ditor.putBoolean("test_put", true).commit();*/
+
+                            MyFileUtil.writeProperties("test_put","true");
 
 
                             Runtime runtime = Runtime.getRuntime();
@@ -118,13 +120,13 @@ public class MyReceiver extends BroadcastReceiver {
                                 if (brInteraction!=null){
                                     brInteraction.setText(message);
                                 }else{
-                                    ToastUtil.showShortToast("brInteraction"+"为空");
+                                    Toast.makeText(context,"brInteraction"+"为空",Toast.LENGTH_LONG).show();
                                 }
 
                         }
 
                     }catch (Exception e){
-                        ToastUtil.showLongToast(e.toString());
+                        Toast.makeText(context,e.toString(),Toast.LENGTH_LONG).show();
                     }
 
                 }

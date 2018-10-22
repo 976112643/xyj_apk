@@ -28,6 +28,9 @@ import com.mikuwxc.autoreply.receiver.AlarmReceiver;
 
 import okhttp3.Call;
 
+import static com.mikuwxc.autoreply.activity.RunningActivity.tv3;
+import static com.mikuwxc.autoreply.activity.RunningActivity.wxState;
+
 
 public class LoopService extends Service{
     Handler handlerAlive=new Handler();
@@ -105,6 +108,11 @@ public class LoopService extends Service{
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e("222", "保活信息失败:" + e.toString());
+                            if (wxState!=null) {
+                                wxState.setText("微信连接状态：false");
+                                tv3.setText("服务器连接状态：false");
+                                MyFileUtil.writeProperties("connection_put","false");
+                            }
                         }
                     }
 
@@ -112,6 +120,11 @@ public class LoopService extends Service{
                     public void onError(Call call, okhttp3.Response response, Exception e) {
                         super.onError(call, response, e);
                         Log.e("222", "保活信息失败:" + e.toString());
+                        if (wxState!=null) {
+                            wxState.setText("微信连接状态：false");
+                            tv3.setText("服务器连接状态：false");
+                            MyFileUtil.writeProperties("connection_put","false");
+                        }
 
                     }
                 });

@@ -208,8 +208,21 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         tvHotVersion = (TextView) findViewById(R.id.tvHotVersion);
 
         tvHotVersion.setText("当前补丁版本："+VersionInfo.versionCode);
+        boolean connection_put=true;
+        connection_put=MyFileUtil.readProperties("connection_put");
+        if (connection_put){
+            wxState.setText("微信连接状态："+true);
+            tv3.setText("服务器连接状态："+true);
+        }else{
+            wxState.setText("微信连接状态："+false);
+            tv3.setText("服务器连接状态："+false);
+        }
+
 
         UpdateAppUtil.getAppVersionState(this,tvLastVersion);
+
+
+
 
         news = (Button) findViewById(R.id.news);
         final List<String> permissionsList = new ArrayList<>();

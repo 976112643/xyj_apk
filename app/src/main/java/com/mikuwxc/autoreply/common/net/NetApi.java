@@ -34,6 +34,7 @@ public class NetApi {
 
     public static final String chatRecord = "api/1.0/log/chatRecord";  //撤回和删除消息
     public static final String creatchatroom = "api/1.0/log/chatroom/";  //
+    public static final String createchatroom="/api/1.0/chatroom";
     public static final String upDateHot = "/api/1.0/version/patch/applyTo/version";
     public static final String upDateAppVersion = "/api/1.0/version/app/last";  //get  //获取app版本信息
 

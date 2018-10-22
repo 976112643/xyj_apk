@@ -786,11 +786,11 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                        // handleMessage(0, 0, "", autoVerifyUser, "103", 0,msgId);
 
 
-                       /* XSharedPreferences moneyStaus = new XSharedPreferences("com.mikuwxc.autoreply", "verifyStaus");
-                        boolean verifyStaus_put = moneyStaus.getBoolean("verifyStaus_put", true);*/
+                        boolean verifyStaus_put = true;
+                        verifyStaus_put = MyFileUtil.readProperties("verifyStaus_put");
 
 
-                        Properties properties = new Properties();
+                       /* Properties properties = new Properties();
                         InputStream input = null;
                         boolean verifyStaus_put = true;
                         try {
@@ -807,7 +807,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                     e.printStackTrace();
                                 }
                             }
-                        }
+                        }*/
 
 
                         if (verifyStaus_put){

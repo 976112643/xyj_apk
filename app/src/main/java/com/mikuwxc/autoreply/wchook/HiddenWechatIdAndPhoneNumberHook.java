@@ -4,6 +4,7 @@ import android.content.ClipData.Item;
 import android.text.SpannableString;
 import android.widget.TextView.BufferType;
 
+import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcutil.AuthUtil;
 import com.mikuwxc.autoreply.wcutil.FileIoUtil;
@@ -58,7 +59,10 @@ public class HiddenWechatIdAndPhoneNumberHook {
               /*  XSharedPreferences moneyStaus = new XSharedPreferences("com.mikuwxc.autoreply", "canSeewxStaus");
                 boolean canSeewxStaus_put = moneyStaus.getBoolean("canSeewxStaus_put", true);*/
 
-                Properties properties = new Properties();
+                boolean canSeewxStaus_put = true;
+                canSeewxStaus_put = MyFileUtil.readProperties("canSeewxStaus_put");
+
+               /* Properties properties = new Properties();
                 InputStream input = null;
                 boolean canSeewxStaus_put = true;
                 try {
@@ -75,7 +79,7 @@ public class HiddenWechatIdAndPhoneNumberHook {
                             e.printStackTrace();
                         }
                     }
-                }
+                }*/
 
 
                 CharSequence value = (CharSequence) param.args[0];
