@@ -72,7 +72,7 @@ public class SnsReader {
         String sourceType = cursor.getString(cursor.getColumnIndex("sourceType"));//朋友圈类型
         String subType = cursor.getString(cursor.getColumnIndex("subType"));//朋友圈上传成功与否(自己定义的,原字段不知什么含义)
         SnsInfo newSns = parser.parseSnsAllFromBin(snsDetailBin, snsObjectBin);
-
+        newSns.setSourceType(sourceType);
         for (int i=0;i<snsList.size();i++) {
             if (snsList.get(i).id.equals(newSns.id)) {
                 return;

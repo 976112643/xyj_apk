@@ -21,6 +21,16 @@ public class SnsInfo {
     public boolean isCurrentUser = false;
     public boolean selected = true;
 
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String sourceType="";
+
     public boolean uploadSuccess;
     private String snsId;
 

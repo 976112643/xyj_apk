@@ -171,9 +171,14 @@ public class Task {
      * **/
     public static void saveToJSONFile(ArrayList<SnsInfo> snsList, String fileName, boolean onlySelected) {
 
-
+        List<SnsInfo> snsInfos=null;
         String json = getFileFromSD(Config.EXT_DIR+"/all_sns.json");//所有的数据
-        List<SnsInfo> snsInfos = JSON.parseArray(json, SnsInfo.class);//解析所有的数据
+        if("".equals(json)){
+            snsInfos = JSON.parseArray("[]", SnsInfo.class);//解析所有的数据
+        }else{
+
+            snsInfos = JSON.parseArray(json, SnsInfo.class);//解析所有的数据
+        }
 
 
         JSONArray snsListJSON = new JSONArray();
@@ -191,12 +196,16 @@ public class Task {
             if(flag){
                 continue;
             }
-            if (!currentSns.ready) {
+            if(!currentSns.isCurrentUser){//不是当前用户
+                continue;
+            }
+            //排除==============================================================================================================================
+          /*  if (!currentSns.ready) {
                 continue;
             }
             if (onlySelected && !currentSns.selected) {
                 continue;
-            }
+            }*/
             JSONObject snsJSON = new JSONObject();
             JSONArray commentsJSON = new JSONArray();
             JSONArray likesJSON = new JSONArray();
@@ -254,10 +263,15 @@ public class Task {
             BufferedWriter bw = new BufferedWriter(fw);
             String str = snsListJSON.toString();
             List<SnsInfo> saveList = JSON.parseArray(str, SnsInfo.class);
-            snsInfos.addAll(saveList);
+            if(saveList!=null&&saveList.size()>0){
+                snsInfos.addAll(saveList);
 //            bw.write(str);//写入json
-            bw.write(JSON.toJSONString(snsInfos));//写入json
+                bw.write(JSON.toJSONString(snsInfos));//写入json
+            }
+
             bw.close();
+            //准备上传
+            MomentPicUpload.handleDatas();
         } catch (IOException e) {
             Log.e("wechatmomentstat", "exception", e);
         }

@@ -46,6 +46,7 @@ import com.mikuwxc.autoreply.utils.Global;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 import com.mikuwxc.autoreply.utils.UpdateAppUtil;
+import com.mikuwxc.autoreply.wxmoment.MomentDBTask;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -481,6 +482,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         callRecord.stopCallReceiver();
         unregisterReceiver(networkChangeReceiver);
         unregisterReceiver(momentReceiver);
+        MomentReceiver.runHandle.removeCallbacksAndMessages(null);
     }
 
 
