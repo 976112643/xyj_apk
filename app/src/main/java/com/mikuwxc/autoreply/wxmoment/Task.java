@@ -180,7 +180,7 @@ public class Task {
 
         for (int snsIndex=0; snsIndex<snsList.size(); snsIndex++) {
             SnsInfo currentSns = snsList.get(snsIndex);
-            //排除
+            //排除==============================================================================================================================
             String id = currentSns.id;
             boolean flag=false;
             for (SnsInfo snsInfo : snsInfos) {

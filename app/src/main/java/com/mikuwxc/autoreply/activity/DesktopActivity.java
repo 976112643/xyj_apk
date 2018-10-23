@@ -38,6 +38,7 @@ import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
+import com.mikuwxc.autoreply.receiver.MomentReceiver;
 import com.mikuwxc.autoreply.receiver.NetworkChangeReceiver;
 import com.mikuwxc.autoreply.service.MyReceiver;
 import com.mikuwxc.autoreply.service.SmsObserverService;
@@ -79,6 +80,8 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     private CallRecord callRecord;
     private IntentFilter netWorkIntentFilter;
     private NetworkChangeReceiver networkChangeReceiver;
+    private MomentReceiver momentReceiver;
+    private IntentFilter momentDBFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,14 +107,18 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         startService(smsObserverIntent);//短信监听
         startRecordService();//电话监听
         startNetWorkBroadcastReceiver();//断网重连后短信 短话上传
-
+        startMomentDBReceiver();//开启朋友圈列表数据库的监听
         String lngAndLat = getLngAndLat(this);
 
         UpdateAppUtil.removeApk(this);
     }
 
-
-
+    private void startMomentDBReceiver() {
+        momentReceiver = new MomentReceiver();
+        momentDBFilter = new IntentFilter();
+        momentDBFilter.addAction("moment");
+        registerReceiver(momentReceiver,momentDBFilter);
+    }
 
 
     @Override
@@ -473,6 +480,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         stopService(smsObserverIntent);
         callRecord.stopCallReceiver();
         unregisterReceiver(networkChangeReceiver);
+        unregisterReceiver(momentReceiver);
     }
 
 

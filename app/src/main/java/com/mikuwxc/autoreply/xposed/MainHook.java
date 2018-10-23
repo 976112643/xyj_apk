@@ -33,6 +33,7 @@ import com.mikuwxc.autoreply.wchook.HiddenWechatIdAndPhoneNumberHook;
 import com.mikuwxc.autoreply.wchook.HideModule;
 import com.mikuwxc.autoreply.wchook.ItemHook;
 import com.mikuwxc.autoreply.wchook.LogWechatDbPathAndPwdHook;
+import com.mikuwxc.autoreply.wchook.MomentHook;
 import com.mikuwxc.autoreply.wchook.ReportDeleteWxMessageRiskOperateHook;
 import com.mikuwxc.autoreply.wchook.ReportVideoCallAndVoiceCallRiskOperateHook;
 import com.mikuwxc.autoreply.wchook.SensitiveHook;
@@ -169,7 +170,8 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
             });
 
-
+            WechatEntity wechatEntity = WechatEntityFactory.create(applicationContext);
+            MomentHook.hook(applicationContext,wechatEntity,lpparam);//朋友圈
 
 
 
