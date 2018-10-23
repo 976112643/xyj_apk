@@ -376,7 +376,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                                    // handleMessage(field_unReadCount, Integer.parseInt(picstatus), field_username, userNameChatroom+newPicPathUrl, field_msgType, field_conversationTime,msgId);
                                     XposedBridge.log("$$$$$$$$$同步接收到的图片成功");
-                                    userNameChatroom="";
+                                 //   userNameChatroom="";
                                 }else{
                                     XposedBridge.log("接收到的图片文件为空");
                                     //因为图片还没下载成功，所以文件会为空，此时就需要重新进这个判断方法，知道文件下载成功

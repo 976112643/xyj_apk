@@ -19,14 +19,14 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class ItemHook {
     public static void hook(final XC_LoadPackage.LoadPackageParam loadPackageParam,WechatEntity paramWechatEntity) throws ClassNotFoundException {
 
-      /*  //是否能发起语音视频聊天
+        /*//是否能发起语音视频聊天
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.voip.ui.VideoActivity", loadPackageParam.classLoader,
-                "onCreate",Bundle.class, new XC_MethodHook() {
+                "onStart",Bundle.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
-                        param.setResult(0);   //加了这句微信会cash掉
-                       *//* Activity activity=(Activity) param.thisObject;
+
+                        Activity activity=(Activity) param.thisObject;
                         ComponentName componentName = new ComponentName(
                                 "com.mikuwxc.autoreply",   //要去启动的App的包名
                                 "com.mikuwxc.autoreply.activity.AuthorityActivity");
@@ -38,7 +38,8 @@ public class ItemHook {
                         Bundle bundle = new Bundle();
                         intent.setComponent(componentName);
                         activity.startActivity(intent);
-                        activity.finish();*//*
+                        activity.finish();
+                        param.setResult(0);   //加了这句微信会cash掉
 
                     }
 
@@ -49,7 +50,6 @@ public class ItemHook {
                     }
                 });
 */
-
 
         //是否能领红包
         XposedHelpers.findAndHookMethod("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyReceiveUI", loadPackageParam.classLoader,

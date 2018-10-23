@@ -143,7 +143,7 @@ public class MainHook implements IXposedHookLoadPackage {
         if (test_put){
         XposedBridge.log("权限开启中");
 
-           /* XposedHelpers.findAndHookMethod(Activity.class, "onCreate", Bundle.class, new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(Activity.class, "onCreate", Bundle.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Activity thisObject = (Activity) param.thisObject;
@@ -166,7 +166,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
                     super.afterHookedMethod(param);
                 }
-            });*/
+            });
 
 
 
