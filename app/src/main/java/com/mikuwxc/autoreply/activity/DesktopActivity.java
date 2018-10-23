@@ -187,7 +187,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                 isDualSimOrNot();
 //                    } else {
-//                        Toast.makeText(MainActivity.this, "android 版本过低！", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MomentChatMainActivity.this, "android 版本过低！", Toast.LENGTH_SHORT).show();
 //                    }
             }
 

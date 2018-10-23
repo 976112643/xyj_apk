@@ -454,7 +454,7 @@ public class SecondActivity extends BaseActivity {
                         ToastUtil.showLongToast("腾讯IM登录成功:" + AppConfig.getIdentifier());
                         NewMessageListener();
                         sendMsg();
-                        //PollingUtils.startPollingService(MainActivity.this, 1, PollingService.class, PollingService.ACTION);
+                        //PollingUtils.startPollingService(MomentChatMainActivity.this, 1, PollingService.class, PollingService.ACTION);
                     }
 
                     @Override
