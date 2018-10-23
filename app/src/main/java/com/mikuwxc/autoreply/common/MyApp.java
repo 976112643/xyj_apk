@@ -43,6 +43,7 @@ import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.taobao.sophix.PatchStatus;
 import com.taobao.sophix.SophixManager;
 import com.taobao.sophix.listener.PatchLoadStatusListener;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.imsdk.TIMConnListener;
 import com.tencent.imsdk.TIMConversation;
 import com.tencent.imsdk.TIMFriendshipSettings;
@@ -123,7 +124,7 @@ public class MyApp extends Application {
         //设置极光推送的别名
         //setTagAndAlias();
         x.Ext.init(this);
-
+        CrashReport.initCrashReport(getApplicationContext(), "7bca0364df", false);
         ContextHolder.initial(this);
         // 获取Runtime对象  获取root权限
         Runtime runtime = Runtime.getRuntime();
