@@ -17,6 +17,7 @@ public class AppConfig {
     private static String selectHost;//选择服务器
     public static final String ROOT = Environment.getExternalStorageDirectory().getAbsolutePath();
     public static final String APP_FOLDER = ROOT + "/HSL_WXFZ";
+    public static final String APP_USERNAME = ROOT + "/wechatusername";//保存用户名 微信号等相关信息
     public static final String APP_ADD = ROOT + "/AddFriend";
     public static final String APP_FILE = ROOT + "/JCM";
     public static final String APP_FILEAPK = ROOT + "/JCM/hsl.apk";

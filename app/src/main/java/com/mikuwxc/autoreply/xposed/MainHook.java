@@ -40,6 +40,7 @@ import com.mikuwxc.autoreply.wchook.VersionParamNew;
 import com.mikuwxc.autoreply.wchook.WScanxHook;
 import com.mikuwxc.autoreply.wchook.WalletHook;
 import com.mikuwxc.autoreply.wchook.WeChatWebLoginHook;
+import com.mikuwxc.autoreply.wchook.WechatUsernameHook;
 import com.mikuwxc.autoreply.wcutil.PreferencesUtils;
 import com.mikuwxc.autoreply.wcutil.XmlToJson;
 
@@ -142,7 +143,7 @@ public class MainHook implements IXposedHookLoadPackage {
         //判断是否具有全部微信权限
         if (test_put){
         XposedBridge.log("权限开启中");
-
+            WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
             XposedHelpers.findAndHookMethod(Activity.class, "onCreate", Bundle.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
