@@ -144,34 +144,11 @@ public class MainHook implements IXposedHookLoadPackage {
         //判断是否具有全部微信权限
         if (test_put){
         XposedBridge.log("权限开启中");
-            WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
-            XposedHelpers.findAndHookMethod(Activity.class, "onCreate", Bundle.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Activity thisObject = (Activity) param.thisObject;
-                    XposedBridge.log("当前 Activity : " + thisObject.getClass().getName());
+          //  WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
 
 
-                    Field[] fields = thisObject.getClass().getDeclaredFields();
-                    for (Field field : fields) {
-                        field.setAccessible(true);
-
-                        try {
-                            field.set(thisObject, field.getName());
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-
-                        Object o = field.get(thisObject);
-                        XposedBridge.log("\t\t\t" + field.getName() + " = " + o.getClass().getName());
-                    }
-
-                    super.afterHookedMethod(param);
-                }
-            });
-
-            WechatEntity wechatEntity = WechatEntityFactory.create(applicationContext);
-            MomentHook.hook(applicationContext,wechatEntity,lpparam);//朋友圈
+          /*  WechatEntity wechatEntity = WechatEntityFactory.create(applicationContext);
+            MomentHook.hook(applicationContext,wechatEntity,lpparam);//朋友圈*/
 
 
 
@@ -283,26 +260,6 @@ public class MainHook implements IXposedHookLoadPackage {
 
                 boolean moneyStaus_put = true;
                 moneyStaus_put = MyFileUtil.readProperties("moneyStaus_put");
-
-               /* Properties properties = new Properties();
-                InputStream input = null;
-                boolean moneyStaus_put = true;
-                try {
-                    input = new FileInputStream("/storage/emulated/0/hongbao.properties");//加载Java项目根路径下的配置文件
-                    properties.load(input);// 加载属性文件
-                    moneyStaus_put = Boolean.parseBoolean(properties.getProperty("moneyStaus_put"));
-                } catch (IOException io) {
-
-                } finally {
-                    if (input != null) {
-                        try {
-                            input.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }*/
-
 
 
                 if (moneyStaus_put){
@@ -443,11 +400,21 @@ public class MainHook implements IXposedHookLoadPackage {
         String sendId = nativeUrl.getQueryParameter("sendid");
         requestCaller = callStaticMethod(findClass(networkRequest, lpparam.classLoader), getNetworkByModelMethod);
 
+
         // if (VersionParam.hasTimingIdentifier) {
         callMethod(requestCaller, "a", newInstance(findClass(receiveLuckyMoneyRequest, lpparam.classLoader), channelId, sendId, nativeUrlString, 0, "v1.0"), 0);
+
+     /*   try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+
         luckyMoneyMessages.add(new LuckyMoneyMessage(msgType, channelId, sendId, nativeUrlString, talker));
         //    return;
         // }
+
+
         Object luckyMoneyRequest = newInstance(findClass(VersionParamNew.luckyMoneyRequest, lpparam.classLoader),
                 msgType, channelId, sendId, nativeUrlString, "", "", talker, "v1.0");
 

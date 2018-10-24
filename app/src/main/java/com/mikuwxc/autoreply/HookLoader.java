@@ -22,6 +22,7 @@ import com.mikuwxc.autoreply.modle.FriendBean;
 import com.mikuwxc.autoreply.wcentity.LuckyMoneyMessage;
 import com.mikuwxc.autoreply.wchook.DonateHook;
 import com.mikuwxc.autoreply.wchook.HideModule;
+import com.mikuwxc.autoreply.wchook.PreventActivityForRiskAndForbiddenHook;
 import com.mikuwxc.autoreply.wchook.VersionParamNew;
 import com.mikuwxc.autoreply.wcutil.PreferencesUtils;
 import com.mikuwxc.autoreply.wcutil.XmlToJson;
@@ -100,11 +101,23 @@ public class HookLoader implements IXposedHookLoadPackage {
     private static String wechatVersion = "";
     private static List<LuckyMoneyMessage> luckyMoneyMessages = new ArrayList<>();
     private static Object requestCaller;
+    private static Context applicationContext;
+    public static Context getApplicationContext() {
+        return applicationContext;
+    }
+
+    private void initApplicationContext() {
+        synchronized (this) {
+            if (applicationContext == null) {
+                applicationContext = (Context) callMethod(callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread", new Object[0]), "getSystemContext", new Object[0]);
+            }
+        }
+    }
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-//        LogUtils.i("HookLoader","*****************  要启动HookLoader  **************");
-
+        initApplicationContext();
+        PreventActivityForRiskAndForbiddenHook.hook(loadPackageParam);  //hook整个手机的全部app,然后给权限
 
         if (hostAppPackages.contains(loadPackageParam.packageName)) {
             //将loadPackageParam的classloader替换为宿主程序Application的classloader,解决宿主程序存在多个.dex文件时,有时候ClassNotFound的问题
