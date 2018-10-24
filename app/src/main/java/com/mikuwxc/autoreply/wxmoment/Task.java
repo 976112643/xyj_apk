@@ -1,10 +1,13 @@
 package com.mikuwxc.autoreply.wxmoment;
 
 import android.app.ActivityManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -170,8 +173,56 @@ public class Task {
      * 量将数据写入到json文件
      * **/
     public static void saveToJSONFile(ArrayList<SnsInfo> snsList, String fileName, boolean onlySelected) {
+        //测试===============数据库改造
+        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+        database.execSQL("create table if not exists moment(id integer primary key autoincrement," +
+                "authorId text, authorName text,comments text,content text,isCurrentUser text," +
+                "likes text,mediaList text,snsId text,sourceType text,timestamp text," +
+                "uploadsuccess text )");
+        database.execSQL("create table if not exists media(id integer primary key autoincrement,address text,uploadsuccess text,snsId text)");//一对多(多的这张表)
+        //判断是否插入
+        for (int i = 0; i < snsList.size(); i++) {
+            SnsInfo snsInfo = snsList.get(i);
+            if (snsInfo.isCurrentUser) {
+                Cursor cursor = database.rawQuery("select * from moment where snsId = ? and timestamp=?", new String[]{snsInfo.id, String.valueOf(snsInfo.timestamp)});
+                int count = cursor.getCount();
+                if(count==0){
+                    ContentValues cv=new ContentValues();
+                    cv.put("authorId",snsInfo.authorId);
+                    cv.put("authorName",snsInfo.authorName);
+                    cv.put("comments",JSON.toJSONString(snsInfo.comments));
+                    cv.put("content",snsInfo.content);
+                    cv.put("isCurrentUser",String.valueOf(snsInfo.isCurrentUser));
+                    cv.put("likes",JSON.toJSONString(snsInfo.likes));
+                    cv.put("mediaList",JSON.toJSONString(snsInfo.mediaList));
+                    cv.put("snsId",snsInfo.id);
+                    cv.put("sourceType",snsInfo.sourceType);
+                    cv.put("timestamp",String.valueOf(snsInfo.timestamp));
+                    cv.put("uploadsuccess","false");
+                    database.insert("moment",null,cv);
 
-        List<SnsInfo> snsInfos=null;
+                    ArrayList<String> mediaList = snsInfo.mediaList;
+                    for (String address : mediaList) {
+                        ContentValues c=new ContentValues();
+                        c.put("address",address);
+                        c.put("uploadsuccess","false");
+                        c.put("snsId",snsInfo.id);//逻辑外键
+                        database.insert("media",null,c);
+                    }
+                }
+                cursor.close();
+            }
+        }
+
+        database.close();
+
+        //上传基本
+
+        //处理下载图片任务
+        MomentPicUpload.handleDatas2();
+
+        //测试===============数据库改造
+       /* List<SnsInfo> snsInfos=null;
         String json = getFileFromSD(Config.EXT_DIR+"/all_sns.json");//所有的数据
         if("".equals(json)){
             snsInfos = JSON.parseArray("[]", SnsInfo.class);//解析所有的数据
@@ -200,12 +251,12 @@ public class Task {
                 continue;
             }
             //排除==============================================================================================================================
-          /*  if (!currentSns.ready) {
+          *//*  if (!currentSns.ready) {
                 continue;
             }
             if (onlySelected && !currentSns.selected) {
                 continue;
-            }*/
+            }*//*
             JSONObject snsJSON = new JSONObject();
             JSONArray commentsJSON = new JSONArray();
             JSONArray likesJSON = new JSONArray();
@@ -262,7 +313,7 @@ public class Task {
             FileWriter fw = new FileWriter(jsonFile.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
             String str = snsListJSON.toString();
-            List<SnsInfo> saveList = JSON.parseArray(str, SnsInfo.class);
+            List<SnsInfo> saveList = JSON.parseArray(str, SnsInfo.class);//需要添加到的
             if(saveList!=null&&saveList.size()>0){
                 snsInfos.addAll(saveList);
 //            bw.write(str);//写入json
@@ -274,7 +325,7 @@ public class Task {
             MomentPicUpload.handleDatas();
         } catch (IOException e) {
             Log.e("wechatmomentstat", "exception", e);
-        }
+        }*/
     }
 
     /**从sd卡获取json**/

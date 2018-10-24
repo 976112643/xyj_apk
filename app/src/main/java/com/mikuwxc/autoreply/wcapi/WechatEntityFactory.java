@@ -1,62 +1,31 @@
 package com.mikuwxc.autoreply.wcapi;
 
 
+import android.content.Context;
+
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
+import com.mikuwxc.autoreply.wcutil.AppUtil;
+import com.mikuwxc.autoreply.wcutil.GlobalUtil;
 
 public class WechatEntityFactory {
     private static WechatEntity current;
 
-    public static WechatEntity create(android.content.Context r3) {
-        /* JADX: method processing error */
-/*
-Error: jadx.core.utils.exceptions.JadxRuntimeException: Exception block dominator not found, method:com.ac.wechat.api.WechatEntityFactory.create(android.content.Context):com.ac.wechat.entity.WechatEntity. bs: [B:3:0x0005, B:13:0x0016]
-	at jadx.core.dex.visitors.regions.ProcessTryCatchRegions.searchTryCatchDominators(ProcessTryCatchRegions.java:86)
-	at jadx.core.dex.visitors.regions.ProcessTryCatchRegions.process(ProcessTryCatchRegions.java:45)
-	at jadx.core.dex.visitors.regions.RegionMakerVisitor.postProcessRegions(RegionMakerVisitor.java:63)
-	at jadx.core.dex.visitors.regions.RegionMakerVisitor.visit(RegionMakerVisitor.java:58)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:31)
-	at jadx.core.dex.visitors.DepthTraversal.visit(DepthTraversal.java:17)
-	at jadx.core.ProcessClass.process(ProcessClass.java:37)
-	at jadx.core.ProcessClass.processDependencies(ProcessClass.java:59)
-	at jadx.core.ProcessClass.process(ProcessClass.java:42)
-	at jadx.api.JadxDecompiler.processClass(JadxDecompiler.java:306)
-	at jadx.api.JavaClass.decompile(JavaClass.java:62)
-*/
-        /*
-        r0 = com.ac.wechat.api.WechatEntityFactory.class;
-        monitor-enter(r0);
-        if (r3 != 0) goto L_0x0012;
-    L_0x0005:
-        r0 = new java.lang.IllegalArgumentException;	 Catch:{ all -> 0x000d }
-        r1 = "context can not be null";	 Catch:{ all -> 0x000d }
-        r0.<init>(r1);	 Catch:{ all -> 0x000d }
-        throw r0;	 Catch:{ all -> 0x000d }
-    L_0x000d:
-        r0 = move-exception;
-        r1 = com.ac.wechat.api.WechatEntityFactory.class;
-        monitor-exit(r1);
-        throw r0;
-    L_0x0012:
-        r0 = current;	 Catch:{ all -> 0x000d }
-        if (r0 != 0) goto L_0x0022;
-    L_0x0016:
-        r0 = com.ac.wechat.util.GlobalUtil.WX_PM;	 Catch:{ Throwable -> 0x0028 }
-        r0 = com.ac.wechat.util.AppUtil.getAppVersion(r3, r0);	 Catch:{ Throwable -> 0x0028 }
-        r0 = create(r0);	 Catch:{ Throwable -> 0x0028 }
-        current = r0;	 Catch:{ Throwable -> 0x0028 }
-    L_0x0022:
-        r0 = current;	 Catch:{ all -> 0x000d }
-        r1 = com.ac.wechat.api.WechatEntityFactory.class;
-        monitor-exit(r1);
-        return r0;
-    L_0x0028:
-        r0 = move-exception;
-        r1 = new java.lang.RuntimeException;	 Catch:{ all -> 0x000d }
-        r2 = r0.getMessage();	 Catch:{ all -> 0x000d }
-        r1.<init>(r2, r0);	 Catch:{ all -> 0x000d }
-        throw r1;	 Catch:{ all -> 0x000d }
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.ac.wechat.api.WechatEntityFactory.create(android.content.Context):com.ac.wechat.entity.WechatEntity");
+    public static synchronized WechatEntity create(Context context) {
+        WechatEntity wechatEntity;
+        synchronized (WechatEntityFactory.class) {
+            if (context == null) {
+                throw new IllegalArgumentException("context can not be null");
+            }
+            if (current == null) {
+                try {
+                    current = create(AppUtil.getAppVersion(context, GlobalUtil.WX_PM));
+                } catch (Throwable ex) {
+                    RuntimeException runtimeException = new RuntimeException(ex.getMessage(), ex);
+                }
+            }
+            wechatEntity = current;
+        }
+        return wechatEntity;
     }
 
     public static WechatEntity create(String str) {
