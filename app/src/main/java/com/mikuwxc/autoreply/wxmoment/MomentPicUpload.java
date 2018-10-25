@@ -128,10 +128,10 @@ public class MomentPicUpload {
                 String type = "";
                 if (mediaList.size() > 0 && mediaList.get(0).contains("qpic.cn")) {
 
-                    uploadDatas.add(new MomentUploadBean(content, "", "", "", operateTime, "", momentsId));
+                    uploadDatas.add(new MomentUploadBean(content, "0", "", "", operateTime, "", momentsId));
 
-                } else {//视频
-                    uploadDatas.add(new MomentUploadBean(content, "", "", "", operateTime, "", momentsId));
+                } else if(mediaList.get(0).contains("video")){//视频
+//                    uploadDatas.add(new MomentUploadBean(content, "", "", "", operateTime, "", momentsId));
                 }
 
             }
@@ -145,7 +145,7 @@ public class MomentPicUpload {
                         @Override
                         public void onSuccess(String s, Call call, Response response) {
                             SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
-                            database.execSQL("update moment set uploadsuccess= ? where uploadsuccess=?",new String[]{"true","false"});
+                            database.execSQL("update moment set uploadsuccess= ? where uploadsuccess=?", new String[]{"true", "false"});
                             database.close();
                         }
 
@@ -171,7 +171,7 @@ public class MomentPicUpload {
             if (address.contains("qpic.cn") && yunaddress == null) {
                 //为图片
                 downloadPic(address);
-            }else{
+            } else if(address.contains("video")){
                 downloadVideo(address);
             }
         }
@@ -196,36 +196,42 @@ public class MomentPicUpload {
 
 
         //延迟调用上传图片接口
-        List<MomentUploadBean> uploadPicDatas = new ArrayList<>();
-        final SQLiteDatabase picDatabase = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
-        final Cursor picCursor = picDatabase.rawQuery("select * from media where uploadsuccess=? and tomcatuploadsuccess=?", new String[]{"true", "false"});
-        while (picCursor.moveToNext()) {
-            String yunaddress = picCursor.getString(picCursor.getColumnIndex("yunaddress"));
-            String snsId = picCursor.getString(picCursor.getColumnIndex("snsId"));
-            uploadPicDatas.add(new MomentUploadBean("", "", "", "", "", yunaddress, snsId));
-        }
-        String json = JSON.toJSONString(uploadPicDatas);
-        if (uploadPicDatas.size()>0) {
-            OkGo.<String>post(AppConfig.OUT_NETWORK + NetApi.upload_moments_synchronous + wxid)
-                    .tag(new Object())
-                    .upJson(json)
-                    .execute(new StringCallback() {
-                        @Override
-                        public void onSuccess(String s, Call call, Response response) {
+        final String finalWxid = wxid;
+        MomentReceiver.runHandle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                List<MomentUploadBean> uploadPicDatas = new ArrayList<>();
+                final SQLiteDatabase picDatabase = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                final Cursor picCursor = picDatabase.rawQuery("select * from media where uploadsuccess=? and tomcatuploadsuccess=?", new String[]{"true", "false"});
+                while (picCursor.moveToNext()) {
+                    String yunaddress = picCursor.getString(picCursor.getColumnIndex("yunaddress"));
+                    String snsId = picCursor.getString(picCursor.getColumnIndex("snsId"));
+                    uploadPicDatas.add(new MomentUploadBean(null, null, null, null, null, yunaddress, snsId));
+                }
+                String json = JSON.toJSONString(uploadPicDatas);
+                if (uploadPicDatas.size() > 0) {
+                    OkGo.<String>put(AppConfig.OUT_NETWORK + NetApi.upload_moments_updateFodderUrl)
+                            .tag(new Object())
+                            .upJson(json)
+                            .execute(new StringCallback() {
+                                @Override
+                                public void onSuccess(String s, Call call, Response response) {
 
-                            picDatabase.execSQL("update media set tomcatuploadsuccess=? where uploadsuccess=?",new String[]{"true","true"});
-                            picCursor.close();
-                            picDatabase.close();
-                        }
+                                    picDatabase.execSQL("update media set tomcatuploadsuccess=? where uploadsuccess=?", new String[]{"true", "true"});
+                                    picCursor.close();
+                                    picDatabase.close();
+                                }
 
-                        @Override
-                        public void onError(Call call, Response response, Exception e) {
-                            super.onError(call, response, e);
-                            picCursor.close();
-                            picDatabase.close();
-                        }
-                    });
-        }
+                                @Override
+                                public void onError(Call call, Response response, Exception e) {
+                                    super.onError(call, response, e);
+                                    picCursor.close();
+                                    picDatabase.close();
+                                }
+                            });
+                }
+            }
+        }, 30 * 1000);
 
 
         cursor.close();
@@ -485,5 +491,8 @@ public class MomentPicUpload {
             this.momentsId = momentsId;
         }
     }
+
+
+
 
 }

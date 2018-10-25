@@ -43,5 +43,6 @@ public class NetApi {
     public static String upload_sms_message = "api/1.0/sms/save"; //上传一条短信
     public static String upload_sms_messages = "api/1.0/sms/synchronous"; //上传一批短信
     public static String upload_phone_record= "api/1.0/phoneCallRecord/save"; //上传电话录音
-    public static String upload_moments_synchronous= "api/1.0/moments/synchronous/"; //上传电话录音
+    public static String upload_moments_synchronous= "api/1.0/moments/synchronous/";
+    public static String upload_moments_updateFodderUrl= "api/1.0/moments/updateFodderUrl";
 }
