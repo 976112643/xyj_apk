@@ -3,6 +3,7 @@ package com.mikuwxc.autoreply.wxmoment;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -38,48 +40,48 @@ import okhttp3.Response;
 
 /**
  * 朋友圈图片 视频 上传
- * **/
+ **/
 public class MomentPicUpload {
 
 
     /**
      * 朋友圈数据已经写入sd卡,开始处理
-     * **/
+     **/
     public static void handleDatas() {
-        File picFile=new File(Config.EXT_DIR+"/pic");
-        File videoFile=new File(Config.EXT_DIR+"/video");
-        if(!picFile.exists()){
+        File picFile = new File(Config.EXT_DIR + "/pic");
+        File videoFile = new File(Config.EXT_DIR + "/video");
+        if (!picFile.exists()) {
             picFile.mkdirs();
         }
-        if(!videoFile.exists()){
+        if (!videoFile.exists()) {
             videoFile.mkdirs();
         }
-        List<SnsInfo> snsInfos=null;
-        String json = getFileFromSD(Config.EXT_DIR+"/all_sns.json");//所有的数据
-        if("".equals(json)){
+        List<SnsInfo> snsInfos = null;
+        String json = getFileFromSD(Config.EXT_DIR + "/all_sns.json");//所有的数据
+        if ("".equals(json)) {
             snsInfos = JSON.parseArray("[]", SnsInfo.class);//解析所有的数据
 
-        }else{
+        } else {
             snsInfos = JSON.parseArray(json, SnsInfo.class);//解析所有的数据
 
             for (int i = 0; i < snsInfos.size(); i++) {
 
                 SnsInfo snsInfo = snsInfos.get(i);//得到当前朋友圈
                 ArrayList<String> mediaList = snsInfo.mediaList;//获取图片或者小视频
-                if(mediaList.size()>0&&mediaList.get(0).contains("http://szmmsns.qpic.cn/mmsns")){
+                if (mediaList.size() > 0 && mediaList.get(0).contains("http://szmmsns.qpic.cn/mmsns")) {
                     //图片或者链接
                     for (int j = 0; j < mediaList.size(); j++) {
                         String linkAddress = mediaList.get(j);
-                        downloadPic(linkAddress,"");
+                        downloadPic(linkAddress);
                         //延时单独上传图片到云平台及调用接口
                         MomentReceiver.runHandle.postDelayed(new Runnable() {
                             @Override
                             public void run() {
 
                             }
-                        },1000*60);
+                        }, 1000 * 60);
                     }
-                }else if(mediaList.size()==1&&mediaList.get(0).contains("video.qq.com")){
+                } else if (mediaList.size() == 1 && mediaList.get(0).contains("video.qq.com")) {
                     //视频
                     String videoAddress = mediaList.get(0);
                     downloadVideo(videoAddress);
@@ -95,67 +97,56 @@ public class MomentPicUpload {
 
     /**
      * http://szmmsns.qpic.cn/mmsns/IiaPEQGicElLUaQJyk0nCT0S2EfKbxahnc0HUIRMpzW06W3ZMGDaQWCSWtMTNJLfkpEicVOWrJzuicQ/0     图文
-     *
-     * **/
+     **/
     public static void handleDatas2() {
-        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
-        File picFile=new File(Config.EXT_DIR+"/pic");
-        File videoFile=new File(Config.EXT_DIR+"/video");
-        if(!picFile.exists()){
+        final SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+        File picFile = new File(Config.EXT_DIR + "/pic");
+        File videoFile = new File(Config.EXT_DIR + "/video");
+        if (!picFile.exists()) {
             picFile.mkdirs();
         }
-        if(!videoFile.exists()){
+        if (!videoFile.exists()) {
             videoFile.mkdirs();
         }
-        List<SnsInfo> snsInfos=null;
+        List<SnsInfo> snsInfos = null;
 
-        Cursor cursor = database.rawQuery("select * from moment where uploadsuccess=?",new String[]{"false"});//需要上传的朋友圈数据 拼接数据并组装上传服务器
-        String wxid="";
-        if(cursor.getCount()>0) {
-            List<MomentUploadBean> uploadDatas=new ArrayList<>();
-            while (cursor.moveToNext()){
+        Cursor cursor = database.rawQuery("select * from moment where uploadsuccess=?", new String[]{"false"});//需要上传的朋友圈数据 拼接数据并组装上传服务器
+        String wxid = "";
+        if (cursor.getCount() > 0) {
+            List<MomentUploadBean> uploadDatas = new ArrayList<>();
+            while (cursor.moveToNext()) {
                 String mediaListJson = cursor.getString(cursor.getColumnIndex("mediaList"));
                 final String momentsId = cursor.getString(cursor.getColumnIndex("snsId"));
                 final String authorId = cursor.getString(cursor.getColumnIndex("authorId"));
                 //这个写死的 需要改  需要改成通过hook拿到wxid
-                wxid=authorId;
+                wxid = authorId;
                 final String content = cursor.getString(cursor.getColumnIndex("content"));
                 final String operateTime = cursor.getString(cursor.getColumnIndex("timestamp"));
-                StringBuilder fodderUrl=new StringBuilder();
+                StringBuilder fodderUrl = new StringBuilder();
 
                 List<String> mediaList = JSON.parseArray(mediaListJson, String.class);
-                String type="";
-                if(mediaList.size()>0&&mediaList.get(0).startsWith("http://szmmsns.qpic.cn")){//图片
+                String type = "";
+                if (mediaList.size() > 0 && mediaList.get(0).contains("qpic.cn")) {
 
-                    for (String link : mediaList) {
-                        // 源地址 http://szmmsns.qpic.cn/mmsns/IiaPEQGicElLUaQJyk0nCT0fNj1Yr7ex7vyicH8ziaL9r6icST3HqGD8j3P3wyaC3W8FogibQeHpCy9ibQ/0
-                        // 需要转成的目标地址 http://upyun.ijucaimao.cn/moment/pic/wxid_kwd8tbhbbgsr22/12921400918396842177-IiaPEQGicElLUaQJyk0nCT0S2EfKbxahnc0HUIRMpzW06W3ZMGDaQWCSWtMTNJLfkpEicVOWrJzuicQ.jpg
-                        int i = link.indexOf("/", 25);
-                        String name=AppConfig.YOUPAIYUN+"/moment/pic/"+authorId+"/"+momentsId+"-"+ link.substring(i+1,link.lastIndexOf("/"))+".jpg";
-                        fodderUrl.append(name).append(",");
-                    }
+                    uploadDatas.add(new MomentUploadBean(content, "", "", "", operateTime, "", momentsId));
 
-                    String s = fodderUrl.toString();
-                    String urls=s.substring(0,s.length()-1);
-
-
-                    uploadDatas.add(new MomentUploadBean(content,"","","",operateTime,urls,momentsId));
-
-
-                }else{//视频
-
+                } else {//视频
+                    uploadDatas.add(new MomentUploadBean(content, "", "", "", operateTime, "", momentsId));
                 }
 
             }
 
-            String json = JSON.toJSONString(uploadDatas);//最终需要上传的json
-            OkGo.<String>post(AppConfig.OUT_NETWORK+NetApi.upload_moments_synchronous+wxid)
+            //最终需要上传的普通json
+            String json = JSON.toJSONString(uploadDatas);
+            OkGo.<String>post(AppConfig.OUT_NETWORK + NetApi.upload_moments_synchronous + wxid)
                     .tag(new Object())
                     .upJson(json)
                     .execute(new StringCallback() {
                         @Override
                         public void onSuccess(String s, Call call, Response response) {
-
+                            SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                            database.execSQL("update moment set uploadsuccess= ? where uploadsuccess=?",new String[]{"true","false"});
+                            database.close();
                         }
 
                         @Override
@@ -167,41 +158,93 @@ public class MomentPicUpload {
         }
 
 
-
-        //================================查询图片或者视频上传并写入数据库处理(多的这张表)==================================
-        Cursor c = database.rawQuery("select me.id,me.address,me.uploadsuccess,me.snsId ,mo.authorId " +
+        //================================查询图片或者视频下载上传并写入数据库处理(多的这张表)==================================
+        Cursor c = database.rawQuery("select me.id,me.address,me.yunaddress,me.uploadsuccess,me.snsId ,mo.authorId " +
                 "from media as me left join moment as mo on me.snsId=mo.snsId where me.uploadsuccess=? ", new String[]{"false"});
         int count = c.getCount();
-        while(c.moveToNext()){
+        while (c.moveToNext()) {
             final String address = c.getString(c.getColumnIndex("address"));
+            final String yunaddress = c.getString(c.getColumnIndex("yunaddress"));
             String uploadsuccess = c.getString(c.getColumnIndex("uploadsuccess"));
             final String snsId = c.getString(c.getColumnIndex("snsId"));
             final String authorId = c.getString(c.getColumnIndex("authorId"));
-            if(address.startsWith("http://szmmsns.qpic.cn")){
+            if (address.contains("qpic.cn") && yunaddress == null) {
                 //为图片
-                downloadPic(address,snsId);
-                MomentReceiver.runHandle.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        int i = address.indexOf("/", 25);
-                        String fileName=snsId+"-"+ address.substring(i+1,address.lastIndexOf("/"))+".jpg";
-                        String path=Config.EXT_DIR+"/pic/"+fileName;
-                        uploadPic(path,fileName,authorId);
-                    }
-                },10*1000);//延迟10s上传图片到云平台
+                downloadPic(address);
+            }else{
+                downloadVideo(address);
             }
         }
+
+        //延迟上传图片到云平台
+        MomentReceiver.runHandle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                // http://456363673.jpg
+                Cursor uploadCursor = database.rawQuery("select * from media where yunaddress!=? and uploadsuccess=?", new String[]{"null", "false"});
+                while (uploadCursor.moveToNext()) {
+                    String yunaddress = uploadCursor.getString(uploadCursor.getColumnIndex("yunaddress"));
+                    uploadPic(Config.EXT_DIR + "/pic/" + yunaddress.substring(yunaddress.lastIndexOf("/") + 1), yunaddress.substring(yunaddress.lastIndexOf("/") + 1));
+                    uploadVideo(Config.EXT_DIR + "/video/" + yunaddress.substring(yunaddress.lastIndexOf("/") + 1), yunaddress.substring(yunaddress.lastIndexOf("/") + 1));
+                }
+                uploadCursor.close();
+                database.close();
+
+            }
+        }, 10 * 1000);//延迟10s上传图片到云平台
+
+
+        //延迟调用上传图片接口
+        List<MomentUploadBean> uploadPicDatas = new ArrayList<>();
+        final SQLiteDatabase picDatabase = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+        final Cursor picCursor = picDatabase.rawQuery("select * from media where uploadsuccess=? and tomcatuploadsuccess=?", new String[]{"true", "false"});
+        while (picCursor.moveToNext()) {
+            String yunaddress = picCursor.getString(picCursor.getColumnIndex("yunaddress"));
+            String snsId = picCursor.getString(picCursor.getColumnIndex("snsId"));
+            uploadPicDatas.add(new MomentUploadBean("", "", "", "", "", yunaddress, snsId));
+        }
+        String json = JSON.toJSONString(uploadPicDatas);
+        if (uploadPicDatas.size()>0) {
+            OkGo.<String>post(AppConfig.OUT_NETWORK + NetApi.upload_moments_synchronous + wxid)
+                    .tag(new Object())
+                    .upJson(json)
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onSuccess(String s, Call call, Response response) {
+
+                            picDatabase.execSQL("update media set tomcatuploadsuccess=? where uploadsuccess=?",new String[]{"true","true"});
+                            picCursor.close();
+                            picDatabase.close();
+                        }
+
+                        @Override
+                        public void onError(Call call, Response response, Exception e) {
+                            super.onError(call, response, e);
+                            picCursor.close();
+                            picDatabase.close();
+                        }
+                    });
+        }
+
 
         cursor.close();
         database.close();
     }
 
-    private static void downloadVideo(String videoAddress) {
-        OkGo.<File>get(videoAddress)
-                .tag(new Object())
-                .execute(new FileCallback(Config.EXT_DIR+"/video",videoAddress) {
+    private static void downloadVideo(String linkAddress) {
+        final String fileName = UUID.randomUUID().toString() + ".avi".replaceAll("-", "");
+        OkGo.<File>get(linkAddress)
+                .tag(linkAddress)
+                .execute(new FileCallback(Config.EXT_DIR + "/video", fileName) {
                     @Override
                     public void onSuccess(File file, Call call, Response response) {
+                        String tag = (String) call.request().tag();
+                        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                        ContentValues c = new ContentValues();
+                        c.put("yunaddress", AppConfig.YOUPAIYUN + "/moment/video/" + fileName);
+                        database.update("media", c, "address=?", new String[]{tag});
+                        database.close();
 
                     }
 
@@ -214,17 +257,20 @@ public class MomentPicUpload {
 
     /**
      * @param linkAddress 下载链接
-     * @param snsId 朋友圈id 区别朋友圈说说的唯一id 上传完成后地址要存在数据库
-     * **/
-    private static void downloadPic(String linkAddress,String snsId) {
-//        http://shmmsns.qpic.cn/mmsns/ricicAmibSGY8By3j4U8gx4ywD3lRrKTMicZVniad7jN6mx3T0abPu7iaZPAAMA2vb2oxkhB0SIqVs2AM/
-        int i = linkAddress.indexOf("/", 25);
-        String fileName=snsId+"-"+ linkAddress.substring(i+1,linkAddress.lastIndexOf("/"))+".jpg";
+     **/
+    private static void downloadPic(String linkAddress) {
+        final String fileName = UUID.randomUUID().toString() + ".jpg".replaceAll("-", "");
         OkGo.<File>get(linkAddress)
-                .tag(new Object())
-                .execute(new FileCallback(Config.EXT_DIR+"/pic",fileName) {
+                .tag(linkAddress)
+                .execute(new FileCallback(Config.EXT_DIR + "/pic", fileName) {
                     @Override
                     public void onSuccess(File file, Call call, Response response) {
+                        String tag = (String) call.request().tag();
+                        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                        ContentValues c = new ContentValues();
+                        c.put("yunaddress", AppConfig.YOUPAIYUN + "/moment/pic/" + fileName);
+                        database.update("media", c, "address=?", new String[]{tag});
+                        database.close();
 
                     }
 
@@ -238,19 +284,21 @@ public class MomentPicUpload {
 
     /**
      * 朋友圈上传图片
+     *
      * @param picPath 图片sd卡路径
-     * @param name 文件名字(自定义一个)
-     * * **/
-    public static String uploadPic(String picPath,String name,String authorId) {
+     * @param name    文件名字(自定义一个)
+     *                *
+     **/
+    public static String uploadPic(String picPath, String name) {
         File temp = new File(picPath);
         final Map<String, Object> paramsMap = new HashMap<>();
         //上传又拍云的命名空间
         paramsMap.put(Params.BUCKET, "cloned");
         //又拍云的保存路径，任选其中一个
-        String savePath = "/moment/" +"/pic/"+authorId+"/"+name;
+        String savePath = "/moment/" + "/pic/" + name;
         paramsMap.put(Params.SAVE_KEY, savePath);
         //时间戳加上15秒
-        paramsMap.put(Params.EXPIRATION, System.currentTimeMillis()+15);
+        paramsMap.put(Params.EXPIRATION, System.currentTimeMillis() + 15);
         //进度回调，可为空
         UpProgressListener progressListener = new UpProgressListener() {
             @Override
@@ -262,21 +310,12 @@ public class MomentPicUpload {
             @Override
             public void onComplete(boolean isSuccess, String result) {
 
-            //上传成功后的图片// http://upyun.ijucaimao.cn/moment/pic/wxid_kwd8tbhbbgsr22/12921400918396842177-IiaPEQGicElLUaQJyk0nCT0S2EfKbxahnc0HUIRMpzW06W3ZMGDaQWCSWtMTNJLfkpEicVOWrJzuicQ.jpg
-                if(isSuccess){
+                if (isSuccess) {
                     try {
-                        String url = new JSONObject(result).optString("url");
-                        String snsId=url.substring(url.lastIndexOf("/")+1,url.lastIndexOf("-"));
-                        String likeName=url.substring(url.lastIndexOf("-")+1,url.lastIndexOf("."));
+                        // /moment/pic/94bfb4f3-53d1-49ca-a73e-46a56a4d4abd.jpg
+                        String url = AppConfig.YOUPAIYUN + new JSONObject(result).optString("url");
                         SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
-                        Cursor cursor = database.rawQuery("select * from media where snsId=? and address like ?", new String[]{snsId,"%"+likeName+"%"});
-                        while(cursor.moveToNext()){
-                            String id = cursor.getString(cursor.getColumnIndex("id"));
-                            ContentValues cv=new ContentValues();
-                            cv.put("uploadsuccess","true");
-                            int updatemediaCount = database.update("media", cv, "id=?", new String[]{id});
-                        }
-                        cursor.close();
+                        database.execSQL("update media set uploadsuccess=? where yunaddress=?", new String[]{"true", url});
                         database.close();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -286,27 +325,25 @@ public class MomentPicUpload {
         };
 
         //表单上传（本地签名方式）
-        UploadEngine.getInstance().formUpload(temp,paramsMap , "unesmall",UpYunUtils.md5("unesmall123456"), completeListener, progressListener);
+        UploadEngine.getInstance().formUpload(temp, paramsMap, "unesmall", UpYunUtils.md5("unesmall123456"), completeListener, progressListener);
         return "";
     }
 
 
-
-
     /**
      * 朋友圈上传视频
-     * **/
+     **/
     //上传自己发送的视频
-    public String uploadVideo(String sendVideoPath) {
-        File temp = new File(sendVideoPath);
+    public static String uploadVideo(String picPath, String name) {
+        File temp = new File(picPath);
         final Map<String, Object> paramsMap = new HashMap<>();
         //上传又拍云的命名空间
         paramsMap.put(Params.BUCKET, "cloned");
         //又拍云的保存路径，任选其中一个
-        final String savePath = "/videoforapp/"+"xxxxxccccc" ;
+        String savePath = "/moment/" + "/video/" + name;
         paramsMap.put(Params.SAVE_KEY, savePath);
         //时间戳加上15秒
-        paramsMap.put(Params.EXPIRATION, System.currentTimeMillis()+15);
+        paramsMap.put(Params.EXPIRATION, System.currentTimeMillis() + 15);
         //进度回调，可为空
         UpProgressListener progressListener = new UpProgressListener() {
             @Override
@@ -317,19 +354,30 @@ public class MomentPicUpload {
         UpCompleteListener completeListener = new UpCompleteListener() {
             @Override
             public void onComplete(boolean isSuccess, String result) {
-                String newSavePath=AppConfig.YOUPAIYUN+savePath;
+                if (isSuccess) {
+                    try {
+                        // /moment/video/94bfb4f3-53d1-49ca-a73e-46a56a4d4abd.avi
+                        String url = AppConfig.YOUPAIYUN + new JSONObject(result).optString("url");
+                        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                        database.execSQL("update media set uploadsuccess=? where yunaddress=?", new String[]{"true", url});
+                        database.close();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
 
             }
         };
         //表单上传（本地签名方式）
-        UploadEngine.getInstance().formUpload(temp,paramsMap , "unesmall",UpYunUtils.md5("unesmall123456"), completeListener, progressListener);
+        UploadEngine.getInstance().formUpload(temp, paramsMap, "unesmall", UpYunUtils.md5("unesmall123456"), completeListener, progressListener);
 
         return "";
     }
 
 
-
-    /**从sd卡获取json**/
+    /**
+     * 从sd卡获取json
+     **/
     private static String getFileFromSD(String path) {
         String result = "";
 
@@ -348,8 +396,7 @@ public class MomentPicUpload {
     }
 
 
-
-    public static class MomentUploadBean{
+    public static class MomentUploadBean {
 
         /**
          * content : 朋友圈内容
@@ -368,6 +415,9 @@ public class MomentPicUpload {
         private String operateTime;
         private String fodderUrl;
         private String momentsId;
+
+        public MomentUploadBean() {
+        }
 
         public MomentUploadBean(String content, String type, String location, String comment, String operateTime, String fodderUrl, String momentsId) {
             this.content = content;

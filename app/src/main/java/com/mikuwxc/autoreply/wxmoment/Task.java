@@ -179,7 +179,7 @@ public class Task {
                 "authorId text, authorName text,comments text,content text,isCurrentUser text," +
                 "likes text,mediaList text,snsId text,sourceType text,timestamp text," +
                 "uploadsuccess text )");
-        database.execSQL("create table if not exists media(id integer primary key autoincrement,address text,uploadsuccess text,snsId text)");//一对多(多的这张表)
+        database.execSQL("create table if not exists media(id integer primary key autoincrement,address text,yunaddress text,uploadsuccess text,tomcatuploadsuccess text,snsId text)");//一对多(多的这张表)
         //判断是否插入
         for (int i = 0; i < snsList.size(); i++) {
             SnsInfo snsInfo = snsList.get(i);

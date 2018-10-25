@@ -24,6 +24,14 @@ public class MomentReceiver extends BroadcastReceiver {
                     MomentDBTask.run();
                 }
             },5*1000);
+        }else if("进入了别人朋友圈".equals(source)){
+            Toast.makeText(context, source, Toast.LENGTH_SHORT).show();
+            runHandle.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    MomentDBTask.run();
+                }
+            },5*1000);
         }
     }
 
