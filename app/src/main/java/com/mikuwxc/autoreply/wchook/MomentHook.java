@@ -31,6 +31,9 @@ public class MomentHook {
                     intent.putExtra("source","进入了当前朋友圈");
                     context.sendBroadcast(intent);
 
+                      WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
+
+
                 }
             }});
             XposedHelpers.findAndHookMethod(wechatEntity.hook_sns_callback_class3, wxClassLoader, wechatEntity.hook_sns_callback_method2, new Object[]{Integer.TYPE, Integer.TYPE, Integer.TYPE, String.class, class1, byte[].class, new XC_MethodHook() {
@@ -38,11 +41,6 @@ public class MomentHook {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 //                    WxEventBus.publish(new WxCollectOtherMoment(wechatEntity, wxClassLoader, param.thisObject, param.args[4]));
                     XposedBridge.log("====朋友圈22===="+param.args[0]);
-                    XposedBridge.log("====朋友圈22===="+param.args[1]);
-                    XposedBridge.log("====朋友圈22===="+param.args[2]);
-                    XposedBridge.log("====朋友圈22===="+param.args[3]);
-                    XposedBridge.log("====朋友圈22===="+param.args[4]);
-
                     Intent intent = new Intent();
                     intent.setAction("moment");
                     intent.putExtra("source","进入了别人朋友圈");

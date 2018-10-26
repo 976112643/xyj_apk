@@ -12,6 +12,7 @@ import com.lzy.okgo.callback.FileCallback;
 import com.lzy.okgo.callback.StringCallback;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.receiver.MomentReceiver;
 import com.mikuwxc.autoreply.wxmoment.model.SnsInfo;
@@ -45,61 +46,15 @@ public class MomentPicUpload {
 
 
     /**
-     * 朋友圈数据已经写入sd卡,开始处理
-     **/
-    public static void handleDatas() {
-        File picFile = new File(Config.EXT_DIR + "/pic");
-        File videoFile = new File(Config.EXT_DIR + "/video");
-        if (!picFile.exists()) {
-            picFile.mkdirs();
-        }
-        if (!videoFile.exists()) {
-            videoFile.mkdirs();
-        }
-        List<SnsInfo> snsInfos = null;
-        String json = getFileFromSD(Config.EXT_DIR + "/all_sns.json");//所有的数据
-        if ("".equals(json)) {
-            snsInfos = JSON.parseArray("[]", SnsInfo.class);//解析所有的数据
-
-        } else {
-            snsInfos = JSON.parseArray(json, SnsInfo.class);//解析所有的数据
-
-            for (int i = 0; i < snsInfos.size(); i++) {
-
-                SnsInfo snsInfo = snsInfos.get(i);//得到当前朋友圈
-                ArrayList<String> mediaList = snsInfo.mediaList;//获取图片或者小视频
-                if (mediaList.size() > 0 && mediaList.get(0).contains("http://szmmsns.qpic.cn/mmsns")) {
-                    //图片或者链接
-                    for (int j = 0; j < mediaList.size(); j++) {
-                        String linkAddress = mediaList.get(j);
-                        downloadPic(linkAddress);
-                        //延时单独上传图片到云平台及调用接口
-                        MomentReceiver.runHandle.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-
-                            }
-                        }, 1000 * 60);
-                    }
-                } else if (mediaList.size() == 1 && mediaList.get(0).contains("video.qq.com")) {
-                    //视频
-                    String videoAddress = mediaList.get(0);
-                    downloadVideo(videoAddress);
-                }
-
-            }
-
-            ToastUtil.showLongToast("朋友圈下载结束了");
-        }
-
-
-    }
-
-    /**
      * http://szmmsns.qpic.cn/mmsns/IiaPEQGicElLUaQJyk0nCT0S2EfKbxahnc0HUIRMpzW06W3ZMGDaQWCSWtMTNJLfkpEicVOWrJzuicQ/0     图文
+     * 处理朋友圈数据的上传
      **/
     public static void handleDatas2() {
+
+        //打开数据库
         final SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+
+        //sd卡文件夹每次判断不存在则创建处理 防止应用崩溃
         File picFile = new File(Config.EXT_DIR + "/pic");
         File videoFile = new File(Config.EXT_DIR + "/video");
         if (!picFile.exists()) {
@@ -108,35 +63,40 @@ public class MomentPicUpload {
         if (!videoFile.exists()) {
             videoFile.mkdirs();
         }
-        List<SnsInfo> snsInfos = null;
 
-        Cursor cursor = database.rawQuery("select * from moment where uploadsuccess=?", new String[]{"false"});//需要上传的朋友圈数据 拼接数据并组装上传服务器
-        String wxid = "";
+
+        //需要拿到当前账户登录的 微信id
+        final String wxid = MyFileUtil.readFromFile(AppConfig.APP_USERNAME).split(",")[1];
+        //查询moment表中 当前微信号登录的用户  且uploadsuccess=false(未上传到服务器) 的所有数据
+        Cursor cursor = database.rawQuery("select * from moment where uploadsuccess=? and authorId=?", new String[]{"false",wxid});
+        //如果查询出来的数量大于0
         if (cursor.getCount() > 0) {
-            List<MomentUploadBean> uploadDatas = new ArrayList<>();
+            //构建json数据的集合  最终需要将List->json上传
+            final List<MomentUploadBean> uploadDatas = new ArrayList<>();
+            //遍历查询到的结果集
             while (cursor.moveToNext()) {
-                String mediaListJson = cursor.getString(cursor.getColumnIndex("mediaList"));
-                final String momentsId = cursor.getString(cursor.getColumnIndex("snsId"));
-                final String authorId = cursor.getString(cursor.getColumnIndex("authorId"));
-                //这个写死的 需要改  需要改成通过hook拿到wxid
-                wxid = authorId;
-                final String content = cursor.getString(cursor.getColumnIndex("content"));
-                final String operateTime = cursor.getString(cursor.getColumnIndex("timestamp"));
-                StringBuilder fodderUrl = new StringBuilder();
+                String mediaListJson = cursor.getString(cursor.getColumnIndex("mediaList"));//媒体集合(图片链接或者视频链接)
+                final String momentsId = cursor.getString(cursor.getColumnIndex("snsId"));//朋友圈id 唯一
+                final String authorId = cursor.getString(cursor.getColumnIndex("authorId"));//微信id
 
+//                wxid = authorId;
+                final String content = cursor.getString(cursor.getColumnIndex("content"));//内容
+                final String operateTime = cursor.getString(cursor.getColumnIndex("timestamp"));//朋友圈时间戳
+
+                //链接集合
                 List<String> mediaList = JSON.parseArray(mediaListJson, String.class);
-                String type = "";
+                //判断链接集合的数量以及链接的所属类型来区分是图片、视频、链接(这种做法不精确,但是暂时未找到微信区分type的方法,待改进)  0图文 1视频 2文本 3链接 99未知
                 if (mediaList.size() > 0 && mediaList.get(0).contains("qpic.cn")) {
-
+                    //为图片类型
                     uploadDatas.add(new MomentUploadBean(content, "0", "", "", operateTime, "", momentsId));
-
-                } else if(mediaList.get(0).contains("video")){//视频
-//                    uploadDatas.add(new MomentUploadBean(content, "", "", "", operateTime, "", momentsId));
+                } else if(mediaList.size() > 0&&mediaList.get(0).contains("video")){
+                    //为视频类型
+                    uploadDatas.add(new MomentUploadBean(content, "1", "", "", operateTime, "", momentsId));
                 }
 
             }
 
-            //最终需要上传的普通json
+            //最终需要上传的普通json  (不包媒体链接,因为需要下载并上传到云平台后才能知道媒体链接)
             String json = JSON.toJSONString(uploadDatas);
             OkGo.<String>post(AppConfig.OUT_NETWORK + NetApi.upload_moments_synchronous + wxid)
                     .tag(new Object())
@@ -144,8 +104,13 @@ public class MomentPicUpload {
                     .execute(new StringCallback() {
                         @Override
                         public void onSuccess(String s, Call call, Response response) {
+                            //上传成功后需要将  上传成功的数据库数据改为成功状态
+
                             SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
-                            database.execSQL("update moment set uploadsuccess= ? where uploadsuccess=?", new String[]{"true", "false"});
+                            for (int i = 0; i < uploadDatas.size(); i++) {
+                                String momentsId = uploadDatas.get(i).getMomentsId();
+                                database.execSQL("update moment set uploadsuccess= ? where snsId=?", new String[]{"true",momentsId});
+                            }
                             database.close();
                         }
 
@@ -158,9 +123,9 @@ public class MomentPicUpload {
         }
 
 
-        //================================查询图片或者视频下载上传并写入数据库处理(多的这张表)==================================
+        //================================查询当前微信号(账户)图片或者视频 下载 上传 并写入数据库处理(多的这张表)==================================
         Cursor c = database.rawQuery("select me.id,me.address,me.yunaddress,me.uploadsuccess,me.snsId ,mo.authorId " +
-                "from media as me left join moment as mo on me.snsId=mo.snsId where me.uploadsuccess=? ", new String[]{"false"});
+                "from media as me left join moment as mo on me.snsId=mo.snsId where me.uploadsuccess=? and mo.authorId=?", new String[]{"false",wxid});
         int count = c.getCount();
         while (c.moveToNext()) {
             final String address = c.getString(c.getColumnIndex("address"));
@@ -168,7 +133,8 @@ public class MomentPicUpload {
             String uploadsuccess = c.getString(c.getColumnIndex("uploadsuccess"));
             final String snsId = c.getString(c.getColumnIndex("snsId"));
             final String authorId = c.getString(c.getColumnIndex("authorId"));
-            if (address.contains("qpic.cn") && yunaddress == null) {
+            //需要剔除 如果下载过的图片 则不需要再次下载  下载完成后 根据链接tag更新yunaddress的值(yunaddress默认为null)
+            if (address!=null&&address.contains("qpic.cn") && yunaddress == null) {
                 //为图片
                 downloadPic(address);
             } else if(address.contains("video")){
@@ -181,12 +147,16 @@ public class MomentPicUpload {
             @Override
             public void run() {
                 final SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
-                // http://456363673.jpg
+                // 查询出未上传到云平台的图片或视频
                 Cursor uploadCursor = database.rawQuery("select * from media where yunaddress!=? and uploadsuccess=?", new String[]{"null", "false"});
                 while (uploadCursor.moveToNext()) {
                     String yunaddress = uploadCursor.getString(uploadCursor.getColumnIndex("yunaddress"));
-                    uploadPic(Config.EXT_DIR + "/pic/" + yunaddress.substring(yunaddress.lastIndexOf("/") + 1), yunaddress.substring(yunaddress.lastIndexOf("/") + 1));
-                    uploadVideo(Config.EXT_DIR + "/video/" + yunaddress.substring(yunaddress.lastIndexOf("/") + 1), yunaddress.substring(yunaddress.lastIndexOf("/") + 1));
+                    //判断云地址来区别是图片链接还是视频链接  http://upyun.ijucaimao.cn/moment/pic/78478-788-4748-48974-4987-.jpg
+                    if(yunaddress.contains(".jpg")){
+                        uploadPic(Config.EXT_DIR + "/pic/" + yunaddress.substring(yunaddress.lastIndexOf("/") + 1), yunaddress.substring(yunaddress.lastIndexOf("/") + 1));
+                    }else if(yunaddress.contains(".video")){
+                        uploadVideo(Config.EXT_DIR + "/video/" + yunaddress.substring(yunaddress.lastIndexOf("/") + 1), yunaddress.substring(yunaddress.lastIndexOf("/") + 1));
+                    }
                 }
                 uploadCursor.close();
                 database.close();
@@ -196,7 +166,6 @@ public class MomentPicUpload {
 
 
         //延迟调用上传图片接口
-        final String finalWxid = wxid;
         MomentReceiver.runHandle.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -267,7 +236,7 @@ public class MomentPicUpload {
     private static void downloadPic(String linkAddress) {
         final String fileName = UUID.randomUUID().toString() + ".jpg".replaceAll("-", "");
         OkGo.<File>get(linkAddress)
-                .tag(linkAddress)
+                .tag(linkAddress)//以图片链接为标识  下载成功后需要更改本地数据库media表中yunaddress状态为新地址
                 .execute(new FileCallback(Config.EXT_DIR + "/pic", fileName) {
                     @Override
                     public void onSuccess(File file, Call call, Response response) {
@@ -275,6 +244,7 @@ public class MomentPicUpload {
                         SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
                         ContentValues c = new ContentValues();
                         c.put("yunaddress", AppConfig.YOUPAIYUN + "/moment/pic/" + fileName);
+                        //根据tag来更新
                         database.update("media", c, "address=?", new String[]{tag});
                         database.close();
 

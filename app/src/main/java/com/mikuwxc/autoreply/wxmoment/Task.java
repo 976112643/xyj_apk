@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.mikuwxc.autoreply.utils.ShellUtils;
+import com.mikuwxc.autoreply.wcutil.FileIoUtil;
+import com.mikuwxc.autoreply.wcutil.GlobalUtil;
 import com.mikuwxc.autoreply.wxmoment.model.SnsInfo;
 
 import org.json.JSONArray;
@@ -75,11 +77,12 @@ public class Task {
         String dataDir = Environment.getDataDirectory().getAbsolutePath();
         String destDir = Config.EXT_DIR;//sd卡目标路径WeChatMomentStat
         Process su = Runtime.getRuntime().exec("su");//执行超级管理员root
-        ParseMoment.copySnsMicroMsgDB();
+        String uniqueName = FileIoUtil.getValueFromPath(GlobalUtil.WX_UNIQUENAME_SAVE_PATH);//微信随机生成的  6416+54165+4111文件夹名称
+//        ParseMoment.copySnsMicroMsgDB();
         DataOutputStream outputStream = new DataOutputStream(su.getOutputStream());
         outputStream.writeBytes("mount -o remount,rw " + dataDir + "\n");//挂载
-        //outputStream.writeBytes("cd " + dataDir + "/data/" + Config.WECHAT_PACKAGE + "/MicroMsg\n");//进入微信数据库文件夹
-        //outputStream.writeBytes("ls | while read line; do cp ${line}/SnsMicroMsg.db " + destDir + "/ ; done \n");//查找并从微信数据库复制一份到sd卡下面
+        outputStream.writeBytes("cd " + dataDir + "/data/" + Config.WECHAT_PACKAGE + "/MicroMsg\n");//进入微信数据库文件夹
+        outputStream.writeBytes("ls | while read line; do cp "+uniqueName+"/SnsMicroMsg.db " + destDir + "/ ; done \n");//查找并从微信数据库复制一份到sd卡下面
         outputStream.writeBytes("sleep 1\n");//睡眠
         outputStream.writeBytes("chmod 777 " + destDir + "/SnsMicroMsg.db\n");//修改WeChatMomentStat的执行权限
         outputStream.writeBytes("exit\n");//退出命令
