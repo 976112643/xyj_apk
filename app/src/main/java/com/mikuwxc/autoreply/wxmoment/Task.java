@@ -81,6 +81,7 @@ public class Task {
 //        ParseMoment.copySnsMicroMsgDB();
         DataOutputStream outputStream = new DataOutputStream(su.getOutputStream());
         outputStream.writeBytes("mount -o remount,rw " + dataDir + "\n");//挂载
+        outputStream.writeBytes("chmod 777 " + "data/data/com.tencent.mm" + "/MicroMsg\n");//增加微信朋友圈数据库文件夹的权限
         outputStream.writeBytes("cd " + dataDir + "/data/" + Config.WECHAT_PACKAGE + "/MicroMsg\n");//进入微信数据库文件夹
         outputStream.writeBytes("ls | while read line; do cp "+uniqueName+"/SnsMicroMsg.db " + destDir + "/ ; done \n");//查找并从微信数据库复制一份到sd卡下面
         outputStream.writeBytes("sleep 1\n");//睡眠
