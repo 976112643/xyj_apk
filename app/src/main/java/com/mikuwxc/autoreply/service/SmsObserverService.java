@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -21,10 +22,13 @@ import com.mikuwxc.autoreply.bean.SmsObserverBean;
 import com.mikuwxc.autoreply.common.MyApp;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.MyFileUtil;
+import com.mikuwxc.autoreply.common.util.RegularUtils;
 import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -138,6 +142,17 @@ public class SmsObserverService extends Service {
             String body = cur.getString(cur.getColumnIndex("body"));
             String type = cur.getString(cur.getColumnIndex("type"));
             long date = cur.getLong(cur.getColumnIndex("date"));
+            //敏感词=============================================
+            RegularUtils.SENSITIVE_WORDVOISE = MyFileUtil.readFromFile(AppConfig.APP_FOLDER + "/sensitiveNotice");
+            if(RegularUtils.SENSITIVE_WORDVOISE!=null){
+                String hasSensitive = RegularUtils.isMatchRegular(body, RegularUtils.SENSITIVE_WORDVOISE);
+                if(hasSensitive!=null){
+                    //提示
+                    EventBus.getDefault().post(new String(hasSensitive));
+                }
+
+            }
+            //敏感词===========================================
             //TODO 这里是具体处理逻辑
             if ("2".equals(type)) {
                 //发出的短信

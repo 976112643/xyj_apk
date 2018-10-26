@@ -16,6 +16,7 @@ import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +36,7 @@ import com.mikuwxc.autoreply.basereclyview.RecycleHomeAdapter;
 import com.mikuwxc.autoreply.bean.ApphttpBean;
 import com.mikuwxc.autoreply.bean.SystemBean;
 import com.mikuwxc.autoreply.callrecorder.sources.CallRecord;
+import com.mikuwxc.autoreply.common.MyApp;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.SPHelper;
@@ -48,6 +50,10 @@ import com.mikuwxc.autoreply.utils.PreferenceUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 import com.mikuwxc.autoreply.utils.UpdateAppUtil;
 import com.mikuwxc.autoreply.wxmoment.MomentDBTask;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -89,6 +95,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_desktop);
+        EventBus.getDefault().register(this);
         ImageView iv = (ImageView) findViewById(R.id.iv);
         recycleV = (RecyclerView) findViewById(R.id.recycleV);
         // 状态栏透明
@@ -484,6 +491,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         unregisterReceiver(networkChangeReceiver);
         unregisterReceiver(momentReceiver);
         MomentReceiver.runHandle.removeCallbacksAndMessages(null);
+        EventBus.getDefault().unregister(this);
     }
 
 
@@ -602,6 +610,15 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         }
     };
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void alertSmsDialog(String str){
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("短信敏感词提醒")
+                .setMessage("短信敏感词包含"+str)
+                .create();
+        alertDialog.show();
+    }
 
 
 

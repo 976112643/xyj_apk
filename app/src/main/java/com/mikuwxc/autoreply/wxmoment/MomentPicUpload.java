@@ -3,19 +3,16 @@ package com.mikuwxc.autoreply.wxmoment;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.FileCallback;
 import com.lzy.okgo.callback.StringCallback;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
-import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.receiver.MomentReceiver;
-import com.mikuwxc.autoreply.wxmoment.model.SnsInfo;
 import com.upyun.library.common.Params;
 import com.upyun.library.common.UploadEngine;
 import com.upyun.library.listener.UpCompleteListener;
@@ -92,6 +89,8 @@ public class MomentPicUpload {
                 } else if(mediaList.size() > 0&&mediaList.get(0).contains("video")){
                     //为视频类型
                     uploadDatas.add(new MomentUploadBean(content, "1", "", "", operateTime, "", momentsId));
+                }else if(mediaList.size()==0){
+                    uploadDatas.add(new MomentUploadBean(content, "0", "", "", operateTime, "", momentsId));
                 }
 
             }
@@ -105,18 +104,23 @@ public class MomentPicUpload {
                         @Override
                         public void onSuccess(String s, Call call, Response response) {
                             //上传成功后需要将  上传成功的数据库数据改为成功状态
-
-                            SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
-                            for (int i = 0; i < uploadDatas.size(); i++) {
-                                String momentsId = uploadDatas.get(i).getMomentsId();
-                                database.execSQL("update moment set uploadsuccess= ? where snsId=?", new String[]{"true",momentsId});
+//                            {"msg":"该微信号不存在","code":"4004","success":false}
+                            SuccessBean successBean = new Gson().fromJson(s, SuccessBean.class);
+                            if("200".equals(successBean.getCode())){
+                                SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
+                                for (int i = 0; i < uploadDatas.size(); i++) {
+                                    String momentsId = uploadDatas.get(i).getMomentsId();
+                                    database.execSQL("update moment set uploadsuccess= ? where snsId=?", new String[]{"true",momentsId});
+                                }
+                                database.close();
                             }
-                            database.close();
+
                         }
 
                         @Override
                         public void onError(Call call, Response response, Exception e) {
                             super.onError(call, response, e);
+
                         }
                     });
 
@@ -169,6 +173,7 @@ public class MomentPicUpload {
         MomentReceiver.runHandle.postDelayed(new Runnable() {
             @Override
             public void run() {
+                //上传图片的数据集
                 List<MomentUploadBean> uploadPicDatas = new ArrayList<>();
                 final SQLiteDatabase picDatabase = SQLiteDatabase.openOrCreateDatabase(new File(Config.EXT_DIR + "/moment.db"), null);
                 final Cursor picCursor = picDatabase.rawQuery("select * from media where uploadsuccess=? and tomcatuploadsuccess=?", new String[]{"true", "false"});
@@ -185,10 +190,13 @@ public class MomentPicUpload {
                             .execute(new StringCallback() {
                                 @Override
                                 public void onSuccess(String s, Call call, Response response) {
+                                    SuccessBean successBean = new Gson().fromJson(s, SuccessBean.class);
+                                    if("200".equals(successBean.getCode())){
+                                        picDatabase.execSQL("update media set tomcatuploadsuccess=? where uploadsuccess=?", new String[]{"true", "true"});
+                                        picCursor.close();
+                                        picDatabase.close();
+                                    }
 
-                                    picDatabase.execSQL("update media set tomcatuploadsuccess=? where uploadsuccess=?", new String[]{"true", "true"});
-                                    picCursor.close();
-                                    picDatabase.close();
                                 }
 
                                 @Override
@@ -459,6 +467,45 @@ public class MomentPicUpload {
 
         public void setMomentsId(String momentsId) {
             this.momentsId = momentsId;
+        }
+    }
+
+
+
+    class SuccessBean{
+
+        /**
+         * msg : 该微信号不存在
+         * code : 4004
+         * success : false
+         */
+
+        private String msg;
+        private String code;
+        private boolean success;
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public void setSuccess(boolean success) {
+            this.success = success;
         }
     }
 
