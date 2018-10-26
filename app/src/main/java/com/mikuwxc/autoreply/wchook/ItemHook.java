@@ -53,14 +53,14 @@ public class ItemHook {
                 });*/
 
 
-        XposedHelpers.findAndHookMethod("com.tencent.mm.ui.p$10", loadPackageParam.classLoader, "onClick", View.class, new XC_MethodHook() {
+     /*   XposedHelpers.findAndHookMethod("com.tencent.mm.ui.p$10", loadPackageParam.classLoader, "onClick", View.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
                 XposedBridge.log("点击了发送按钮");
                 
             }
-        });
+        });*/
 
 
         //是否能领红包

@@ -25,7 +25,6 @@ public class FriendBean {
     private String remarkname;
     private String headImgUrl;
     private String serviceId;
-    private String sex;
     private String wxno;
     private long createTime;
     private String wxid;
@@ -34,6 +33,10 @@ public class FriendBean {
     private String country;
     private String province;
     private String city;
+    private int sex;
+    private String phone;
+    private String region;
+    private int from;
 
     public String getWxid() {
         return wxid;
@@ -91,11 +94,11 @@ public class FriendBean {
         this.serviceId = serviceId;
     }
 
-    public String getSex() {
+    public int getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(int sex) {
         this.sex = sex;
     }
 
@@ -142,5 +145,29 @@ public class FriendBean {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public int getFrom() {
+        return from;
+    }
+
+    public void setFrom(int from) {
+        this.from = from;
     }
 }

@@ -157,7 +157,7 @@ public class MountReceiver extends XC_MethodHook {
 
 
         XposedBridge.log("contentcontentcontent:::"+content);
-        XposedBridge.log("typetypetypetypetype:::"+type);
+        XposedBridge.log("circleTypecircleTypecircleType:::"+circleType);
         if (name!=null) {
             try {
                  final String path = Environment.getExternalStorageDirectory().toString() + "/shidoe/";
@@ -193,6 +193,16 @@ public class MountReceiver extends XC_MethodHook {
 
                     }else if ("2".equals(circleType)){
                         MomentUtil.sendTxtMoment(classLoader,create,circleText,0,null);
+                    }else if ("1".equals(circleType)){
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<String> listMonentVideo = downLoadPicMonet(fodderUrl, circleText, classLoader, create, "", path, type, context);
+                                XposedBridge.log("发视频朋友圈：："+listMonentVideo.get(0)+"::"+listMonentVideo.get(1));
+                                MomentUtil.sendVideoMoment(classLoader,create,circleText,0,null,listMonentVideo.get(0),listMonentVideo.get(1));
+                            }
+                        }).start();
+
                     }
 
                 }else if ("118".equals(type)){

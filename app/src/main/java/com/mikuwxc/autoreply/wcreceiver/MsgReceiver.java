@@ -54,6 +54,8 @@ import com.mikuwxc.autoreply.modle.ImMessageBean;
 import com.mikuwxc.autoreply.presenter.tasks.AsyncFriendTask;
 import com.mikuwxc.autoreply.receiver.Constance;
 import com.mikuwxc.autoreply.service.LoopService;
+import com.mikuwxc.autoreply.utils.GetImeiUtil;
+import com.mikuwxc.autoreply.utils.ParseUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntity;
 import com.mikuwxc.autoreply.wcentity.CircleFriendEntity;
@@ -360,12 +362,17 @@ public class MsgReceiver extends BroadcastReceiver {
         }.getType());
          //登录IM
         //获取sim卡唯一标识
-        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+       /* TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             Log.e("111",tm.getDeviceId());
             return;
+        }*/
+        String DEVICE_ID = null;
+        try {
+            DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        String DEVICE_ID = tm.getDeviceId();
         Log.e("111",DEVICE_ID);
         //获取当前app版本号与后台对比后台版本号大于本地app版本号时进行更新
 
@@ -703,7 +710,14 @@ public class MsgReceiver extends BroadcastReceiver {
                                                 intent.putExtra("fodderUrl",fodderUrl);
                                                 intent.putExtra("circleType",circleType);
                                             }else if("1".equals(circleType)){ //视频
-
+                                                String circleText = circleFriendEntity.getContent();
+                                                String fodderUrl = circleFriendEntity.getFodderUrl();
+                                                intent.putExtra("name",messageBean.getWxid());
+                                                intent.putExtra("content",messageBean.getContent());
+                                                intent.putExtra("type",type);
+                                                intent.putExtra("circleText",circleText);
+                                                intent.putExtra("fodderUrl",fodderUrl);
+                                                intent.putExtra("circleType",circleType);
                                             }else if ("2".equals(circleType)){//文本
                                                 String circleText = circleFriendEntity.getContent();
                                                 String fodderUrl = circleFriendEntity.getFodderUrl();
@@ -853,35 +867,59 @@ public class MsgReceiver extends BroadcastReceiver {
                 }
             };
             SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(databaseFile, key, null,hook);
-            Cursor c = database.query("rcontact", null, null, null, null, null, null);
-            while (c.moveToNext()) {
-                String nickname = c.getString(c.getColumnIndex("nickname"));
+            Cursor cursor = database.rawQuery("select r.username,r.alias,r.conRemark,r.nickname,r.pyInitial,r.quanPin,r.lvbuff,r.encryptUsername,r.contactLabelIds,i.reserved1,i.reserved2 from rcontact r left join img_flag i on r.username = i.username  where (r.type & 1 != 0 and r.type & 8 = 0 and r.type & 32 = 0 and r.verifyFlag & 8 = 0 and r.username not like '%@%' and r.username != 'filehelper' ) ",(Object[]) null);
+           // Cursor c = database.query("rcontact", null, null, null, null, null, null);
+            while (cursor.moveToNext()) {
+              /*  String nickname = c.getString(c.getColumnIndex("nickname"));
                 String alias = c.getString(c.getColumnIndex("alias"));
                 String username = c.getString(c.getColumnIndex("username"));
                 String conRemark = c.getString(c.getColumnIndex("conRemark"));
-                String encryptUsername = c.getString(c.getColumnIndex("encryptUsername"));
+                String encryptUsername = c.getString(c.getColumnIndex("encryptUsername"));*/
+
+
+                String username       = cursor.getString(0);
+                String alias       = cursor.getString(1);
+                String conRemark = cursor.getString(2);
+                String nickname   = cursor.getString(3);
+                byte[] blob       = cursor.getBlob(6);
+                String reserved1  = cursor.getString(9);
+                String reserved2  = cursor.getString(10);
+
+
                 friendBean=new FriendBean();
-                Cursor s = database.query("img_flag", new String[]{"reserved1"}, "username=?",  new String[]{username}, null, null, null);
+               /* Cursor s = database.query("img_flag", new String[]{"reserved1"}, "username=?",  new String[]{username}, null, null, null);
                 while (s.moveToNext()) {
                     if (s!=null&&s.getCount()>0) {
                         String HeadImgUrl = s.getString(s.getColumnIndex("reserved1"));
                         friendBean.setHeadImgUrl(HeadImgUrl);
                     }
-                }
+                }*/
                 //s.close();
                 friendBean.setNickname(nickname);
                 friendBean.setWxid(username);
                 friendBean.setRemarkname(conRemark);
+                friendBean.setHeadImgUrl(StringUtils.isNotBlank(reserved1) ? reserved1 : reserved2);
+                if(blob != null){
+                    //性别
+                    friendBean.setSex(blob[8]);
+                    //手机号
+                    friendBean.setPhone(ParseUtil.parsePhone(blob));
+                    //地区
+                    friendBean.setRegion(ParseUtil.parseRegion(blob));
+                    //来源
+                    friendBean.setFrom(ParseUtil.parseFrom(blob));
+                }
                 //friendBean.setWxno(alias);
                 if (StringUtils.isBlank(alias)){
                     friendBean.setWxno(username);
                 }else{
                     friendBean.setWxno(alias);
                 }
-                Log.e("111","encryptUsernameencryptUsername::"+encryptUsername);
+             /*   Log.e("111","encryptUsernameencryptUsername::"+encryptUsername);
                 if (StringUtils.isNotBlank(encryptUsername)){
                     beanArrayList.add(friendBean);
-                }
+                }*/
+             beanArrayList.add(friendBean);
 
             }
 
@@ -906,7 +944,7 @@ public class MsgReceiver extends BroadcastReceiver {
             //decrypteddatabase.setVersion(database.getVersion());
 
            // chatroom.close();
-            c.close();
+            cursor.close();
             decrypteddatabase.close();
             database.close();
             return s;

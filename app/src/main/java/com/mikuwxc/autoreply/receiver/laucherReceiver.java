@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.mikuwxc.autoreply.activity.RunningActivity;
 import com.mikuwxc.autoreply.service.ContextHolder;
+import com.mikuwxc.autoreply.utils.GetImeiUtil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class laucherReceiver extends BroadcastReceiver {
         Log.e("111","onReceiver...");
 
         //设置极光推送的别名
-        setTagAndAlias();
+        setTagAndAlias(context);
         try {
             Intent mBootIntent = new Intent(context, RunningActivity.class);
             // 下面这句话必须加上才能开机自动运行app的界面
@@ -40,7 +41,7 @@ public class laucherReceiver extends BroadcastReceiver {
     /**
      * 设置标签与别名
      */
-    private void setTagAndAlias() {
+    private void setTagAndAlias(Context context) {
         /**
          *这里设置了别名，在这里获取的用户登录的信息
          *并且此时已经获取了用户的userId,然后就可以用用户的userId来设置别名了
@@ -50,12 +51,12 @@ public class laucherReceiver extends BroadcastReceiver {
         Set<String> tags = new HashSet<String>();
         //这里可以设置你要推送的人，一般是用户uid 不为空在设置进去 可同时添加多个
 
-        TelephonyManager tm = (TelephonyManager) ContextHolder.getContext().getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(ContextHolder.getContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            return;
+        String DEVICE_ID = null;
+        try {
+            DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        String DEVICE_ID = tm.getDeviceId();
         Log.e("111",DEVICE_ID);
         if (!TextUtils.isEmpty(DEVICE_ID)){
             tags.add(DEVICE_ID);//设置tag

@@ -45,6 +45,7 @@ import com.mikuwxc.autoreply.receiver.MomentReceiver;
 import com.mikuwxc.autoreply.receiver.NetworkChangeReceiver;
 import com.mikuwxc.autoreply.service.MyReceiver;
 import com.mikuwxc.autoreply.service.SmsObserverService;
+import com.mikuwxc.autoreply.utils.GetImeiUtil;
 import com.mikuwxc.autoreply.utils.Global;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
@@ -56,6 +57,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.DataOutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -103,7 +105,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         // 状态栏设为黑包
         // Global.setStatusBarColor(this, Color.BLUE);
         //设置极光推送的别名
-        setTagAndAlias();
+        setTagAndAlias(this);
 
         //注册广播收到极光推送的时候可以回调接口更新请求桌面
         IntentFilter intentFilter = new IntentFilter();
@@ -186,7 +188,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                 }
             }
 
-
         } catch (Exception e) {
             Log.e("111", e.toString());
         }
@@ -197,30 +198,21 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     public void getAppList(final Context context) {
         try{
             if (Build.VERSION.SDK_INT >= 23) {
-
                 telephonyInfo = TelephonyManagement.getInstance().updateTelephonyInfo(this).getTelephonyInfo(this);
             } else {
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                 isDualSimOrNot();
-//                    } else {
-//                        Toast.makeText(MomentChatMainActivity.this, "android 版本过低！", Toast.LENGTH_SHORT).show();
-//                    }
+
             }
-
-
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            String DEVICE_ID = tm.getDeviceId();
+
+            //TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            String DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
+
+            Log.e("555","getDeviceId"+DEVICE_ID);
             SystemBean systemBean = new SystemBean();
             systemBean.setManufacturer(SystemUtil.getDeviceBrand());
             Log.e("111", "手机型号：" + SystemUtil.getSystemModel());
@@ -267,29 +259,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                                 }
                             }
 
-       /*             if(newBean != null && !newBean.isEmpty()){
-                        if(newBean.contains(new ApphttpBean.ResultBean("com.android.settings"))){
-                            // 获取Runtime对象  获取root权限
-                            Runtime runtime = Runtime.getRuntime();
-                            try {
-                                Process process = runtime.exec("su");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            search[0]=chineseToUnicode("pm enable " + "com.android.settings");
-                            execShell(search);
-                        }else{
-                            // 获取Runtime对象  获取root权限
-                            Runtime runtime = Runtime.getRuntime();
-                            try {
-                                Process process = runtime.exec("su");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            search[0]=chineseToUnicode("pm disable " + "com.android.settings");
-                            execShell(search);
-                        }
-                    }*/
 
                             adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
                             recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
@@ -351,7 +320,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     /**
      * 设置标签与别名
      */
-    private void setTagAndAlias() {
+    private void setTagAndAlias(Context context) {
         /**
          *这里设置了别名，在这里获取的用户登录的信息
          *并且此时已经获取了用户的userId,然后就可以用用户的userId来设置别名了
@@ -361,12 +330,17 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         Set<String> tags = new HashSet<String>();
         //这里可以设置你要推送的人，一般是用户uid 不为空在设置进去 可同时添加多个
 
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+       /* TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             return;
+        }*/
+        String DEVICE_ID = null;
+        try {
+            DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        String DEVICE_ID = tm.getDeviceId();
         Log.e("111", DEVICE_ID);
         if (!TextUtils.isEmpty(DEVICE_ID)) {
             tags.add(DEVICE_ID);//设置tag
