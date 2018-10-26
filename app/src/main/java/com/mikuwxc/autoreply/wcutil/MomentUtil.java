@@ -505,99 +505,6 @@ public class MomentUtil {
 
 
 
-    public static int sendVideoMoment(ClassLoader paramClassLoader, WechatEntity paramWechatEntity, String paramString1, int paramInt, Set<String> paramSet, String paramString2, String paramString3)
-    {
-        int i = 0;
-        if (paramInt == 1) {
-            i = 1;
-        }
-        Object localObject6 = new LinkedList();
-        Object localObject1 = new LinkedList();
-        if ((paramInt == 2) || (paramInt == 3)) {
-            localObject1 = WechatDb.getInstance().selectContactByLabelName(paramSet);
-        }
-        int j = 0;
-        if (paramInt == 3) {
-            j = 1;
-        }
-        Object localObject5 = XposedHelpers.findClass(paramWechatEntity.commit_video_moment_class1, paramClassLoader);
-        Object localObject4 = XposedHelpers.findClass(paramWechatEntity.commit_video_moment_class2, paramClassLoader);
-        Class localClass2 = XposedHelpers.findClass(paramWechatEntity.commit_video_moment_class3, paramClassLoader);
-        Object localObject2 = XposedHelpers.findClass(paramWechatEntity.commit_video_moment_class4, paramClassLoader);
-        Object localObject7 = XposedHelpers.findClass(paramWechatEntity.commit_video_moment_class5, paramClassLoader);
-        Class paramSet1 = XposedHelpers.findClass(paramWechatEntity.commit_video_moment_class6, paramClassLoader);
-        Class localClass1 = XposedHelpers.findClass(paramWechatEntity.commit_video_moment_class7, paramClassLoader);
-        Object localObject3 = initArj(paramWechatEntity, (Class)localObject2);
-        localObject2 = Md5Util.getFileMD5(paramString3);
-        LinkedList localLinkedList = new LinkedList();
-        XposedBridge.log("aaaaaaaaaaaaaaaa");
-        if (localObject6 != null)
-        {
-            localObject7 = (List) XposedHelpers.callStaticMethod((Class)localObject7, paramWechatEntity.commit_video_moment_method1, new Object[0]);
-            Iterator localIterator = ((List)localObject6).iterator();
-            while (localIterator.hasNext())
-            {
-                String str = (String)localIterator.next();
-                if (!((List)localObject7).contains(str))
-                {
-                    localObject6 = XposedHelpers.newInstance(localClass2, new Object[0]);
-                    XposedHelpers.setObjectField(localObject6, paramWechatEntity.commit_video_moment_field1, str);
-                    localLinkedList.add(localObject6);
-                }
-            }
-        }
-        XposedBridge.log("bbbbbbbbbbbbbbbbb");
-        localObject5 = XposedHelpers.newInstance((Class)localObject5, new Object[] { Integer.valueOf(15) });
-        localObject4 = XposedHelpers.newInstance((Class)localObject4, new Object[0]);
-        localObject6 = XposedHelpers.getObjectField(localObject5, paramWechatEntity.commit_video_moment_field2);
-        XposedHelpers.setObjectField(localObject4, paramWechatEntity.commit_video_moment_field3, localObject6);
-        if (Integer.MAX_VALUE > 0) {
-            XposedHelpers.callMethod(localObject5, paramWechatEntity.commit_video_moment_method2, new Object[] { Integer.valueOf(3) });
-        }
-        localObject1 = XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(localObject5, paramWechatEntity.commit_video_moment_method3, new Object[] { paramString1 }), paramWechatEntity.commit_video_moment_method4, new Object[] { localObject3 }), paramWechatEntity.commit_video_moment_method5, new Object[] { localLinkedList }), paramWechatEntity.commit_video_moment_method6, new Object[] { Integer.valueOf(i) }), paramWechatEntity.commit_video_moment_method7, new Object[] { Integer.valueOf(0) }), paramWechatEntity.commit_video_moment_method8, new Object[] { localObject1 });
-        XposedBridge.log("ccccccccccccccccccc");
-        if (j != 0)
-        {
-            XposedBridge.log("dddddddddddddddddddd");
-            XposedHelpers.callMethod(localObject5, paramWechatEntity.commit_video_moment_method9, new Object[] { Integer.valueOf(1) });
-            XposedHelpers.callMethod(localObject1, paramWechatEntity.commit_video_moment_method10, new Object[] { Integer.valueOf(i) });
-            XposedHelpers.callMethod(localObject5, paramWechatEntity.commit_video_moment_method11, new Object[] { Integer.valueOf(0) });
-            XposedHelpers.callMethod(localObject5, paramWechatEntity.commit_video_moment_method12, new Object[] { null, null, null, Integer.valueOf(0), Integer.valueOf(0) });
-            if (!((Boolean) XposedHelpers.callMethod(localObject5, paramWechatEntity.commit_video_moment_method13, new Object[] { paramString3, paramString2, paramString1, localObject2 })).booleanValue()) {
-                //break label708;
-            }
-            XposedBridge.log("eeeeeeeeeeeeeeeee");
-           String paramString4 = (String) XposedHelpers.newInstance(localClass1, new Object[0]);
-           String paramString5 = (String) XposedHelpers.getObjectField(paramString4, paramWechatEntity.commit_video_moment_field4);
-            XposedHelpers.setObjectField(paramString5, paramWechatEntity.commit_video_moment_field5, Integer.valueOf(0));
-            XposedHelpers.setObjectField(paramString5, paramWechatEntity.commit_video_moment_field6, Boolean.valueOf(true));
-            XposedHelpers.callMethod(XposedHelpers.getStaticObjectField(paramSet1, paramWechatEntity.commit_video_moment_field7), paramWechatEntity.commit_video_moment_method14, new Object[] { paramString1 });
-            paramInt = ((Integer) XposedHelpers.callMethod(localObject5, paramWechatEntity.commit_video_moment_method15, new Object[0])).intValue();
-            sendCommitMoment(paramClassLoader, paramWechatEntity);
-        }
-      /*  for (;;)
-        {
-
-
-            XposedHelpers.callMethod(localObject5, paramWechatEntity.commit_video_moment_method9, new Object[] { Integer.valueOf(0) });
-            break;
-            label708:
-            paramInt = 0;
-            return paramInt;
-        }*/
-
-      return paramInt;
-
-    }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -724,6 +631,73 @@ public class MomentUtil {
         sendCommitMoment(classLoader, wechatEntity);
         return commit;
     }
+
+
+    public static int sendVideoMoment(ClassLoader classLoader, WechatEntity wechatEntity, String content, int publicMode, Set<String> labelNames, String videoThumbPath, String videoPath)
+    {
+        int i = 0;
+        if (publicMode == 1) {
+            i = 1;
+        }
+        List<String> list = new LinkedList();
+        List<String> list2 = new LinkedList();
+        if (publicMode == 2 || publicMode == 3) {
+            list2 = WechatDb.getInstance().selectContactByLabelName(labelNames);
+        }
+        boolean z = false;
+        if (publicMode == 3) {
+            z = true;
+        }
+        Class class_ax = XposedHelpers.findClass(wechatEntity.commit_video_moment_class1, classLoader);
+        Class class_Pint = XposedHelpers.findClass(wechatEntity.commit_video_moment_class2, classLoader);
+        Class class_bqg = XposedHelpers.findClass(wechatEntity.commit_video_moment_class3, classLoader);
+        Class class_arj = XposedHelpers.findClass(wechatEntity.commit_video_moment_class4, classLoader);
+        Class class_s = XposedHelpers.findClass(wechatEntity.commit_video_moment_class5, classLoader);
+        Class class_a = XposedHelpers.findClass(wechatEntity.commit_video_moment_class6, classLoader);
+        Class class_pn = XposedHelpers.findClass(wechatEntity.commit_video_moment_class7, classLoader);
+        Object object_arj = initArj(wechatEntity, class_arj);
+        String bkg = Md5Util.getFileMD5(videoPath);
+        LinkedList linkedList = new LinkedList();
+        if (list != null) {
+            List Hv = (List) XposedHelpers.callStaticMethod(class_s, wechatEntity.commit_video_moment_method1, new Object[0]);
+            for (String str3 : list) {
+                if (!Hv.contains(str3)) {
+                    Object com_tencent_mm_protocal_c_bqg = XposedHelpers.newInstance(class_bqg, new Object[0]);
+                    XposedHelpers.setObjectField(com_tencent_mm_protocal_c_bqg, wechatEntity.commit_video_moment_field1, str3);
+                    linkedList.add(com_tencent_mm_protocal_c_bqg);
+                }
+            }
+        }
+        Object object_ax = XposedHelpers.newInstance(class_ax, new Object[]{Integer.valueOf(15)});
+        Object object_pInt = XposedHelpers.newInstance(class_Pint, new Object[0]);
+        Object object_afv = XposedHelpers.getObjectField(object_ax, wechatEntity.commit_video_moment_field2);
+        XposedHelpers.setObjectField(object_pInt, wechatEntity.commit_video_moment_field3, object_afv);
+        if (0 > Integer.MAX_VALUE) {
+            XposedHelpers.callMethod(object_ax, wechatEntity.commit_video_moment_method2, new Object[]{Integer.valueOf(3)});
+        }
+        Object object_ci = XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(object_ax, wechatEntity.commit_video_moment_method3, new Object[]{content}), wechatEntity.commit_video_moment_method4, new Object[]{object_arj}), wechatEntity.commit_video_moment_method5, new Object[]{linkedList}), wechatEntity.commit_video_moment_method6, new Object[]{Integer.valueOf(i)}), wechatEntity.commit_video_moment_method7, new Object[]{Integer.valueOf(0)}), wechatEntity.commit_video_moment_method8, new Object[]{list2});
+        if (z) {
+            XposedHelpers.callMethod(object_ax, wechatEntity.commit_video_moment_method9, new Object[]{Integer.valueOf(1)});
+        } else {
+            XposedHelpers.callMethod(object_ax, wechatEntity.commit_video_moment_method9, new Object[]{Integer.valueOf(0)});
+        }
+        XposedHelpers.callMethod(object_ci, wechatEntity.commit_video_moment_method10, new Object[]{Integer.valueOf(i)});
+        XposedHelpers.callMethod(object_ax, wechatEntity.commit_video_moment_method11, new Object[]{Integer.valueOf(0)});
+        XposedHelpers.callMethod(object_ax, wechatEntity.commit_video_moment_method12, new Object[]{null, null, null, Integer.valueOf(0), Integer.valueOf(0)});
+        if (!((Boolean) XposedHelpers.callMethod(object_ax, wechatEntity.commit_video_moment_method13, new Object[]{videoPath, videoThumbPath, content, bkg})).booleanValue()) {
+            return 0;
+        }
+        Object object_cap = XposedHelpers.getObjectField(XposedHelpers.newInstance(class_pn, new Object[0]), wechatEntity.commit_video_moment_field4);
+        XposedHelpers.setObjectField(object_cap, wechatEntity.commit_video_moment_field5, Integer.valueOf(0));
+        XposedHelpers.setObjectField(object_cap, wechatEntity.commit_video_moment_field6, Boolean.valueOf(true));
+        //  XposedHelpers.callMethod(XposedHelpers.getStaticObjectField(class_s, wechatEntity.commit_video_moment_field7), wechatEntity.commit_video_moment_method14, new Object[]{object_cap});
+        int commit = ((Integer) XposedHelpers.callMethod(object_ax, wechatEntity.commit_video_moment_method15, new Object[0])).intValue();
+        sendCommitMoment(classLoader, wechatEntity);
+        return commit;
+
+    }
+
+
 
 
     private static void sendCommitMoment(ClassLoader paramClassLoader, WechatEntity paramWechatEntity)

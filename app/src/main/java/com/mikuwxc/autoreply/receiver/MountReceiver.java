@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.gson.Gson;
 import com.mikuwxc.autoreply.Tools;
+import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.modle.FriendBean;
 import com.mikuwxc.autoreply.wcapi.WechatEntityFactory;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
@@ -232,6 +233,7 @@ public class MountReceiver extends XC_MethodHook {
                 } else if (type.equals("201")){   //201代表加好友
                     if ("1".equals(addType)){   //1代表微信号加好友
                         XposedBridge.log("addWxid"+addWxid+"addMsg"+addMsg);
+                        MyFileUtil.writeProperties("addFriend_put","true");
                         FriendUtil.searchFriend(classLoader,create,0,"",addWxid,"",15);
           /*              FriendUtil.addFriendWithUpdateRemark(classLoader, create, "", "测试电话", "", 15);
                         FriendUtil.addFriend12(classLoader,create,addWxid,addMsg,15);   //15 是通过手机号途径加好友  content代表微信号，circleText代表打招呼信息*/

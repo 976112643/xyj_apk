@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
@@ -229,7 +230,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
 
 
             //String DEVICE_ID1 = telephonyInfo.getImeiSIM1();
-
+            Toast.makeText(this,DEVICE_ID,Toast.LENGTH_LONG).show();
             Log.e("111", "DEVICE_IDDEVICE_IDDEVICE_IDDEVICE_ID" + DEVICE_ID);
             if (DEVICE_ID != null) {
                 OkGo.get(AppConfig.OUT_NETWORK + NetApi.getAppList + DEVICE_ID).execute(new StringCallback() {

