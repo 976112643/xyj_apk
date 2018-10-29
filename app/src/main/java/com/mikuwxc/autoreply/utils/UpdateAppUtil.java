@@ -267,7 +267,7 @@ public class UpdateAppUtil {
                 String b = password.getText().toString().trim();
                 //    将输入的用户名和密码打印出来
                 if (b.equals("admin")){
-                    MyFileUtil.writeProperties(Constants.PHONESETTINGSTAUS_PUT,"true");
+                    MyFileUtil.writeProperties(Constants.PACKAGESTAUE_PUT,"false");
                 }
             }
         });

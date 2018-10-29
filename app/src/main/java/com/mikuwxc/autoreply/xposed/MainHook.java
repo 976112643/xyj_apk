@@ -185,6 +185,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
             //是否显示微信号
             HiddenWechatIdAndPhoneNumberHook.hookSystem(lpparam);
+            //HiddenWechatIdAndPhoneNumberHook.hookWechat(lpparam,create);
             //删除好友上报服务器
             DeleteContactsHook.hook(create, lpparam);
             //撤回消息统计

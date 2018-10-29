@@ -60,6 +60,7 @@ public class RiskUtil {
         Intent intent1 = new Intent();
         Bundle bundle = new Bundle();
         intent1.setComponent(componentName);
+        intent1.setFlags(SQLiteDatabase.CREATE_IF_NECESSARY);
         applicationContext.startActivity(intent1);
         //applicationContext.finish();
     }
