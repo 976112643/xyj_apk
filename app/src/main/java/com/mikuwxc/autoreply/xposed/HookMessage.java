@@ -968,6 +968,17 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     String isSend=localContentValues.getAsString("isSend");
                     String talker=localContentValues.getAsString("talker");
                     String s=localContentValues.getAsString("createTime");
+                    String reserved3=localContentValues.getAsString("reserved3");
+                    XposedBridge.log("reserved3::"+reserved3);
+
+                    //发送43视频type的时候，从相册那里选择的时候downloadWxVideoRes会报错，所以要加这个判断
+                    if (StringUtils.isNotBlank(reserved3)){
+                        sedImagin=null;
+                        videostatus="1";
+
+                        sedVideoPath=reserved3;
+                        videoState=1;
+                    }
 
 
                     if ("43".equals(type)){
