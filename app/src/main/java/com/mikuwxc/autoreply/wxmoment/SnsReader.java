@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.wxmoment.model.SnsInfo;
 
 import java.io.File;
@@ -49,7 +51,11 @@ public class SnsReader {
         snsList.clear();
         SQLiteDatabase database = SQLiteDatabase.openDatabase(dbPath, null, 0);
         getCurrentUserIdFromDatabase(database);
-        Cursor cursor = database.query("SnsInfo", new String[]{"SnsId", "userName", "createTime", "content", "attrBuf","sourceType","subType"} ,"", new String[]{},"","","createTime DESC","");
+// 查询所有的
+// Cursor cursor = database.query("SnsInfo", new String[]{"SnsId", "userName", "createTime", "content", "attrBuf","sourceType","subType"} ,"", new String[]{},"","","createTime DESC","");
+        //只查询本人的
+        String wxid = MyFileUtil.readFromFile(AppConfig.APP_USERNAME).split(",")[1];
+        Cursor cursor = database.query("SnsInfo", new String[]{"SnsId", "userName", "createTime", "content", "attrBuf","sourceType","subType"} ,"userName=?", new String[]{wxid},"","","createTime DESC","");
         while (cursor.moveToNext()) {
             addSnsInfoFromCursor(cursor);
         }
