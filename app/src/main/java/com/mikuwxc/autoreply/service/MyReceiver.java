@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.mikuwxc.autoreply.activity.RunningActivity;
 import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.Constants;
 import com.mikuwxc.autoreply.common.util.LogUtils;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
@@ -96,7 +97,7 @@ public class MyReceiver extends BroadcastReceiver {
                             SharedPreferences.Editor ditor = sp.edit();
                             ditor.putBoolean("test_put", true).commit();*/
 
-                            MyFileUtil.writeProperties("test_put","true");
+                            MyFileUtil.writeProperties(Constants.TEST_PUT,"true");
 
 
                             Runtime runtime = Runtime.getRuntime();

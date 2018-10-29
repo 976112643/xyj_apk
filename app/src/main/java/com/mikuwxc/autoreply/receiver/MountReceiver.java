@@ -37,7 +37,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -203,6 +205,17 @@ public class MountReceiver extends XC_MethodHook {
                             }
                         }).start();
 
+                    }else if("3".equals(circleType)){
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Set<String> labelNameSet = new HashSet();
+                                List<String> linkMonent = downLoadLickMonet(fodderUrl, circleText, classLoader, create, "", path, type, context);
+                                XposedBridge.log("发链接朋友圈：："+linkMonent.get(0)+"::"+linkMonent.get(1)+"::"+linkMonent.get(2));
+                                MomentUtil.sendLinkMoment(classLoader,create,circleText,0,labelNameSet,"",linkMonent.get(0),linkMonent.get(1),linkMonent.get(2));
+                            }
+                        }).start();
+
                     }
 
                 }else if ("118".equals(type)){
@@ -267,7 +280,9 @@ public class MountReceiver extends XC_MethodHook {
                     RemarkUtil.updateContactRemark(classLoader, create, name, content);    // 修改好友备注
                 }else if ("207".equals(type)){  //设置好友电话号码
                     RemarkUtil.updateContactPhone(classLoader, create, name, content);
-                }else if ("112".equals(type)){  //是否能领红包
+                }else if ("111".equals(type)){ //是否显示电话号码
+
+                } else if ("112".equals(type)){  //是否能领红包
                     Intent in=new Intent();
                     in.setClassName(Constance.packageName_me,Constance.receiver_my);
                     in.setAction(Constance.action_receiveluckmoney);
@@ -328,16 +343,6 @@ public class MountReceiver extends XC_MethodHook {
 //                    String suffixes="avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|htm|java|doc|amr";
                     String file=path.substring(path.lastIndexOf('/')+1);//截取url最后的数据
                     substring=file;
-//                    XposedBridge.log("path:::;"+path);
-//                    XposedBridge.log("file:::;"+file);
-//                    Pattern pat=Pattern.compile("[\\w]+[\\.]("+suffixes+")");//正则判断
-//                    Matcher mc=pat.matcher(file);
-//                    while(mc.find()){
-//                        //截取文件名后缀名
-//                        substring = mc.group();
-//                        XposedBridge.log("123456789"+ substring);
-//                    }
-
                     URL url = new URL(path);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     con.setReadTimeout(5000);
@@ -451,9 +456,6 @@ public class MountReceiver extends XC_MethodHook {
                             }
                         }
                     }
-
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -461,6 +463,75 @@ public class MountReceiver extends XC_MethodHook {
         return listPicMonet;
 
     }
+
+
+    /**
+     * 从服务器下载文件
+     * @param path 下载文件的地址
+     * @param
+     */
+    public  List<String> downLoadLickMonet(final String path, final String cirletext, final ClassLoader classLoader, final WechatEntity create, final String name, final String picpach, final String type, final Context context) {
+        final List<String> listPicMonet = new ArrayList<String>();
+        try {
+
+
+            String[] split = path.split(",");
+
+            for (int i = 0; i < 1; i++) {
+                String suffixes = "avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|htm|java|doc|amr";
+                String file = split[i].substring(split[i].lastIndexOf('/') + 1);//截取url最后的数据
+                Pattern pat = Pattern.compile("[\\w]+[\\.](" + suffixes + ")");//正则判断
+                Matcher mc = pat.matcher(file);
+                while (mc.find()) {
+                    //截取文件名后缀名
+                    substring = mc.group();
+                    XposedBridge.log("123456789" + substring);
+                }
+                URL url = new URL(split[i]);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setReadTimeout(5000);
+                con.setConnectTimeout(5000);
+                con.setRequestProperty("Charset", "UTF-8");
+                con.setRequestMethod("GET");
+                if (con.getResponseCode() == 200) {
+                    InputStream is = con.getInputStream();//获取输入流
+                    FileOutputStream fileOutputStream = null;//文件输出流
+                    if (is != null) {
+                        FileUtils fileUtils = new FileUtils();
+                        fileOutputStream = new FileOutputStream(fileUtils.createFile(substring));//指定文件保存路径，代码看下一步
+                        byte[] buf = new byte[1024];
+                        int ch;
+                        while ((ch = is.read(buf)) != -1) {
+                            fileOutputStream.write(buf, 0, ch);//将获取到的流写入文件中
+                        }
+                    }
+                    if (fileOutputStream != null) {
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+
+                        listPicMonet.add(picpach + substring);
+                    }
+                }
+            }
+                listPicMonet.add(split[1]);
+                int splitLength=split.length;
+                String urlContent="";
+            for (int i = 2; i <splitLength ; i++) {
+                if(i==2){
+                    urlContent=split[i];
+                }else{
+                    urlContent=urlContent+","+split[i];
+                }
+            }
+            listPicMonet.add(urlContent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listPicMonet;
+
+    }
+
+
 
 
     public class FileUtils {

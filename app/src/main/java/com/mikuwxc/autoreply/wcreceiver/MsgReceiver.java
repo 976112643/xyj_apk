@@ -224,21 +224,21 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_candeletefriendchat(Context context,String deletefriendchatType) {
         if ("true".equals(deletefriendchatType)) {
           //  ToastUtil.showLongToast("开启删除好友聊天权限");
-            MyFileUtil.writeProperties("onFriendChatDeleteStaus_put","true");
+            MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"true");
 
         } else {
          //   ToastUtil.showLongToast("关闭删除好友聊天权限");
-            MyFileUtil.writeProperties("onFriendChatDeleteStaus_put","false");
+            MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"false");
         }
     }
 
     private void action_candeletefriend(Context context,String deletefriendType) {
         if ("true".equals(deletefriendType)) {
          //   ToastUtil.showLongToast("开启删除好友权限");
-            MyFileUtil.writeProperties("onDeleteFriendStaus_put","true");
+            MyFileUtil.writeProperties(Constants.ONDELETEFRIENDSTAUS_PUT,"true");
         } else {
           //  ToastUtil.showLongToast("关闭删除好友权限");
-            MyFileUtil.writeProperties("onDeleteFriendStaus_put","false");
+            MyFileUtil.writeProperties(Constants.ONDELETEFRIENDSTAUS_PUT,"false");
         }
     }
 
@@ -246,11 +246,11 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_receiveluckmoney(Context context,String receivemomyType) {
         if ("true".equals(receivemomyType)) {
           //  ToastUtil.showLongToast("开启领取权限");
-            MyFileUtil.writeProperties("receiveLuckyMoneyStaus_put","true");
+            MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"true");
 
         } else {
          //   ToastUtil.showLongToast("关闭领取权限");
-            MyFileUtil.writeProperties("receiveLuckyMoneyStaus_put","false");
+            MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"false");
         }
     }
 
@@ -259,11 +259,11 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_settings(Context context,String saoyisaoType) {
         if ("true".equals(saoyisaoType)) {
           //  ToastUtil.showLongToast("开启设置权限");
-            MyFileUtil.writeProperties("setting_put","true");
+            MyFileUtil.writeProperties(Constants.SETTING_PUT,"true");
 
         } else {
         //    ToastUtil.showLongToast("关闭设置权限");
-            MyFileUtil.writeProperties("setting_put","false");
+            MyFileUtil.writeProperties(Constants.SETTING_PUT,"false");
         }
     }
 
@@ -271,11 +271,11 @@ public class MsgReceiver extends BroadcastReceiver {
         if ("true".equals(saoyisaoType)) {
             //重连微信并且更改红包是否能自动获取
            // ToastUtil.showLongToast("开启微信扫一扫能权限");
-            MyFileUtil.writeProperties("saoyisaoStaus_put","true");
+            MyFileUtil.writeProperties(Constants.SAOYISAOSTAUS_PUT,"true");
 
         } else {
          //   ToastUtil.showLongToast("关闭微信扫一扫权限");
-            MyFileUtil.writeProperties("saoyisaoStaus_put","false");
+            MyFileUtil.writeProperties(Constants.SAOYISAOSTAUS_PUT,"false");
         }
     }
 
@@ -283,11 +283,11 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_canseewxno(Context context,String canSeewxType) {
         if ("true".equals(canSeewxType)) {
             //重连微信并且更改红包是否能自动获取
-            MyFileUtil.writeProperties("canSeewxStaus_put","true");
+            MyFileUtil.writeProperties(Constants.CANSEEWXSTAUS_PUT,"true");
 
         } else {
           //  ToastUtil.showLongToast("关闭微信能否看微信号权限");
-            MyFileUtil.writeProperties("canSeewxStaus_put","false");
+            MyFileUtil.writeProperties(Constants.CANSEEWXSTAUS_PUT,"false");
         }
     }
 
@@ -295,11 +295,11 @@ public class MsgReceiver extends BroadcastReceiver {
         if ("true".equals(verifyType)) {
             //重连微信并且更改红包是否能自动获取
            // ToastUtil.showLongToast("开启微信自动通过好友权限");
-            MyFileUtil.writeProperties("verifyStaus_put","true");
+            MyFileUtil.writeProperties(Constants.VERIFYSTAUS_PUT,"true");
 
         } else {
           //  ToastUtil.showLongToast("关闭微信自动通过好友权限");
-            MyFileUtil.writeProperties("verifyStaus_put","false");
+            MyFileUtil.writeProperties(Constants.VERIFYSTAUS_PUT,"false");
         }
 
     }
@@ -313,11 +313,11 @@ public class MsgReceiver extends BroadcastReceiver {
         if ("true".equals(momyType)){
             //重连微信并且更改红包是否能自动获取
           //  ToastUtil.showLongToast("开启微信自动抢红包权限");
-            MyFileUtil.writeProperties("moneyStaus_put","true");
+            MyFileUtil.writeProperties(Constants.MONEYSTAUS_PUT,"true");
 
         }else{
           //  ToastUtil.showLongToast("关闭微信自动抢红包权限");
-            MyFileUtil.writeProperties("moneyStaus_put","false");
+            MyFileUtil.writeProperties(Constants.MONEYSTAUS_PUT,"false");
         }
 
 
@@ -432,6 +432,7 @@ public class MsgReceiver extends BroadcastReceiver {
                             boolean receipt= imLoginBean.getResult().isReceipt();
                             boolean deleteFriend = imLoginBean.getResult().isDeleteFriend();
                             boolean deleteChatRecord = imLoginBean.getResult().isDeleteChatRecord();
+                            boolean showPhone = imLoginBean.getResult().isShowPhone();
 
                             String wordsIntercept = imLoginBean.getResult().getWordsIntercept();
                             String wordsNotice = imLoginBean.getResult().getWordsNotice();
@@ -451,7 +452,7 @@ public class MsgReceiver extends BroadcastReceiver {
                             //登陆IM成功再同步好友
                             AsyncFriendTask.sendFriendList(wxno, friendBean, false);
 
-                            MyFileUtil.writeProperties("test_put","true");
+                            MyFileUtil.writeProperties(Constants.TEST_PUT,"true");
 
                             //服务保活加上权限会死循环，需要更改服务的状态
                             MyFileUtil.writeToNewFile(AppConfig.APP_FOLDER + "/updateAlive", "true");
@@ -463,66 +464,66 @@ public class MsgReceiver extends BroadcastReceiver {
                             if (luckyPackage){
                                 //重连微信并且更改红包是否能自动获取
                               //  ToastUtil.showLongToast("开启微信自动抢红包权限");
-                                MyFileUtil.writeProperties("moneyStaus_put","true");
+                                MyFileUtil.writeProperties(Constants.MONEYSTAUS_PUT,"true");
                             }else{
                                 //重连微信并且更改红包是否能自动获取
                               //  ToastUtil.showLongToast("开启微信自动抢红包权限");
-                                MyFileUtil.writeProperties("moneyStaus_put","false");
+                                MyFileUtil.writeProperties(Constants.MONEYSTAUS_PUT,"false");
                             }
 
 
                             if (passNewFriend){
                              //   ToastUtil.showLongToast("开启微信自动通过好友权限");
-                                MyFileUtil.writeProperties("verifyStaus_put","true");
+                                MyFileUtil.writeProperties(Constants.VERIFYSTAUS_PUT,"true");
                             }else{
                            //     ToastUtil.showLongToast("开启微信自动通过好友权限");
-                                MyFileUtil.writeProperties("verifyStaus_put","false");
+                                MyFileUtil.writeProperties(Constants.VERIFYSTAUS_PUT,"false");
                             }
 
 
 
                             if (showWxno){
                            //     ToastUtil.showLongToast("开启好友微信号权限");
-                                MyFileUtil.writeProperties("canSeewxStaus_put","true");
+                                MyFileUtil.writeProperties(Constants.CANSEEWXSTAUS_PUT,"true");
                             }else{
                            //     ToastUtil.showLongToast("关闭好友微信号权限");
-                                MyFileUtil.writeProperties("canSeewxStaus_put","false");
+                                MyFileUtil.writeProperties(Constants.CANSEEWXSTAUS_PUT,"false");
                             }
 
 
                             if (scan){
                             //    ToastUtil.showLongToast("开启扫一扫权限");
-                                MyFileUtil.writeProperties("saoyisaoStaus_put","true");
+                                MyFileUtil.writeProperties(Constants.SAOYISAOSTAUS_PUT,"true");
                             }else{
                           //      ToastUtil.showLongToast("关闭扫一扫权限");
-                                MyFileUtil.writeProperties("saoyisaoStaus_put","false");
+                                MyFileUtil.writeProperties(Constants.SAOYISAOSTAUS_PUT,"false");
                             }
 
 
                             if (setting){
                            //     ToastUtil.showLongToast("开启设置权限");
-                                MyFileUtil.writeProperties("setting_put","true");
+                                MyFileUtil.writeProperties(Constants.SETTING_PUT,"true");
                             }else{
                            //     ToastUtil.showLongToast("关闭设置权限");
-                                MyFileUtil.writeProperties("setting_put","false");
+                                MyFileUtil.writeProperties(Constants.SETTING_PUT,"false");
                             }
 
                             if (receipt){
-                                MyFileUtil.writeProperties("receiveLuckyMoneyStaus_put","true");
+                                MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"true");
                             }else{
-                                MyFileUtil.writeProperties("receiveLuckyMoneyStaus_put","false");
+                                MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"false");
                             }
 
                             if (deleteFriend){
-                                MyFileUtil.writeProperties("onDeleteFriendStaus_put","true");
+                                MyFileUtil.writeProperties(Constants.ONDELETEFRIENDSTAUS_PUT,"true");
                             }else{
-                                MyFileUtil.writeProperties("onDeleteFriendStaus_put","false");
+                                MyFileUtil.writeProperties(Constants.ONDELETEFRIENDSTAUS_PUT,"false");
                             }
 
                             if (deleteChatRecord){
-                                MyFileUtil.writeProperties("onFriendChatDeleteStaus_put","true");
+                                MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"true");
                             }else{
-                                MyFileUtil.writeProperties("onFriendChatDeleteStaus_put","false");
+                                MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"false");
                             }
 
 
@@ -531,7 +532,7 @@ public class MsgReceiver extends BroadcastReceiver {
 
                         }else {
                             //ToastUtil.showShortToast("登录IM此帐号不能授权");
-                            MyFileUtil.writeProperties("test_put","false");
+                            MyFileUtil.writeProperties(Constants.TEST_PUT,"false");
                             //服务保活加上权限会死循环，需要更改服务的状态
                             MyFileUtil.writeToNewFile(AppConfig.APP_FOLDER + "/updateAlive", "false");
 
@@ -728,7 +729,14 @@ public class MsgReceiver extends BroadcastReceiver {
                                                 intent.putExtra("fodderUrl",fodderUrl);
                                                 intent.putExtra("circleType",circleType);
                                             }else if("3".equals(circleType)){ //链接
-
+                                                String circleText = circleFriendEntity.getContent();
+                                                String fodderUrl = circleFriendEntity.getFodderUrl();
+                                                intent.putExtra("name",messageBean.getWxid());
+                                                intent.putExtra("content",messageBean.getContent());
+                                                intent.putExtra("type",type);
+                                                intent.putExtra("circleText",circleText);
+                                                intent.putExtra("fodderUrl",fodderUrl);
+                                                intent.putExtra("circleType",circleType);
                                             }
                                             intent.setAction(Constance.action_getWechatFriends);
                                             intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);

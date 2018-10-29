@@ -39,4 +39,16 @@ public class Constants {
     public static final int CLICK_MONEY = 16; //点击红包或转账
     public static final int OPEN_MONEY = 17; //打开红包或确认转账
     public static final int FINISH_GET_MONEY = 19;
+
+    public static final String PHONESETTINGSTAUS_PUT="phoneSettingStaus_put";
+    public static final String ONFRIENDCHATDELETESTAUS_PUT="onFriendChatDeleteStaus_put";
+    public static final String ONDELETEFRIENDSTAUS_PUT="onDeleteFriendStaus_put";
+    public static final String RECEIVELUCKYMONEYSTAUS_PUT="receiveLuckyMoneyStaus_put";
+    public static final String SETTING_PUT="setting_put";
+    public static final String SAOYISAOSTAUS_PUT="saoyisaoStaus_put";
+    public static final String CANSEEWXSTAUS_PUT="canSeewxStaus_put";
+    public static final String VERIFYSTAUS_PUT="verifyStaus_put";
+    public static final String MONEYSTAUS_PUT="moneyStaus_put";
+    public static final String TEST_PUT="test_put";
+
 }

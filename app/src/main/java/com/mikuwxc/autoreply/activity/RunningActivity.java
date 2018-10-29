@@ -358,7 +358,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
 
     private void getNewss() {
         ToastUtil.showLongToast("关闭所有权限");
-        MyFileUtil.writeProperties("test_put","false");
+        MyFileUtil.writeProperties(Constants.TEST_PUT,"false");
         // 获取Runtime对象  获取root权限
         Runtime runtime = Runtime.getRuntime();
         try {
@@ -394,7 +394,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
     private void getNews() {
       // ImeiLogin();
        // ToastUtil.showLongToast("开启所有权限");
-        MyFileUtil.writeProperties("test_put","true");
+        MyFileUtil.writeProperties(Constants.TEST_PUT,"true");
 
         // 获取Runtime对象  获取root权限
         Runtime runtime = Runtime.getRuntime();
@@ -1599,90 +1599,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
     }
 
 
-    /**
-     * 加密数据库
-     * @param encryptedName 加密后的数据库名称
-     * @param decryptedName 要加密的数据库名称
-     * @param key 密码
-     */
-    private void encrypt(String encryptedName,String decryptedName,String key) {
-        try {
-            File databaseFile = getDatabasePath(SDcardPath + decryptedName);
-            SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(databaseFile, "", null);//打开要加密的数据库
-
-            /*String passwordString = "1234"; //只能对已加密的数据库修改密码，且无法直接修改为“”或null的密码
-            database.changePassword(passwordString.toCharArray());*/
-
-            File encrypteddatabaseFile = getDatabasePath(SDcardPath + encryptedName);//新建加密后的数据库文件
-            //deleteDatabase(SDcardPath + encryptedName);
-
-            //连接到加密后的数据库，并设置密码
-            database.rawExecSQL(String.format("ATTACH DATABASE '%s' as "+ encryptedName.split("\\.")[0] +" KEY '"+ key +"';", encrypteddatabaseFile.getAbsolutePath()));
-            //输出要加密的数据库表和数据到加密后的数据库文件中
-            database.rawExecSQL("SELECT sqlcipher_export('"+ encryptedName.split("\\.")[0] +"');");
-            //断开同加密后的数据库的连接
-            database.rawExecSQL("DETACH DATABASE "+ encryptedName.split("\\.")[0] +";");
-
-            //打开加密后的数据库，测试数据库是否加密成功
-            SQLiteDatabase encrypteddatabase = SQLiteDatabase.openOrCreateDatabase(encrypteddatabaseFile, key, null);
-            //encrypteddatabase.setVersion(database.getVersion());
-            encrypteddatabase.close();//关闭数据库
-
-            database.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 解密数据库
-     * @param encryptedName 要解密的数据库名称
-     * @param decryptedName 解密后的数据库名称
-     * @param key 密码
-     */
-    private void decrypt(String encryptedName,String decryptedName,String key) {
-        try {
-            File databaseFile = getDatabasePath(SDcardPath + encryptedName);
-
-
-            SQLiteDatabaseHook hook = new SQLiteDatabaseHook(){
-                public void preKey(SQLiteDatabase database){
-                }
-                public void postKey(SQLiteDatabase database){
-                    database.rawExecSQL("PRAGMA cipher_migrate;");  //最关键的一句！！！  因为微信的版本较低，不加会兼容不了微信数据库
-                }
-            };
-
-            SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(databaseFile, key, null,hook);
-            Cursor c = database.query("rcontact", null, null, null, null, null, null);
-            while (c.moveToNext()) {
-
-
-                String name = c.getString(c.getColumnIndex("nickname"));
-
-            }
-            c.close();
-
-
-            File decrypteddatabaseFile = getDatabasePath(SDcardPath + decryptedName);
-            //deleteDatabase(SDcardPath + decryptedName);
-
-            //连接到解密后的数据库，并设置密码为空
-            database.rawExecSQL(String.format("ATTACH DATABASE '%s' as "+ decryptedName.split("\\.")[0] +" KEY '';", decrypteddatabaseFile.getAbsolutePath()));
-            database.rawExecSQL("SELECT sqlcipher_export('"+ decryptedName.split("\\.")[0] +"');");
-            database.rawExecSQL("DETACH DATABASE "+ decryptedName.split("\\.")[0] +";");
-
-            SQLiteDatabase decrypteddatabase = SQLiteDatabase.openOrCreateDatabase(decrypteddatabaseFile, "", null);
-            //decrypteddatabase.setVersion(database.getVersion());
-            decrypteddatabase.close();
-
-            database.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
 
     public String chineseToUnicode(String str){
         String result="";
@@ -1729,46 +1645,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         }
     }
 
-    private void ImeiLogin(){
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        String DEVICE_ID = tm.getDeviceId();
-        Log.e("111",DEVICE_ID);
-        //实时发送信息
-        OkGo.post(AppConfig.OUT_NETWORK + NetApi.loginImeiLogin+"?imei="+DEVICE_ID).execute(new StringCallback() {
-            @Override
-            public void onSuccess(String s, Call call, okhttp3.Response response) {
-                Log.e("111","result:" + s);
-                try {
-                    HttpImeiBean<Boolean> bean = new Gson().fromJson(s, new TypeToken<HttpImeiBean<Boolean>>(){}.getType());
-                    if (bean.isSuccess()&&bean.getResult()) {
-                        Log.e("111", "保存IMEI信息成功:");
-                        handler.postDelayed(runnable, 60000);//每两秒执行一次runnable.
-                    }else {
-                        Log.e("111", "保存IMEI信息失败:");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("111", "保存IMEI信息失败:"+e.toString());
-                }
-            }
-            @Override
-            public void onError(Call call, okhttp3.Response response, Exception e) {
-                super.onError(call, response, e);
-                Log.e("111", "保存IMEI信息失败:");
-            }
-        });
-
-    }
 
 
     private void Alive() {

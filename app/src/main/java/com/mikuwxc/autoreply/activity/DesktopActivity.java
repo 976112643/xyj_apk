@@ -24,6 +24,8 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -100,6 +102,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         EventBus.getDefault().register(this);
         ImageView iv = (ImageView) findViewById(R.id.iv);
         recycleV = (RecyclerView) findViewById(R.id.recycleV);
+        Button btAdmin=(Button) findViewById(R.id.bt_admin);
         // 状态栏透明
         Global.setNoStatusBarFullMode(this);
         // 状态栏设为黑包
@@ -595,6 +598,11 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     }
 
 
+    public void click(View v){
+        if (v.getId()==R.id.bt_admin){
+            UpdateAppUtil.showDialog(this);
+        }
+    }
 
 
 

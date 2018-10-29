@@ -36,6 +36,7 @@ public class FriendBean {
     private int sex;
     private String phone;
     private String region;
+    @SerializedName("addFrom")
     private int from;
 
     public String getWxid() {

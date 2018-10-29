@@ -149,13 +149,14 @@ public class ItemHook {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
-                        XposedBridge.log("onMMMenuItemSelectedonMMMenuItemSelectedonMMMenuItemSelectedonMMMenuItemSelected::");
+                        MenuItem menuItem= (MenuItem) param.args[0];
+                        XposedBridge.log("onMMMenuItemSelectedonMMMenuItemSelectedonMMMenuItemSelectedonMMMenuItemSelected::"+menuItem.getTitle());
                         boolean onFriendChatDeleteStaus_put = true;
                         onFriendChatDeleteStaus_put = MyFileUtil.readProperties("onFriendChatDeleteStaus_put");
-                        if (onFriendChatDeleteStaus_put){
-                            //可以删除好友聊天会话
-                        }else{
+                        if (onFriendChatDeleteStaus_put==false&&"删除".equals(menuItem.getTitle())){
                             param.setResult(0);
+                        }else{
+                            //可以删除好友聊天会话
                         }
                     }
 

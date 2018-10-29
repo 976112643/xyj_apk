@@ -12,6 +12,9 @@ import android.os.Environment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,11 +22,15 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
+import com.mikuwxc.autoreply.R;
+import com.mikuwxc.autoreply.activity.DesktopActivity;
 import com.mikuwxc.autoreply.activity.RunningActivity;
 import com.mikuwxc.autoreply.bean.AppHotVersionBean;
 import com.mikuwxc.autoreply.common.VersionInfo;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.Constants;
+import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.modle.AppVersionBean;
 import com.mikuwxc.autoreply.modle.HttpImeiBean;
@@ -236,6 +243,42 @@ public class UpdateAppUtil {
             }
         });
         // 5 显示
+        builder.show();
+        // 6 细节
+    }
+
+
+    // 弹出更新的对话框
+    public static void showDialog(final Context context) {
+        // 1 构建AlertDialog.Buidler的对象
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(false);// 点击外面，对话不可以取消
+        // 2 设置标题
+        builder.setTitle("请输入管理员密码");
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog, null);
+        final EditText password = (EditText)view.findViewById(R.id.password);
+        //    设置我们自己定义的布局文件作为弹出框的Content
+        builder.setView(view);
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                String b = password.getText().toString().trim();
+                //    将输入的用户名和密码打印出来
+                if (b.equals("admin")){
+                    MyFileUtil.writeProperties(Constants.PHONESETTINGSTAUS_PUT,"true");
+                }
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+
+            }
+        });
         builder.show();
         // 6 细节
     }

@@ -7,6 +7,14 @@
     tools:context=".activity.DesktopActivity"
     android:background="@mipmap/bg">
 
+    <Button
+        android:id="@+id/bt_admin"
+        android:onClick="click"
+        android:layout_gravity="right"
+        android:background="@mipmap/bon1"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginRight="10dp"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycleV"
         android:layout_width="match_parent"

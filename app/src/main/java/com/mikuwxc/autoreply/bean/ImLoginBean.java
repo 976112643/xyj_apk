@@ -105,6 +105,18 @@ public class ImLoginBean {
         private boolean   deleteFriend;
         //收款
         private boolean   receipt;
+        private boolean showPhone;  //是否显示电话号码
+
+        public boolean isShowPhone() {
+            return showPhone;
+        }
+
+        public void setShowPhone(boolean showPhone) {
+            this.showPhone = showPhone;
+        }
+
+
+
 
 
         public boolean isDeleteChatRecord() {

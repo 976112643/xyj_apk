@@ -1,5 +1,8 @@
 package com.mikuwxc.autoreply.wcutil;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import com.alibaba.fastjson.JSONArray;
 import com.mikuwxc.autoreply.wcentity.CircleCommentEntity;
 import com.mikuwxc.autoreply.wcentity.CircleLikeEntity;
@@ -697,6 +700,58 @@ public class MomentUtil {
 
     }
 
+
+
+    public static int sendLinkMoment(ClassLoader classLoader, WechatEntity wechatEntity, String content, int publicMode, Set<String> labelNames, String imgThumbUrl, String imgPath, String KsnsuploadLink, String KsnsuploadTitle) {
+        int i = 0;
+        if (publicMode == 1) {
+            i = 1;
+        }
+        List<String> list = new LinkedList();
+        List<String> list2 = new LinkedList();
+        if (publicMode == 2 || publicMode == 3) {
+            list2 = WechatDb.getInstance().selectContactByLabelName(labelNames);
+        }
+        boolean z = false;
+        if (publicMode == 3) {
+            z = true;
+        }
+        Class class_ax = XposedHelpers.findClass(wechatEntity.commit_link_moment_class1, classLoader);
+        Class class_Pint = XposedHelpers.findClass(wechatEntity.commit_link_moment_class2, classLoader);
+        Class class_arj = XposedHelpers.findClass(wechatEntity.commit_link_moment_class3, classLoader);
+        Class class_atg = XposedHelpers.findClass(wechatEntity.commit_link_moment_class4, classLoader);
+        Class class_platformtool_c = XposedHelpers.findClass(wechatEntity.commit_link_moment_class5, classLoader);
+        Object object_arj = initArj(wechatEntity, class_arj);
+        Object object_ax = XposedHelpers.newInstance(class_ax, new Object[]{Integer.valueOf(3)});
+        Object object_pInt = XposedHelpers.newInstance(class_Pint, new Object[0]);
+        Object object_afv = XposedHelpers.getObjectField(object_ax, wechatEntity.commit_link_moment_field1);
+        XposedHelpers.setObjectField(object_pInt, wechatEntity.commit_link_moment_field2, object_afv);
+        if (0 > Integer.MAX_VALUE) {
+            XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method1, new Object[]{Integer.valueOf(4)});
+        }
+        Bitmap bm = BitmapFactory.decodeFile(imgPath);
+        bm = (Bitmap) XposedHelpers.callStaticMethod(class_platformtool_c, wechatEntity.commit_link_moment_method2, new Object[]{bm, Integer.valueOf(150), Integer.valueOf(150), Boolean.valueOf(false), Boolean.valueOf(false)});
+        byte[] arr = (byte[]) XposedHelpers.callStaticMethod(class_platformtool_c, wechatEntity.commit_link_moment_method3, new Object[]{bm});
+        XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method4, new Object[]{arr, "", ""});
+        XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method5, new Object[]{KsnsuploadTitle}), wechatEntity.commit_link_moment_method6, new Object[]{KsnsuploadLink}), wechatEntity.commit_link_moment_method7, new Object[]{KsnsuploadLink}), wechatEntity.commit_link_moment_method8, new Object[]{content}), wechatEntity.commit_link_moment_method9, new Object[]{list2});
+        Object object_ate = XposedHelpers.callStaticMethod(class_ax, wechatEntity.commit_link_moment_method10, new Object[]{"", imgThumbUrl, imgThumbUrl});
+        XposedHelpers.setObjectField(object_ate, wechatEntity.commit_link_moment_field3, imgThumbUrl);
+        Object object_atg = XposedHelpers.newInstance(class_atg, new Object[0]);
+        XposedHelpers.setObjectField(object_atg, wechatEntity.commit_link_moment_field4, Float.valueOf(640.0f));
+        XposedHelpers.setObjectField(object_atg, wechatEntity.commit_link_moment_field5, Float.valueOf(640.0f));
+        XposedHelpers.setObjectField(object_ate, wechatEntity.commit_link_moment_field6, object_atg);
+        XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method11, new Object[]{Integer.valueOf(i)});
+        if (z) {
+            XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method12, new Object[]{Integer.valueOf(1)});
+        } else {
+            XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method12, new Object[]{Integer.valueOf(0)});
+        }
+        XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method13, new Object[]{Integer.valueOf(0)});
+        XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method14, new Object[]{KsnsuploadLink, KsnsuploadLink, "", Integer.valueOf(0), Integer.valueOf(0)});
+        int commit = ((Integer) XposedHelpers.callMethod(object_ax, wechatEntity.commit_link_moment_method15, new Object[0])).intValue();
+        sendCommitMoment(classLoader, wechatEntity);
+        return commit;
+    }
 
 
 
