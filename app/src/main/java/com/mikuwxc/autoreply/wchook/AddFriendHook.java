@@ -27,14 +27,17 @@ public class AddFriendHook {
                         Object paramAnonymousMethodHookParam1 = XposedHelpers.getObjectField(localObject3,wechatEntity.add_search_friend_field3);
                         Object localObject4 = XposedHelpers.getObjectField(XposedHelpers.getObjectField(localObject3, wechatEntity.add_search_friend_field4), wechatEntity.add_search_friend_field5);
 
+                        if (String.valueOf(localObject1).endsWith("@stranger")){
+                            if (addContent!=null) {
+                                FriendUtil.addFriendWithUpdateRemark(wxClassLoader, wechatEntity, addContent,addContent, addContent, 15);
+                                FriendUtil.addFriend11(wxClassLoader, wechatEntity, addContent, (String) localObject2, 15);   //15 是通过微信号加好友*/
+                                XposedBridge.log("addFriend11" + addContent);
+                            }else {
+                                XposedBridge.log("需要添加的好友已经存在");
+                            }
+                        }
 
-                       if (addContent!=null) {
-                           FriendUtil.addFriendWithUpdateRemark(wxClassLoader, wechatEntity, addContent, addContent, "", 15);
-                           FriendUtil.addFriend11(wxClassLoader, wechatEntity, addContent, "ppp", 15);   //15 是通过微信号加好友*/
-                           XposedBridge.log("addFriend11" + addContent);
-                       }else {
-                           XposedBridge.log("addContent11内存中的为空" + "");
-                       }
+
 
                     }
 
@@ -45,13 +48,9 @@ public class AddFriendHook {
             XposedHelpers.findAndHookMethod(XposedHelpers.findClass(wechatEntity.add_search_friend_class4, wxClassLoader), wechatEntity.add_search_friend_method5, new Object[]{Integer.TYPE, Integer.TYPE, Integer.TYPE, String.class, XposedHelpers.findClass(wechatEntity.add_search_friend_class3, wxClassLoader), byte[].class, new XC_MethodHook() {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     XposedBridge.log("===== searchFriend 444"+Integer.parseInt(param.args[1].toString()));
-                    boolean addFriend_put=true;
-                    addFriend_put= MyFileUtil.readProperties("addFriend_put");
                     String addContent = MyFileUtil.readFromFile(AppConfig.APP_ADD);
-                    XposedBridge.log("addFriend_putaddFriend_putaddFriend_put:"+addFriend_put);
-                    if (Integer.parseInt(param.args[1].toString()) == 4) {
                         XposedBridge.log("1111");
-                        if (Intrinsics.areEqual((Object) "user need verify", param.args[3].toString())){
+                        if (Integer.parseInt(param.args[1].toString()) == 4 && Intrinsics.areEqual((Object) "user need verify",param.args[3].toString())){
                             XposedBridge.log("222");
 
                             if (addContent!=null) {
@@ -60,18 +59,12 @@ public class AddFriendHook {
                             }else {
                                 XposedBridge.log("addContent12内存中的为空" + "");
                             }
+                        }else if(Integer.parseInt(param.args[1].toString()) == 0 && Integer.parseInt(param.args[2].toString()) == 0){
+                        //FriendUtil.addFriend12(wxClassLoader, wechatEntity, addContent, "你好", 15);   //15 是通过微信号加好友*/
+                        XposedBridge.log("加好友申请中1");
+                        }else{
+                             XposedBridge.log("加好友申请中2");
                         }
-
-                    }else if(Integer.parseInt(param.args[1].toString()) == 0 && Integer.parseInt(param.args[2].toString()) == 0&&addFriend_put==true){
-                        MyFileUtil.writeProperties("addFriend_put","false");
-                        FriendUtil.addFriend12(wxClassLoader, wechatEntity, addContent, "你好", 15);   //15 是通过微信号加好友*/
-                        XposedBridge.log("===== searchFriend 444else"+Integer.parseInt(param.args[1].toString())+"addFriend_put"+addFriend_put);
-                    }
-
-                    if (addFriend_put){
-                        FriendUtil.addFriend12(wxClassLoader, wechatEntity, addContent, "你好", 15);   //15 是通过微信号加好友*/
-                    }
-
                 }
 
             }});

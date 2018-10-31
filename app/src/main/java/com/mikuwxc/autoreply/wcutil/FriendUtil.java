@@ -64,6 +64,21 @@ public class FriendUtil {
         XposedHelpers.callMethod(XposedHelpers.callStaticMethod(findClass2, wechatEntity.add_friend_with_update_remark_method1, new Object[0]), wechatEntity.add_friend_with_update_remark_method3, new Object[]{newInstance});
     }
 
+
+    public static void addFriendWithUpdateRemark(ClassLoader classLoader, WechatEntity wechatEntity, String stranger, String remarkName, String searchValue, String labelNames, int type) {
+        Object object_1 = XposedHelpers.newInstance(XposedHelpers.findClass(wechatEntity.add_friend_with_update_remark_class1, classLoader), new Object[]{stranger});
+        XposedHelpers.setObjectField(object_1, wechatEntity.add_friend_with_update_remark_field1, remarkName);
+        XposedHelpers.setObjectField(object_1, wechatEntity.add_friend_with_update_remark_field2, "");
+        XposedHelpers.setObjectField(object_1, wechatEntity.add_friend_with_update_remark_field3, labelNames);
+        if (type == 15) {
+            XposedHelpers.setObjectField(object_1, wechatEntity.add_friend_with_update_remark_field4, searchValue);
+        }
+        Class class_2 = XposedHelpers.findClass(wechatEntity.add_friend_with_update_remark_class2, classLoader);
+        Class class_3 = XposedHelpers.findClass(wechatEntity.add_friend_with_update_remark_class3, classLoader);
+        XposedHelpers.callStaticMethod(class_2, wechatEntity.add_friend_with_update_remark_method2, new Object[0]);
+        XposedHelpers.callMethod(XposedHelpers.callStaticMethod(class_3, wechatEntity.add_friend_with_update_remark_method1, new Object[0]), wechatEntity.add_friend_with_update_remark_method3, new Object[]{object_1});
+    }
+
     public static void autoVerifyUser(ClassLoader paramClassLoader, WechatEntity wechatEntity, String str, String str2, int i) throws Exception {
         XposedBridge.log("000000000000000000");
         XposedHelpers.callMethod(XposedHelpers.callStaticMethod(paramClassLoader.loadClass(wechatEntity.auto_verify_user_class1), wechatEntity.auto_verify_user_method1, new Object[0]), wechatEntity.auto_verify_user_method2, new Object[0]);

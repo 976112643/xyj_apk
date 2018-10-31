@@ -194,7 +194,7 @@ public class MainHook implements IXposedHookLoadPackage {
             WeChatWebLoginHook.hook(create, lpparam);
 
             //加好友时需要hook到
-            //AddFriendHook.hook(create, lpparam);
+            AddFriendHook.hook(create, lpparam);
         //操作微信相关
         Class receiver=classLoader.loadClass(Constance.receiver_wechat);
         XposedBridge.hookAllMethods(receiver,"onReceive",new MountReceiver());

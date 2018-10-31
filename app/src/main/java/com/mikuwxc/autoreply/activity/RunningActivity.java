@@ -8,7 +8,6 @@ import android.app.AlarmManager;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -33,7 +32,6 @@ import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -53,7 +51,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.mikuwxc.autoreply.AlarmReceiver;
@@ -93,9 +90,6 @@ import com.mikuwxc.autoreply.widget.UrlCircleImageView;
 import com.mikuwxc.autoreply.wxid.WxIdUtil;
 
 
-import net.sqlcipher.Cursor;
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteDatabaseHook;
 
 import org.json.JSONObject;
 import org.xutils.common.Callback;
@@ -118,11 +112,6 @@ import java.util.TimeZone;
 
 import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
-import it.sauronsoftware.jave.AudioAttributes;
-import it.sauronsoftware.jave.Encoder;
-import it.sauronsoftware.jave.EncoderException;
-import it.sauronsoftware.jave.EncodingAttributes;
-import it.sauronsoftware.jave.InputFormatException;
 import okhttp3.Call;
 
 
@@ -328,9 +317,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         findViewById(R.id.start_run).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String path1 = "/storage/emulated/0/msg_5017190806185ece7d22a74101.amr";
-                String path2 = "/storage/emulated/0/msg_5017190806185ece7d22a74101.mp3";
-                changeToMp3(path1, path2);
                 if (StaticData.isStartTask) {
                     StaticData.isStartTask = false;
                 } else {
@@ -1576,7 +1562,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
     }*/
 
 
-    public static void changeToMp3(String sourcePath, String targetPath) {
+   /* public static void changeToMp3(String sourcePath, String targetPath) {
         File source = new File(sourcePath);
         File target = new File(targetPath);
         AudioAttributes audio = new AudioAttributes();
@@ -1596,7 +1582,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         } catch (EncoderException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 
 
