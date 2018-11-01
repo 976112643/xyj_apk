@@ -326,7 +326,7 @@ public class MsgReceiver extends BroadcastReceiver {
 
     //获取数据库的路径并复制去指定文件夹，和密码
     private void action_getWechatDB(Context context, Intent intent) {
-        String dabase_Route=intent.getStringExtra(Constance.dabase_cpRoute);
+      /*  String dabase_Route=intent.getStringExtra(Constance.dabase_cpRoute);
         Log.e("111","收到广播1"+dabase_Route);
         String dabase_Password=intent.getStringExtra(Constance.dabase_cpPassword);
         Log.e("111","收到广播2"+dabase_Password);
@@ -353,20 +353,31 @@ public class MsgReceiver extends BroadcastReceiver {
         String friendList=decrypt(fileName,"EnMicroMsglyNew"+dabase_Password+".db",dabase_Password,context);
         if (friendList!=null){
             sendWXFriendList(friendList,context, wxno,wxid,headImgUrl,userName);
+        }*/
+
+
+
+        String friendBeans = MyFileUtil.readFromFile(AppConfig.APP_FILE + "/friendBeans");
+        wxno = intent.getStringExtra("wxno");
+        String wxid = intent.getStringExtra("wxid");
+        if (StringUtils.isBlank(wxno)){
+            wxno=wxid;
         }
+        String headImgUrl = intent.getStringExtra("headImgUrl");
+        String userName = intent.getStringExtra("userName");
+        Toast.makeText(context,"连接中",Toast.LENGTH_LONG).show();
+        if (StringUtils.isNotBlank(friendBeans)){
+            Log.e("111","friendBeansJson：："+friendBeans);
+            sendWXFriendList(friendBeans,context, wxno,wxid,headImgUrl,userName);
+        }
+
+
     }
 
 
     private void sendWXFriendList(String WXFriendList,Context context,String wxno,String wxid,String headImgUrl,String userName) {
          List<FriendBean> friendBean = new Gson().fromJson(WXFriendList, new TypeToken<List<FriendBean>>() {
         }.getType());
-         //登录IM
-        //获取sim卡唯一标识
-       /* TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("111",tm.getDeviceId());
-            return;
-        }*/
         String DEVICE_ID = null;
         try {
             DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
@@ -1023,6 +1034,11 @@ public class MsgReceiver extends BroadcastReceiver {
 
                     Log.e("111","保活成功"+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date)+list_msgFail.size());
 
+                    if (wxState!=null) {
+                        wxState.setText("微信连接状态：true");
+                        tv3.setText("服务器连接状态：true");
+                    }
+
                     if (list_msgFail.size()>0){
                         handleFailedMessage(list_msgFail);
                     }else {
@@ -1035,7 +1051,6 @@ public class MsgReceiver extends BroadcastReceiver {
                     if (wxState!=null) {
                         wxState.setText("微信连接状态：false");
                         tv3.setText("服务器连接状态：false");
-                        MyFileUtil.writeProperties("connection_put","false");
                     }
                 }
             }
@@ -1046,7 +1061,6 @@ public class MsgReceiver extends BroadcastReceiver {
                 if (wxState!=null) {
                     wxState.setText("微信连接状态：false");
                     tv3.setText("服务器连接状态：false");
-                    MyFileUtil.writeProperties("connection_put","false");
                 }
 
             }

@@ -197,22 +197,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         tvHotVersion = (TextView) findViewById(R.id.tvHotVersion);
 
         tvHotVersion.setText("当前补丁版本："+VersionInfo.versionCode);
-        boolean connection_put=true;
-        connection_put=MyFileUtil.readProperties("connection_put");
-        if (connection_put){
-            wxState.setText("微信连接状态："+true);
-            tv3.setText("服务器连接状态："+true);
-        }else{
-            wxState.setText("微信连接状态："+false);
-            tv3.setText("服务器连接状态："+false);
-        }
-
-
         UpdateAppUtil.getAppVersionState(this,tvLastVersion);
-
-
-
-
         news = (Button) findViewById(R.id.news);
         final List<String> permissionsList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -286,14 +271,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
             @Override
             public void onClick(View v) {
                 if (MyApp.api.isWXAppInstalled()) {
-                  /*  if (MyApp.api.isWXAppSupportAPI()) {
-                        SendAuth.Req req = new SendAuth.Req();
-                        req.scope = "snsapi_userinfo";
-                        req.state = "wechat_sdk";
-                        MyApp.api.sendReq(req);
-                    } else {
-                        Toast.makeText(RunningActivity.this, "不支持微信授权", Toast.LENGTH_LONG).show();
-                    }*/
                 } else {
                     Toast.makeText(RunningActivity.this, "没安装有微信哦", Toast.LENGTH_LONG).show();
                 }
@@ -1473,116 +1450,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         UI.initUIVersion(version);
     }
 
-/*    @Subscribe(threadMode = ThreadMode.MainThread)
-    public void onEventBusCome(Event event) {
-        if (event != null) {
-            // 接受到Event后的相关逻辑
-            switch (event.getCode()) {
-                case C.EventCode.A:
-                    break;
-                case C.EventCode.B:
-                    LogUtils.w(TAG, "wxno:" + Constants.wxno);
-                    Log.e("111","wxno:" + Constants.wxno);
-                    Log.e("111","qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
-                    loginPresenter.iLoginPrToLogin(Constants.wxno, Constants.phone, Constants.imei, AppConfig.Registration_Id);
-                    dismissProcessDialog();
-                    break;
-                case C.EventCode.H:
-                    moveTaskToBack(true);
-                    break;
-            }
-        }
-    }*/
-
-
-/*    public void dismissProcessDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
-    }*/
-
-
- /*   *//**
-     * 该方法  由  ILoginview 回调
-     *//*
-    @Override
-    public void iLoginViewSuccess(LoginBean loginBean) {
-        Log.e("111","ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt");
-        dismissProcessDialog();
-        //登录  成功  处理ui数据
-        if (loginBean != null) {
-            if (loginBean.getResult() != null) {
-//                AppConfig.setIdentifier(loginBean.getResult().getName());
-//                AppConfig.setUserSig(loginBean.getResult().getSig());
-                Constants.token = loginBean.getResult().getToken();
-                Log.e("111","uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
-                LogUtils.d(TAG, "登录成功");
-                if (!TextUtils.isEmpty(Constants.token)) {
-                    //头尾添加1位随机数作加密
-                    Random rand = new Random();
-                    int start = rand.nextInt(10);
-                    int end = rand.nextInt(10);
-                    try {
-                        File tokenFile = new File(AppConfig.APP_FOLDER, "/token");
-                        tokenFile.createNewFile();
-                        FileOutputStream fos = new FileOutputStream(tokenFile);
-                        OutputStreamWriter osw = new OutputStreamWriter(fos, "utf-8");
-                        osw.write(start + Constants.token + end);
-                        osw.flush();
-                        fos.flush();
-                        osw.close();
-                        fos.close();
-                        LogUtils.e(TAG, "保存token:" + Constants.token);
-                    } catch (Exception e) {
-                        LogUtils.e(TAG, "保存token出错");
-                        e.printStackTrace();
-                    }
-                    ToastUtil.showLongToast("登录成功");
-                } else {
-                    ToastUtil.showLongToast("token为空");
-                }
-            } else {
-                ToastUtil.showLongToast("result为空");
-            }
-        } else {
-            ToastUtil.showLongToast("LoginBean为空");
-        }
-    }*/
-
-/*    *//**
-     * 该方法  由   ILoginview  回调
-     *//*
-    @Override
-    public void iLoginViewFailed(Exception e) {
-        //登录 失败 处理UI数据
-        Log.e("111","yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
-        dismissProcessDialog();
-        ToastUtil.showLongToast(e.getMessage());
-    }*/
-
-
-   /* public static void changeToMp3(String sourcePath, String targetPath) {
-        File source = new File(sourcePath);
-        File target = new File(targetPath);
-        AudioAttributes audio = new AudioAttributes();
-        Encoder encoder = new Encoder();
-
-        audio.setCodec("libmp3lame");
-        EncodingAttributes attrs = new EncodingAttributes();
-        attrs.setFormat("mp3");
-        attrs.setAudioAttributes(audio);
-
-        try {
-            encoder.encode(source, target, attrs);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InputFormatException e) {
-            e.printStackTrace();
-        } catch (EncoderException e) {
-            e.printStackTrace();
-        }
-    }*/
 
 
 

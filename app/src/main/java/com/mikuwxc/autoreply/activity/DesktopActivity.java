@@ -109,7 +109,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         // Global.setStatusBarColor(this, Color.BLUE);
         //设置极光推送的别名
         setTagAndAlias(this);
-
         //注册广播收到极光推送的时候可以回调接口更新请求桌面
         IntentFilter intentFilter = new IntentFilter();
         MyReceiver dianLiangBR = new MyReceiver();
@@ -123,7 +122,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         startNetWorkBroadcastReceiver();//断网重连后短信 短话上传
         startMomentDBReceiver();//开启朋友圈列表数据库的监听
         String lngAndLat = getLngAndLat(this);
-
         UpdateAppUtil.removeApk(this);
     }
 
@@ -243,10 +241,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                         if (apphttpBean != null) {
                             resultBean = (ArrayList<ApphttpBean.ResultBean>) apphttpBean.getResult();
                             PreferenceUtil.setWxAccessToken(context, s);
-
-
                             newBean = new ArrayList<>();
-
                             if (resultBean != null) {
                                 //newBean.add(resultBean.get(0));
                                 for (int i = 0; i < resultBean.size(); i++) {
@@ -258,11 +253,8 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                                     } catch (PackageManager.NameNotFoundException e) {
                                         e.printStackTrace();
                                     }
-
                                 }
                             }
-
-
                             adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
                             recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
                             recycleV.setAdapter(adapter);
@@ -275,15 +267,11 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                         super.onError(call, response, e);
                         Log.e("111", "e" + e.toString());
                         String wxAccessToken = PreferenceUtil.getWxAccessToken(context);
-
-
                         ApphttpBean apphttpBean = new Gson().fromJson(wxAccessToken, ApphttpBean.class);
                         if (apphttpBean != null) {
                             resultBean = (ArrayList<ApphttpBean.ResultBean>) apphttpBean.getResult();
                             PreferenceUtil.setWxAccessToken(context, wxAccessToken);
                             newBean = new ArrayList<>();
-
-
                             if (resultBean != null) {
                                 for (int i = 0; i < resultBean.size(); i++) {
                                     PackageManager pm = getApplicationContext().getPackageManager();
@@ -301,7 +289,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                             recycleV.setAdapter(adapter);
                             adapter.setClickListener((BaseOnRecycleClickListener) context);
                         }
-
                     }
                 });
 
@@ -309,8 +296,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         }catch (Exception e){
             Log.e("444",e.toString());
         }
-
-
 
     }
 
@@ -328,16 +313,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
          *这里设置了别名，在这里获取的用户登录的信息
          *并且此时已经获取了用户的userId,然后就可以用用户的userId来设置别名了
          **/
-        //false状态为未设置标签与别名成功
-        //if (UserUtils.getTagAlias(getHoldingActivity()) == false) {
         Set<String> tags = new HashSet<String>();
-        //这里可以设置你要推送的人，一般是用户uid 不为空在设置进去 可同时添加多个
-
-       /* TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            return;
-        }*/
         String DEVICE_ID = null;
         try {
             DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
@@ -351,7 +327,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         //上下文、别名【Sting行】、标签【Set型】、回调
         JPushInterface.setAliasAndTags(this, DEVICE_ID, tags,
                 mAliasCallback);
-
     }
 
 
@@ -396,69 +371,8 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     };
 
 
-    /**
-     * 打开微信
-     */
-    private void openWeiXinApp() {
-        try {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            ComponentName cmp = new ComponentName("com.android.phone", "com.android.phone");
-            intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setComponent(cmp);
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // TODO: handle exception
-            ToastUtil.showLongToast("检查到您手机没有安装微信，请安装后使用该功能");
-        }
-
-    }
 
 
-    public String chineseToUnicode(String str) {
-        String result = "";
-        for (int i = 0; i < str.length(); i++) {
-            int chr1 = (char) str.charAt(i);
-            if (chr1 >= 19968 && chr1 <= 171941) {//汉字范围 \u4e00-\u9fa5 (中文)
-                result += "\\u" + Integer.toHexString(chr1);
-            } else {
-                result += str.charAt(i);
-            }
-        }
-        return result;
-    }
-
-
-    /**
-     30      * 执行Shell命令
-     31      *
-     32      * @param commands
-     33      *            要执行的命令数组
-     34      */
-    public void execShell(String[] commands) {
-        // 获取Runtime对象
-        Runtime runtime = Runtime.getRuntime();
-
-        DataOutputStream os = null;
-        try {
-            // 获取root权限
-            Process process = runtime.exec("su");
-            os = new DataOutputStream(process.getOutputStream());
-            for (String command : commands) {
-                if (command == null) {
-                    continue;
-                }
-                os.write(command.getBytes());
-                os.writeBytes("\n");
-                os.flush();
-            }
-            os.writeBytes("exit\n");
-            os.flush();
-            process.waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -500,12 +414,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {  //从gps获取经纬度
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 return "";
             }
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -518,12 +426,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         } else {    //从网络获取经纬度
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 return "";
             }
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
@@ -543,12 +445,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return "";
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);

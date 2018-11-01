@@ -4,6 +4,8 @@ import android.database.Cursor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.mikuwxc.autoreply.modle.FriendBean;
+import com.mikuwxc.autoreply.utils.ParseUtil;
 import com.mikuwxc.autoreply.wcentity.AutoVerifyEntity;
 import com.mikuwxc.autoreply.wcentity.ChatroomEntity;
 import com.mikuwxc.autoreply.wcentity.MemberEntity;
@@ -406,6 +408,63 @@ public class WechatDb extends AbstractWeChatDb {
         }
         return hashMap3;
     }
+
+
+    public ArrayList<FriendBean> selectContactTree() {
+        ArrayList<FriendBean> beanArrayList=new ArrayList<>();
+        Cursor cursor = query("select r.username,r.alias,r.conRemark,r.nickname,r.pyInitial,r.quanPin,r.lvbuff,r.encryptUsername,r.contactLabelIds,i.reserved1,i.reserved2 from rcontact r left join img_flag i on r.username = i.username  where (r.type & 1 != 0 and r.type & 8 = 0 and r.type & 32 = 0 and r.verifyFlag & 8 = 0 and r.username not like '%@%' and r.username != 'filehelper' ) ");
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String username       = cursor.getString(0);
+                String alias       = cursor.getString(1);
+                String conRemark = cursor.getString(2);
+                String nickname   = cursor.getString(3);
+                byte[] blob       = cursor.getBlob(6);
+                String reserved1  = cursor.getString(9);
+                String reserved2  = cursor.getString(10);
+
+                FriendBean  friendBean=new FriendBean();
+               /* Cursor s = database.query("img_flag", new String[]{"reserved1"}, "username=?",  new String[]{username}, null, null, null);
+                while (s.moveToNext()) {
+                    if (s!=null&&s.getCount()>0) {
+                        String HeadImgUrl = s.getString(s.getColumnIndex("reserved1"));
+                        friendBean.setHeadImgUrl(HeadImgUrl);
+                    }
+                }*/
+                //s.close();
+                friendBean.setNickname(nickname);
+                friendBean.setWxid(username);
+                friendBean.setRemarkname(conRemark);
+                friendBean.setHeadImgUrl(StringUtils.isNotBlank(reserved1) ? reserved1 : reserved2);
+                if(blob != null){
+                    //性别
+                    friendBean.setSex(blob[8]);
+                    //手机号
+                    friendBean.setPhone(ParseUtil.parsePhone(blob));
+                    //地区
+                    friendBean.setRegion(ParseUtil.parseRegion(blob));
+                    //来源
+                    friendBean.setFrom(ParseUtil.parseFrom(blob));
+                }
+                //friendBean.setWxno(alias);
+                if (StringUtils.isBlank(alias)){
+                    friendBean.setWxno(username);
+                }else{
+                    friendBean.setWxno(alias);
+                }
+             /*   Log.e("111","encryptUsernameencryptUsername::"+encryptUsername);
+                if (StringUtils.isNotBlank(encryptUsername)){
+                    beanArrayList.add(friendBean);
+                }*/
+                beanArrayList.add(friendBean);
+
+            }
+            cursor.close();
+        }
+        return beanArrayList;
+    }
+
+
 
     public List<WxEntity> selectContacts(Set<String> set) {
         Throwable th;

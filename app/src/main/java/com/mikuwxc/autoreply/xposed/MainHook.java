@@ -328,7 +328,7 @@ public class MainHook implements IXposedHookLoadPackage {
             }
         });
 
-        findAndHookMethod("com.tencent.mm.plugin.chatroom.ui.ChatroomInfoUI", loadPackageParam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+     /*   findAndHookMethod("com.tencent.mm.plugin.chatroom.ui.ChatroomInfoUI", loadPackageParam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 Activity activity = (Activity) param.thisObject;
@@ -336,7 +336,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 ClipboardManager cmb = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
                 cmb.setText(wechatId);
             }
-        });
+        });*/
 
         new HideModule().hide(loadPackageParam);
     }
