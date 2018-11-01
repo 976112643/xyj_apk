@@ -144,7 +144,7 @@ public class MainHook implements IXposedHookLoadPackage {
             MomentHook.hook(applicationContext,wechatEntity,lpparam);//朋友圈
         //判断是否具有全部微信权限
         if (test_put){
-        XposedBridge.log("权限开启中");
+            XposedBridge.log("权限开启中");
           //  WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
 
 
@@ -165,12 +165,12 @@ public class MainHook implements IXposedHookLoadPackage {
          //   commonHook.showToast(mContext, "wechat hooked " + CommonHook.wechatVersionName);
             MyFileUtil.writeToNewFile(AppConfig.APP_FOLDER + "/version", CommonHook.wechatVersionName);
         }
-        WechatEntity create = WechatEntityFactory.create(CommonHook.wechatVersionName);
-        ClassLoader classLoader1 = lpparam.classLoader;
+            WechatEntity create = WechatEntityFactory.create(CommonHook.wechatVersionName);
+            ClassLoader classLoader1 = lpparam.classLoader;
             //读取微信数据库聊天历史的时候要先初始化这个
-        LogWechatDbPathAndPwdHook.hook(create,lpparam,classLoader1,mContext);
+             LogWechatDbPathAndPwdHook.hook(create,lpparam,classLoader1,mContext);
             //监听钱包
-        WalletHook.hook(create, lpparam,classLoader1,mContext);
+            WalletHook.hook(create, lpparam,classLoader1,mContext);
             //敏感词操作
             SensitiveHook.hook(create, lpparam,mContext);
 
@@ -196,8 +196,8 @@ public class MainHook implements IXposedHookLoadPackage {
             //加好友时需要hook到
             AddFriendHook.hook(create, lpparam);
         //操作微信相关
-        Class receiver=classLoader.loadClass(Constance.receiver_wechat);
-        XposedBridge.hookAllMethods(receiver,"onReceive",new MountReceiver());
+            Class receiver=classLoader.loadClass(Constance.receiver_wechat);
+            XposedBridge.hookAllMethods(receiver,"onReceive",new MountReceiver());
 
         //聊天信息监听
        // CommonHook.markAllActivity();

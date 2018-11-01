@@ -101,7 +101,10 @@ public class LoopService extends Service{
                     public void onSuccess(String s, Call call, okhttp3.Response response) {
                         Log.e("222", "result:" + s);
                         try {
-
+                            if (wxState!=null) {
+                                wxState.setText("微信连接状态：true");
+                                tv3.setText("服务器连接状态：true");
+                            }
                             Log.e("222", "保活成功");
 
 
@@ -111,7 +114,6 @@ public class LoopService extends Service{
                             if (wxState!=null) {
                                 wxState.setText("微信连接状态：false");
                                 tv3.setText("服务器连接状态：false");
-                                MyFileUtil.writeProperties("connection_put","false");
                             }
                         }
                     }
@@ -123,7 +125,6 @@ public class LoopService extends Service{
                         if (wxState!=null) {
                             wxState.setText("微信连接状态：false");
                             tv3.setText("服务器连接状态：false");
-                            MyFileUtil.writeProperties("connection_put","false");
                         }
 
                     }
