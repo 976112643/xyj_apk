@@ -19,10 +19,11 @@ public class AppConfig {
     public static final String APP_FOLDER = ROOT + "/HSL_WXFZ";
     public static final String APP_USERNAME = ROOT + "/wechatusername.txt";//保存用户名 微信号等相关信息
     public static final String APP_ADD = ROOT + "/AddFriend";
+    public static final String AddFriend="/storage/emulated/0/addfriend.properties";
     public static final String APP_FILE = ROOT + "/JCM";
     public static final String APP_FILEAPK = ROOT + "/JCM/hsl.apk";
 
-    //public static String OUT_NETWORK = "http://192.168.5.173:8080/";
+   // public static String OUT_NETWORK = "http://192.168.5.168:8080/";
     //public static String OUT_NETWORK = "http://192.168.5.170:8080/";
 
     public static String OUT_NETWORK = "http://120.24.102.187:8066/";

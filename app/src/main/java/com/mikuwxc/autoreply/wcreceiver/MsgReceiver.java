@@ -757,7 +757,7 @@ public class MsgReceiver extends BroadcastReceiver {
                                             AddFriendEntity addFriendEntity = new Gson().fromJson(messageBean.getContent(), AddFriendEntity.class);
                                             String addType = addFriendEntity.getType();
                                             Toast.makeText(context,addType+"343757500",Toast.LENGTH_LONG).show();
-                                            if ("1".equals(addType)){  //根据微信号加好友 addtype为1
+                                          //  if ("1".equals(addType)){  //根据微信号加好友 addtype为1
                                                 String addWxid = addFriendEntity.getAddNo();
                                                 String addMsg = addFriendEntity.getMsg();
                                                 intent.putExtra("name",messageBean.getWxid());
@@ -765,7 +765,8 @@ public class MsgReceiver extends BroadcastReceiver {
                                                 intent.putExtra("addWxid",addWxid);
                                                 intent.putExtra("addMsg",addMsg);
                                                 intent.putExtra("addType",addType);
-                                            }
+                                                intent.putExtra("addRemark",addFriendEntity.getRemark());
+                                          //  }
                                             intent.setAction(Constance.action_getWechatFriends);
                                             intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
                                             context.sendBroadcast(intent);

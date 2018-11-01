@@ -156,6 +156,7 @@ public class MountReceiver extends XC_MethodHook {
         String addMsg = intent.getStringExtra("addMsg");
         String addType = intent.getStringExtra("addType");
         String deleFriend = intent.getStringExtra("deleFriend");
+        String addRemark = intent.getStringExtra("addRemark");
 
 
         XposedBridge.log("contentcontentcontent:::"+content);
@@ -254,14 +255,14 @@ public class MountReceiver extends XC_MethodHook {
                     in.putExtra("saoyisaoType",content);
                     context.sendBroadcast(in);
                 } else if (type.equals("201")){   //201代表加好友
-                    if ("1".equals(addType)){   //1代表微信号加好友
+                    if ("3".equals(addType)){   //3代表微信号加好友
                         XposedBridge.log("addWxid"+addWxid+"addMsg"+addMsg);
-                        MyFileUtil.writeProperties("addFriend_put","true");
-                        FriendUtil.searchFriend(classLoader,create,0,"",addWxid,"",15);
-          /*              FriendUtil.addFriendWithUpdateRemark(classLoader, create, "", "测试电话", "", 15);
-                        FriendUtil.addFriend12(classLoader,create,addWxid,addMsg,15);   //15 是通过手机号途径加好友  content代表微信号，circleText代表打招呼信息*/
+                        FriendUtil.searchFriend(classLoader,create,0,addMsg,addWxid,addRemark,3);
                         XposedBridge.log("addWxiddd"+addWxid+"addMsggg"+addMsg);
-
+                    }else if("15".equals(addType)){ //15代表手机号
+                        XposedBridge.log("addWxid"+addWxid+"addMsg"+addMsg);
+                        FriendUtil.searchFriend(classLoader,create,0,addMsg,addWxid,addRemark,15);
+                        XposedBridge.log("addWxiddd"+addWxid+"addMsggg"+addMsg);
                     }
 
                 }else if("101".equals(type)){

@@ -107,7 +107,7 @@ public class MainHook implements IXposedHookLoadPackage {
         String packageName = lpparam.packageName;
         initApplicationContext();
 
-        Properties properties = new Properties();
+  /*      Properties properties = new Properties();
         InputStream input = null;
         boolean test_put = true;
         try {
@@ -128,7 +128,11 @@ public class MainHook implements IXposedHookLoadPackage {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
+
+        boolean test_put = true;
+        test_put = MyFileUtil.readProperties("test_put");
+
 
         if (!wechat_package.equals(lpparam.packageName)) {
             return;
@@ -168,7 +172,6 @@ public class MainHook implements IXposedHookLoadPackage {
             WScanxHook.hook(lpparam);
             //是否能领微信红包转账和聊天记录是否能删除
             ItemHook.hook(lpparam,create);
-
             //是否显示微信号
             HiddenWechatIdAndPhoneNumberHook.hookSystem(lpparam);
             //HiddenWechatIdAndPhoneNumberHook.hookWechat(lpparam,create);
@@ -178,7 +181,6 @@ public class MainHook implements IXposedHookLoadPackage {
             ReportDeleteWxMessageRiskOperateHook.hook(create, lpparam);
             //网页或者pc版微信登录上传服务器
             WeChatWebLoginHook.hook(create, lpparam);
-
             //加好友时需要hook到
             AddFriendHook.hook(create, lpparam);
         //操作微信相关

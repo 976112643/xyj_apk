@@ -39,6 +39,7 @@ public class NetApi {
     public static final String upDateAppVersion = "/api/1.0/version/app/last";  //get  //获取app版本信息
 
     public static String getAppList = "api/1.0/app/list/"; //桌面APP数量显示
+    public static String appPermission = "/api/1.0/device/permission/"; //桌面APP数量显示
 
     public static String upload_sms_message = "api/1.0/sms/save"; //上传一条短信
     public static String upload_sms_messages = "api/1.0/sms/synchronous"; //上传一批短信

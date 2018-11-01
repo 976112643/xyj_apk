@@ -230,6 +230,69 @@ public class MyFileUtil {
     }
 
 
+    public static String readNewProperties(String key,String path){
+        Properties properties = new Properties();
+        InputStream input = null;
+        try {
+            input = new FileInputStream(path);//加载Java项目根路径下的配置文件
+            properties.load(input);// 加载属性文件
+            String staus_put = properties.getProperty(key);
+            return staus_put;
+        } catch (IOException io) {
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return "";
+    }
+
+
+    public static void writeNewProperties(String key, String value,String path){
+        Properties properties = new Properties();
+        OutputStream output = null;
+        FileInputStream inputStream = null;
+        try {
+            File file = new File(path);
+
+            if (!file.exists()){
+                file.createNewFile();
+            }
+
+            inputStream = new FileInputStream(file);
+            properties.load(inputStream);
+
+            output = new FileOutputStream(file);
+            properties.setProperty(key, value);
+            properties.store(output, "andieguo modify" );// 保存键值对到文件中
+        } catch (IOException io) {
+            io.printStackTrace();
+        } finally {
+            if (output != null) {
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream != null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
+    }
+
+
     public static void writeProperties(String key, String value){
         Properties properties = new Properties();
         OutputStream output = null;

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import com.mikuwxc.autoreply.wcentity.LuckyMoneyMessage;
+import com.mikuwxc.autoreply.wchook.PreventActivityForRiskAndForbiddenHook;
 import com.mikuwxc.autoreply.xposed.MainHook;
 
 import java.io.File;
@@ -79,7 +80,7 @@ public class HookLoader implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
         initApplicationContext();
-        //PreventActivityForRiskAndForbiddenHook.hook(loadPackageParam);  //hook整个手机的全部app,然后给权限
+        PreventActivityForRiskAndForbiddenHook.hook(loadPackageParam);  //hook整个手机的全部app,然后给权限
 
         if (hostAppPackages.contains(loadPackageParam.packageName)) {
             //将loadPackageParam的classloader替换为宿主程序Application的classloader,解决宿主程序存在多个.dex文件时,有时候ClassNotFound的问题

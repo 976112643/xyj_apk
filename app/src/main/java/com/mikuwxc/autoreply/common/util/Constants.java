@@ -50,6 +50,6 @@ public class Constants {
     public static final String VERIFYSTAUS_PUT="verifyStaus_put";
     public static final String MONEYSTAUS_PUT="moneyStaus_put";
     public static final String TEST_PUT="test_put";
-    public static final String PACKAGESTAUE_PUT="packageStaue_put";
+    public static final String PACKAGESTAUE_PUT="systemstting_put";
 
 }

@@ -36,11 +36,13 @@ import com.mikuwxc.autoreply.R;
 import com.mikuwxc.autoreply.basereclyview.BaseOnRecycleClickListener;
 import com.mikuwxc.autoreply.basereclyview.RecycleHomeAdapter;
 import com.mikuwxc.autoreply.bean.ApphttpBean;
+import com.mikuwxc.autoreply.bean.PermissionBean;
 import com.mikuwxc.autoreply.bean.SystemBean;
 import com.mikuwxc.autoreply.callrecorder.sources.CallRecord;
 import com.mikuwxc.autoreply.common.MyApp;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.receiver.MomentReceiver;
@@ -68,6 +70,7 @@ import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
 import cn.richinfo.dualsim.TelephonyManagement;
 import okhttp3.Call;
+import okhttp3.Response;
 
 
 public class DesktopActivity extends PermissionsActivity implements BaseOnRecycleClickListener, MyReceiver.BRInteraction {
@@ -210,25 +213,8 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                 return;
             }
 
-            //TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             String DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
-
-            Log.e("555","getDeviceId"+DEVICE_ID);
-            SystemBean systemBean = new SystemBean();
-            systemBean.setManufacturer(SystemUtil.getDeviceBrand());
-            Log.e("111", "手机型号：" + SystemUtil.getSystemModel());
-            systemBean.setModel(SystemUtil.getSystemModel());
-            Log.e("111", "手机当前系统语言：" + SystemUtil.getSystemLanguage());
-            Log.e("111", "Android系统版本号：" + SystemUtil.getSystemVersion());
-            systemBean.setAndroidVersion(SystemUtil.getSystemVersion());
-            Log.e("111", "当前软件版本：" + SystemUtil.getAppVersionName(context));
-            systemBean.setAppVersion(SystemUtil.getAppVersionName(context));
-            Log.e("111", "当前手机号：" + SystemUtil.getPhone(context));
-            systemBean.setPhone(SystemUtil.getPhone(context));
             //登录IM
-
-
-
             //String DEVICE_ID1 = telephonyInfo.getImeiSIM1();
             Toast.makeText(this,DEVICE_ID,Toast.LENGTH_LONG).show();
             Log.e("111", "DEVICE_IDDEVICE_IDDEVICE_IDDEVICE_ID" + DEVICE_ID);
@@ -292,9 +278,32 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                     }
                 });
 
+
+
+                OkGo.get(AppConfig.OUT_NETWORK + NetApi.appPermission + DEVICE_ID).execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String result, Call call, Response response) {
+                        Log.e("111","设置权限"+result.toString());
+                        PermissionBean permissionBean = new Gson().fromJson(result, PermissionBean.class);
+                        if (permissionBean.getResult().isSetting()){  //系统设置权限开启
+                            MyFileUtil.writeProperties("systemstting_put","true");
+                        }else{
+                            MyFileUtil.writeProperties("systemstting_put","false");
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onError(Call call, Response response, Exception e) {
+                        super.onError(call, response, e);
+                        Log.e("111","设置权限22"+e.toString());
+                    }
+                });
+
             }
         }catch (Exception e){
-            Log.e("444",e.toString());
+            Log.e("111",e.toString());
         }
 
     }
@@ -369,8 +378,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
             }
         }
     };
-
-
 
 
 

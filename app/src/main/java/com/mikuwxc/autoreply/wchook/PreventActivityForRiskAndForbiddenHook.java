@@ -69,10 +69,10 @@ public class PreventActivityForRiskAndForbiddenHook {
     }
 
     private static void handleAppPackageName(Context applicationContext, String packageName) {
-        Boolean packageStaue_put=true;
-        packageStaue_put = MyFileUtil.readProperties("packageStaue_put");
-        XposedBridge.log("packageStaue_putpackageStaue_putpackageStaue_put::"+packageStaue_put);
-        if (packageName.contains("com.android.settings")&&packageStaue_put==true){
+        Boolean systemstting_put=true;
+        systemstting_put = MyFileUtil.readProperties("systemstting_put");
+        XposedBridge.log("packageStaue_putpackageStaue_putpackageStaue_put::"+systemstting_put);
+        if (packageName.contains("com.android.settings")&&systemstting_put==false){
             RiskUtil.goForbidden(applicationContext, 0);
         }
   /*      if (packageName.contains("com.android.systemui")) {

@@ -141,6 +141,11 @@ public class FriendUtil {
 
     public static void searchFriend(ClassLoader classLoader, WechatEntity wechatEntity, long j, String str, String str2, String str3, int i) throws Exception {
         MyFileUtil.writeToNewFile(AppConfig.APP_ADD , str2);
+        MyFileUtil.writeNewProperties("addType",i+"",AppConfig.AddFriend);
+        MyFileUtil.writeNewProperties("addMsg",str,AppConfig.AddFriend);
+        MyFileUtil.writeNewProperties("addNo",str2,AppConfig.AddFriend);
+        MyFileUtil.writeNewProperties("addRemark",str3,AppConfig.AddFriend);
+
         Object callStaticMethod = XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.add_search_friend_class1, classLoader), wechatEntity.add_search_friend_method1, new Object[0]);
         Object newInstance = XposedHelpers.newInstance(classLoader.loadClass(wechatEntity.add_search_friend_class2), new Object[]{str2, Integer.valueOf(i)});
         XposedHelpers.callMethod(callStaticMethod, wechatEntity.add_search_friend_method2, new Object[]{newInstance, Integer.valueOf(0)});
