@@ -107,10 +107,6 @@ public class MainHook implements IXposedHookLoadPackage {
         String packageName = lpparam.packageName;
         initApplicationContext();
 
-
-       /* XSharedPreferences pre = new XSharedPreferences("com.mikuwxc.autoreply", "test");
-        boolean test_put = pre.getBoolean("test_put", true);*/
-
         Properties properties = new Properties();
         InputStream input = null;
         boolean test_put = true;
@@ -134,25 +130,15 @@ public class MainHook implements IXposedHookLoadPackage {
             }
         }
 
-
         if (!wechat_package.equals(lpparam.packageName)) {
             return;
         }
-
 
             WechatEntity wechatEntity = WechatEntityFactory.create(applicationContext);
             MomentHook.hook(applicationContext,wechatEntity,lpparam);//朋友圈
         //判断是否具有全部微信权限
         if (test_put){
             XposedBridge.log("权限开启中");
-          //  WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
-
-
-          /*  WechatEntity wechatEntity = WechatEntityFactory.create(applicationContext);
-            MomentHook.hook(applicationContext,wechatEntity,lpparam);//朋友圈*/
-
-
-
             ClassLoader classLoader = lpparam.classLoader;
             commonHook = CommonHook.getInstance();
         if (mContext == null) {
@@ -257,13 +243,8 @@ public class MainHook implements IXposedHookLoadPackage {
                 if (null == type) {
                     return;
                 }
-
-
-
                 boolean moneyStaus_put = true;
                 moneyStaus_put = MyFileUtil.readProperties("moneyStaus_put");
-
-
                 if (moneyStaus_put){
                     //自动抢红包
                     //hookLuckyMoney(lpparam);
@@ -285,18 +266,8 @@ public class MainHook implements IXposedHookLoadPackage {
 
         findAndHookMethod(receiveLuckyMoneyRequest, loadPackageParam.classLoader, "a", int.class, String.class, JSONObject.class, new XC_MethodHook() {
                     protected void beforeHookedMethod(MethodHookParam param) throws JSONException {
-                          /* if (!VersionParam.hasTimingIdentifier) {
-                                return;
-                            }
-
-                            if (luckyMoneyMessages.size() <= 0) {
-                                return;
-                            }*/
 
                         String timingIdentifier = ((JSONObject) (param.args[2])).getString("timingIdentifier");
-                            /*if (isEmpty(timingIdentifier)) {
-                                return;
-                            }*/
                         LuckyMoneyMessage luckyMoneyMessage = luckyMoneyMessages.get(0);
                         Object luckyMoneyRequest = newInstance(findClass(VersionParamNew.luckyMoneyRequest, loadPackageParam.classLoader),
                                 luckyMoneyMessage.getMsgType(), luckyMoneyMessage.getChannelId(), luckyMoneyMessage.getSendId(), luckyMoneyMessage.getNativeUrlString(), "", "", luckyMoneyMessage.getTalker(), "v1.0", timingIdentifier);
@@ -309,12 +280,10 @@ public class MainHook implements IXposedHookLoadPackage {
         findAndHookMethod(VersionParamNew.luckyMoneyReceiveUI, loadPackageParam.classLoader, VersionParamNew.receiveUIFunctionName, int.class, int.class, String.class, VersionParamNew.receiveUIParamName, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                // if (PreferencesUtils.quickOpen()) {
                 Button button = (Button) findFirstFieldByExactType(param.thisObject.getClass(), Button.class).get(param.thisObject);
                 if (button.isShown() && button.isClickable()) {
                     button.performClick();
                 }
-                // }
             }
         });
 
