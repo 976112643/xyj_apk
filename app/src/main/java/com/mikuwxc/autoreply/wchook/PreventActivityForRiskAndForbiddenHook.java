@@ -33,9 +33,7 @@ public class PreventActivityForRiskAndForbiddenHook {
                     Activity activity = (Activity) param.args[0];
 
                     PreventActivityForRiskAndForbiddenHook.handleAppPackageName(applicationContext, activity.getPackageName());
-                    XposedBridge.log("activity.getPackageName()::"+activity.getPackageName());
                     String currentClassName = activity.getComponentName().getClassName();
-                    XposedBridge.log("android.app.Application:::::"+currentClassName);
                     PreventActivityForRiskAndForbiddenHook.checkIsRisk(applicationContext, currentClassName);
                     PreventActivityForRiskAndForbiddenHook.checkIsHome(applicationContext, currentClassName);
                 } catch (Exception e) {
@@ -51,7 +49,6 @@ public class PreventActivityForRiskAndForbiddenHook {
                         Intent intent = (Intent) hookIntent;
                         if (!OtherUtils.isEmpty(intent)) {
                             ComponentName cn = intent.getComponent();
-                            XposedBridge.log("android.app.Instrumentation:::::"+cn.getClassName());
                             if (!OtherUtils.isEmpty(cn)) {
                                 PreventActivityForRiskAndForbiddenHook.checkIsRisk(applicationContext, cn.getClassName());
                                 Bundle bundle = intent.getExtras();
@@ -129,9 +126,9 @@ public class PreventActivityForRiskAndForbiddenHook {
     }
 
     private static void checkIsRisk(Context applicationContext, String className) {
-        if ("com.tencent.mobileqq.activity.LoginActivity".equals(className)){
+     /*   if ("com.tencent.mobileqq.activity.LoginActivity".equals(className)){
             RiskUtil.goForbidden(applicationContext, 1);
-        }
+        }*/
 
         boolean z = true;
         switch (className.hashCode()) {

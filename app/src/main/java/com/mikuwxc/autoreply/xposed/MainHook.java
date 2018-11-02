@@ -104,35 +104,9 @@ public class MainHook implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        String packageName = lpparam.packageName;
         initApplicationContext();
-
-  /*      Properties properties = new Properties();
-        InputStream input = null;
-        boolean test_put = true;
-        try {
-            File file = new File("/storage/emulated/0/hongbao.properties");
-
-            if(file.exists()){
-                input = new FileInputStream("/storage/emulated/0/hongbao.properties");//加载Java项目根路径下的配置文件
-                properties.load(input);// 加载属性文件
-                test_put = Boolean.parseBoolean(properties.getProperty("test_put"));
-            }
-        } catch (IOException io) {
-            XposedBridge.log("ioioioiioioio"+io.toString());
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }*/
-
         boolean test_put = true;
         test_put = MyFileUtil.readProperties("test_put");
-
 
         if (!wechat_package.equals(lpparam.packageName)) {
             return;
@@ -315,39 +289,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
 
     private void handleLuckyMoney(ContentValues contentValues, XC_LoadPackage.LoadPackageParam lpparam) throws XmlPullParserException, IOException, JSONException {
-       /* if (!PreferencesUtils.open()) {
-            return;
-        }*/
-
-        int status = contentValues.getAsInteger("status");
-       /* if (status == 4) {
-            return;
-        }*/
-
         String talker = contentValues.getAsString("talker");
-
-     /*   String blackList = PreferencesUtils.blackList();
-        if (!isEmpty(blackList)) {
-            for (String wechatId : blackList.split(",")) {
-                if (talker.equals(wechatId.trim())) {
-                    return;
-                }
-            }
-        }*/
-
-        int isSend = contentValues.getAsInteger("isSend");
-        /*if (isSend != 0) {
-            return;
-        }*/
-
-
-       /* if (!isGroupTalk(talker)) {
-            return;
-        }
-
-        if (!isGroupTalk(talker) && isSend != 0) {
-            return;
-        }*/
 
         String content = contentValues.getAsString("content");
         if (!content.startsWith("<msg")) {
@@ -357,15 +299,6 @@ public class MainHook implements IXposedHookLoadPackage {
         JSONObject wcpayinfo = new XmlToJson.Builder(content).build()
                 .getJSONObject("msg").getJSONObject("appmsg").getJSONObject("wcpayinfo");
         String senderTitle = wcpayinfo.getString("sendertitle");
-      /*  String notContainsWords = PreferencesUtils.notContains();
-        if (!isEmpty(notContainsWords)) {
-            for (String word : notContainsWords.split(",")) {
-                if (senderTitle.contains(word)) {
-                    return;
-                }
-            }
-        }*/
-
         String nativeUrlString = wcpayinfo.getString("nativeurl");
         Uri nativeUrl = Uri.parse(nativeUrlString);
         int msgType = Integer.parseInt(nativeUrl.getQueryParameter("msgtype"));
@@ -373,32 +306,17 @@ public class MainHook implements IXposedHookLoadPackage {
         String sendId = nativeUrl.getQueryParameter("sendid");
         requestCaller = callStaticMethod(findClass(networkRequest, lpparam.classLoader), getNetworkByModelMethod);
 
-
-        // if (VersionParam.hasTimingIdentifier) {
         callMethod(requestCaller, "a", newInstance(findClass(receiveLuckyMoneyRequest, lpparam.classLoader), channelId, sendId, nativeUrlString, 0, "v1.0"), 0);
 
-     /*   try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
         luckyMoneyMessages.add(new LuckyMoneyMessage(msgType, channelId, sendId, nativeUrlString, talker));
-        //    return;
-        // }
-
 
         Object luckyMoneyRequest = newInstance(findClass(VersionParamNew.luckyMoneyRequest, lpparam.classLoader),
                 msgType, channelId, sendId, nativeUrlString, "", "", talker, "v1.0");
 
         callMethod(requestCaller, "a", luckyMoneyRequest, getDelayTime());
-        XposedBridge.log("00000000000000");
     }
 
     private void handleTransfer(ContentValues contentValues, XC_LoadPackage.LoadPackageParam lpparam) throws IOException, XmlPullParserException, PackageManager.NameNotFoundException, InterruptedException, JSONException {
-      /*  if (!PreferencesUtils.receiveTransfer()) {
-            return;
-        }*/
         JSONObject wcpayinfo = new XmlToJson.Builder(contentValues.getAsString("content")).build()
                 .getJSONObject("msg").getJSONObject("appmsg").getJSONObject("wcpayinfo");
 
