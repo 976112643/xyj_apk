@@ -1,23 +1,10 @@
 package com.mikuwxc.autoreply.wcreceiver;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.PowerManager;
-import android.support.v4.app.ActivityCompat;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -30,7 +17,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
-import com.mikuwxc.autoreply.activity.AuthorityActivity;
 import com.mikuwxc.autoreply.bean.ImLoginBean;
 import com.mikuwxc.autoreply.bean.SystemBean;
 import com.mikuwxc.autoreply.common.MyApp;
@@ -42,14 +28,11 @@ import com.mikuwxc.autoreply.common.util.EventBusUtil;
 import com.mikuwxc.autoreply.common.util.LogUtils;
 import com.mikuwxc.autoreply.common.util.Logger;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
-import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
-import com.mikuwxc.autoreply.common.util.ToastUtil;
 import com.mikuwxc.autoreply.modle.C;
 import com.mikuwxc.autoreply.modle.Event;
 import com.mikuwxc.autoreply.modle.FriendBean;
 import com.mikuwxc.autoreply.modle.HookMessageBean;
 import com.mikuwxc.autoreply.modle.HttpBean;
-import com.mikuwxc.autoreply.modle.HttpImeiBean;
 import com.mikuwxc.autoreply.modle.ImMessageBean;
 import com.mikuwxc.autoreply.presenter.tasks.AsyncFriendTask;
 import com.mikuwxc.autoreply.receiver.Constance;
@@ -59,8 +42,6 @@ import com.mikuwxc.autoreply.utils.ParseUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntity;
 import com.mikuwxc.autoreply.wcentity.CircleFriendEntity;
-import com.mikuwxc.autoreply.xposed.CommonHook;
-import com.mikuwxc.autoreply.xposed.HookMessage;
 import com.tencent.imsdk.TIMCallBack;
 import com.tencent.imsdk.TIMConversation;
 import com.tencent.imsdk.TIMConversationType;
@@ -86,7 +67,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -96,11 +76,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import de.robv.android.xposed.XposedBridge;
 import okhttp3.Call;
 import okhttp3.Response;
 
-import static com.mikuwxc.autoreply.activity.RunningActivity.tv2;
 import static com.mikuwxc.autoreply.activity.RunningActivity.tv3;
 import static com.mikuwxc.autoreply.activity.RunningActivity.wxState;
 
@@ -927,7 +905,7 @@ public class MsgReceiver extends BroadcastReceiver {
                     //地区
                     friendBean.setRegion(ParseUtil.parseRegion(blob));
                     //来源
-                    friendBean.setFrom(ParseUtil.parseFrom(blob));
+                    friendBean.setAddFrom(ParseUtil.parseFrom(blob));
                 }
                 //friendBean.setWxno(alias);
                 if (StringUtils.isBlank(alias)){

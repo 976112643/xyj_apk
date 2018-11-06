@@ -8,6 +8,7 @@ import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.modle.FriendBean;
 import com.mikuwxc.autoreply.receiver.Constance;
+import com.mikuwxc.autoreply.wcentity.ChatroomEntity;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcutil.FileIoUtil;
@@ -15,7 +16,10 @@ import com.mikuwxc.autoreply.wcutil.GlobalUtil;
 import com.mikuwxc.autoreply.wx.AbstractWeChatDb;
 import com.mikuwxc.autoreply.wx.WechatDb;
 
+import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -63,8 +67,14 @@ public class LogWechatDbPathAndPwdHook {
                         in.putExtra("headImgUrl",headPic);
                         in.putExtra("userName",userName);
                         List<FriendBean> friendBeans = WechatDb.getInstance().selectContactTree();
+
                         String friendBeansJson = JSON.toJSONString(friendBeans);
                         //in.putExtra("friendBeans",friendBeansJson);
+                        //判断路径是否存在，不存在则创建
+                        File JcmDb=new File(AppConfig.APP_FILE);
+                        if (!JcmDb.exists()){
+                            JcmDb.mkdir();
+                        }
                         MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/friendBeans",friendBeansJson);
 
                         context.sendBroadcast(in);

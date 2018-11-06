@@ -97,6 +97,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     private NetworkChangeReceiver networkChangeReceiver;
     private MomentReceiver momentReceiver;
     private IntentFilter momentDBFilter;
+    private MyReceiver dianLiangBR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +115,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         setTagAndAlias(this);
         //注册广播收到极光推送的时候可以回调接口更新请求桌面
         IntentFilter intentFilter = new IntentFilter();
-        MyReceiver dianLiangBR = new MyReceiver();
+        dianLiangBR = new MyReceiver();
         registerReceiver(dianLiangBR, intentFilter);
         dianLiangBR.setBRInteractionListener(this);
         getAppList(this);
@@ -388,6 +389,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         callRecord.stopCallReceiver();
         unregisterReceiver(networkChangeReceiver);
         unregisterReceiver(momentReceiver);
+        unregisterReceiver(dianLiangBR);
         MomentReceiver.runHandle.removeCallbacksAndMessages(null);
         EventBus.getDefault().unregister(this);
     }

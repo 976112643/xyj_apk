@@ -37,7 +37,7 @@ public class FriendBean {
     private String phone;
     private String region;
     @SerializedName("addFrom")
-    private int from;
+    private long addFrom;
 
     public String getWxid() {
         return wxid;
@@ -164,11 +164,11 @@ public class FriendBean {
         this.region = region;
     }
 
-    public int getFrom() {
-        return from;
+    public long getAddFrom() {
+        return addFrom;
     }
 
-    public void setFrom(int from) {
-        this.from = from;
+    public void setAddFrom(int addFrom) {
+        this.addFrom = addFrom;
     }
 }

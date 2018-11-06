@@ -35,6 +35,7 @@ import de.robv.android.xposed.XposedHelpers;
 public class WechatDb extends AbstractWeChatDb {
     private static WechatDb wechatDb;
     private String str2;
+    private Throwable th22;
 
     private WechatDb() {
     }
@@ -134,7 +135,7 @@ public class WechatDb extends AbstractWeChatDb {
             } else {
                 query.close();
             }
-        }*/
+        }
        // throw th;
     }
 
@@ -373,6 +374,83 @@ public class WechatDb extends AbstractWeChatDb {
         throw th;*/
     }
 
+
+
+    public List<ChatroomEntity> selectChatroomss(Set<String> chatroomIds) {
+        ChatroomEntity chatroomEntity;
+        Throwable th = null;
+        List<ChatroomEntity> chatrooms = new ArrayList();
+        XposedBridge.log("chatrooms::"+chatrooms.toString());
+        String sql = "select c.chatroomname,c.memberlist,c.displayname,c.roomowner,r.conRemark,r.nickname,r.pyInitial,r.quanPin,c.roomdata,i.reserved1,i.reserved2 from chatroom c join rcontact r on c.chatroomname = r.username join img_flag i on c.chatroomname = i.username where c.roomowner is not null";
+        if (chatroomIds != null && chatroomIds.size() > 0) {
+            ArrayList ids = new ArrayList(chatroomIds.size());
+            for (String id : chatroomIds) {
+                ids.add("\"" + id + "\"");
+            }
+            sql = sql + " and c.chatroomname in (" + StringUtils.join(ids, ',') + ")";
+        }
+        List<MemberEntity> allMembers = selectAllContactsForChatroomMember();
+        XposedBridge.log("allMembers::"+allMembers.toString());
+        Cursor c = query(sql);
+        XposedBridge.log("ccc"+c.toString());
+        if (c!=null) {
+            try {
+            while (c.moveToNext()) {
+                XposedBridge.log("1111111111111111");
+
+                    XposedBridge.log("c.moveToNext()::c.moveToNext()c.moveToNext()");
+                    chatroomEntity = parseChatroom(c);
+                    chatroomEntity.setMembers(selectChatroomMembers(StringUtils.split(c.getString(1), ';'), allMembers));
+                    chatrooms.add(chatroomEntity);
+                }
+            } catch (Throwable th22) {
+               XposedBridge.log(th22);
+            }
+        }
+        XposedBridge.log("22222222222222");
+        if (c != null) {
+            XposedBridge.log("333333333333");
+            if (th22 != null) {
+                try {
+                    c.close();
+                } catch (Throwable th4) {
+                    th22.addSuppressed(th4);
+                }
+            } else {
+                c.close();
+            }
+        }
+        XposedBridge.log("4444444444444");
+        if (chatroomIds != null) {
+            for (String chatroomId : chatroomIds) {
+                if (!includeChatroom(chatroomId, chatrooms)) {
+                    chatroomEntity = new ChatroomEntity();
+                    chatroomEntity.setChatroomId(chatroomId);
+                    chatroomEntity.setOpType(3);
+                    chatrooms.add(chatroomEntity);
+                }
+            }
+        }
+
+        if (c != null) {
+            if (th22 != null) {
+                try {
+                    c.close();
+                } catch (Throwable th5) {
+                    th22.addSuppressed(th5);
+                }
+            } else {
+                c.close();
+            }
+        }
+
+        return chatrooms;
+       // throw th;
+
+      //  throw th;
+    }
+
+
     public WxEntity selectContact(HashMap<String, String> hashMap, String str, String str2, HashMap<String, String> hashMap2) throws Exception {
         WxEntity wxEntity = null;
         for (int i = 0; i < 30; i++) {
@@ -444,7 +522,11 @@ public class WechatDb extends AbstractWeChatDb {
                     //地区
                     friendBean.setRegion(ParseUtil.parseRegion(blob));
                     //来源
-                    friendBean.setFrom(ParseUtil.parseFrom(blob));
+                    friendBean.setAddFrom(ParseUtil.parseFrom(blob));
+                    //省
+                    friendBean.setProvince(ParseUtil.parseProvince(blob));
+                    //市
+                    friendBean.setCity(ParseUtil.parseCity(blob));
                 }
                 //friendBean.setWxno(alias);
                 if (StringUtils.isBlank(alias)){
