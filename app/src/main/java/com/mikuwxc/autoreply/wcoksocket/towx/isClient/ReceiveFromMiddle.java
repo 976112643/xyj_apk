@@ -63,7 +63,7 @@ public class ReceiveFromMiddle {
                 localSocketClient.reportOneChatroom(WechatDb.getInstance().selectChatRoomContact(selectHeadPics, WechatDb.getInstance().selectContactTree(selectHeadPics, selectSelf.getUserTalker(), WechatDb.getInstance().selectLabel()), selectSelf, parseObject.getString("chatroomId")));
                 return;
             case WxCmdType.GET_ADD_FRIEND_RESULT /*2013*/:
-                FriendUtil.searchFriend(classLoader, wechatEntity, parseObject.getLong("taskId").longValue(), parseObject.getString("remark"), parseObject.getString("searchValue"), parseObject.getString("sendWord"), parseObject.getIntValue("scene"));
+                FriendUtil.searchFriend(classLoader, wechatEntity, parseObject.getLong("taskId").longValue(), parseObject.getString("remark"), parseObject.getString("searchValue"), parseObject.getString("sendWord"), parseObject.getIntValue("scene"),null);
                 return;
             case WxCmdType.REPORT_VERIFY_FRIEND /*2017*/:
                 for (AutoVerifyEntity autoVerifyEntity : WechatDb.getInstance().selectFromFmessage(parseObject.getIntValue("friendCountLimit"))) {

@@ -41,6 +41,7 @@ import com.mikuwxc.autoreply.utils.GetImeiUtil;
 import com.mikuwxc.autoreply.utils.ParseUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntity;
+import com.mikuwxc.autoreply.wcentity.AddFriendEntitys;
 import com.mikuwxc.autoreply.wcentity.CircleFriendEntity;
 import com.tencent.imsdk.TIMCallBack;
 import com.tencent.imsdk.TIMConversation;
@@ -732,19 +733,12 @@ public class MsgReceiver extends BroadcastReceiver {
                                             context.sendBroadcast(intent);
                                           //  Toast.makeText(context,"发送广播朋友圈:"+Constance.action_getWechatFriends,Toast.LENGTH_LONG).show();
                                         }else if (type.equals("201")){   //加好友的type
-                                            AddFriendEntity addFriendEntity = new Gson().fromJson(messageBean.getContent(), AddFriendEntity.class);
-                                            String addType = addFriendEntity.getType();
-                                            Toast.makeText(context,addType+"343757500",Toast.LENGTH_LONG).show();
-                                          //  if ("1".equals(addType)){  //根据微信号加好友 addtype为1
-                                                String addWxid = addFriendEntity.getAddNo();
-                                                String addMsg = addFriendEntity.getMsg();
-                                                intent.putExtra("name",messageBean.getWxid());
-                                                intent.putExtra("type",type);
-                                                intent.putExtra("addWxid",addWxid);
-                                                intent.putExtra("addMsg",addMsg);
-                                                intent.putExtra("addType",addType);
-                                                intent.putExtra("addRemark",addFriendEntity.getRemark());
-                                          //  }
+                                            List<FriendBean> wechatIdList = new Gson().fromJson(messageBean.getContent(), new TypeToken<List<AddFriendEntity>>() {
+                                            }.getType());
+                                            String wechatIdListJson = JSON.toJSONString(wechatIdList);
+                                            MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/addFriendList",wechatIdListJson);
+                                            intent.putExtra("name",messageBean.getWxid());
+                                            intent.putExtra("type",type);
                                             intent.setAction(Constance.action_getWechatFriends);
                                             intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
                                             context.sendBroadcast(intent);
@@ -782,7 +776,7 @@ public class MsgReceiver extends BroadcastReceiver {
                                         }
                                     }catch (Exception e){
                                       //  ToastUtil.showLongToast("收到的数据格式有错"+e.toString());
-                                        Toast.makeText(context,"收到的数据格式有错",Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context,"收到的数据格式有错"+e.toString(),Toast.LENGTH_SHORT).show();
                                     }
                                 }else{
                                   //  ToastUtil.showLongToast("收到的数据格式有错");

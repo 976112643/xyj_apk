@@ -12,15 +12,19 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mikuwxc.autoreply.Tools;
+import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.modle.FriendBean;
 import com.mikuwxc.autoreply.wcapi.WechatEntityFactory;
+import com.mikuwxc.autoreply.wcentity.AddFriendEntitys;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcutil.FriendUtil;
 import com.mikuwxc.autoreply.wcutil.LabelUtil;
 import com.mikuwxc.autoreply.wcutil.MomentUtil;
+import com.mikuwxc.autoreply.wcutil.PatternUtil;
 import com.mikuwxc.autoreply.wcutil.RemarkUtil;
 import com.mikuwxc.autoreply.wcutil.SendMesUtil;
 import com.mikuwxc.autoreply.wx.WechatDb;
@@ -255,7 +259,7 @@ public class MountReceiver extends XC_MethodHook {
                     in.putExtra("saoyisaoType",content);
                     context.sendBroadcast(in);
                 } else if (type.equals("201")){   //201代表加好友
-                    if ("3".equals(addType)){   //3代表微信号加好友
+                    /*if ("3".equals(addType)){   //3代表微信号加好友
                         XposedBridge.log("addWxid"+addWxid+"addMsg"+addMsg);
                         FriendUtil.searchFriend(classLoader,create,0,addMsg,addWxid,addRemark,3);
                         XposedBridge.log("addWxiddd"+addWxid+"addMsggg"+addMsg);
@@ -263,7 +267,30 @@ public class MountReceiver extends XC_MethodHook {
                         XposedBridge.log("addWxid"+addWxid+"addMsg"+addMsg);
                         FriendUtil.searchFriend(classLoader,create,0,addMsg,addWxid,addRemark,15);
                         XposedBridge.log("addWxiddd"+addWxid+"addMsggg"+addMsg);
+                    }*/
+
+                    String addFriendList = MyFileUtil.readFromFile(AppConfig.APP_FILE + "/addFriendList");
+                    List<AddFriendEntitys> wechatIdList = new Gson().fromJson(addFriendList, new TypeToken<List<AddFriendEntitys>>() {
+                    }.getType());
+                    if (wechatIdList.size()>0){
+                        boolean phoneNumber = PatternUtil.isPhoneNumber(wechatIdList.get(0).getAddNo());
+                        XposedBridge.log("phoneNumberphoneNumber::"+phoneNumber);
+                        if (phoneNumber){
+                            FriendUtil.searchFriend(classLoader,create,0,wechatIdList.get(0).getMsg(),wechatIdList.get(0).getAddNo(),wechatIdList.get(0).getRemark(),15,wechatIdList);
+                        }else{
+                            FriendUtil.searchFriend(classLoader,create,0,wechatIdList.get(0).getMsg(),wechatIdList.get(0).getAddNo(),wechatIdList.get(0).getRemark(),3,wechatIdList);
+                        }
+
+                    }else{
+                        Toast.makeText(context,"需要添加的好友列表为空",Toast.LENGTH_LONG).show();
                     }
+
+
+
+
+
+
+
 
                 }else if("101".equals(type)){
                     if (deleFriend!=null){

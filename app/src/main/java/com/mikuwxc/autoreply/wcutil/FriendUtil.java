@@ -1,8 +1,11 @@
 package com.mikuwxc.autoreply.wcutil;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
+import com.mikuwxc.autoreply.wcentity.AddFriendEntitys;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcentity.WxEntity;
 import com.mikuwxc.autoreply.wcloop.ClearBlackFriendBasket;
@@ -139,16 +142,25 @@ public class FriendUtil {
         XposedHelpers.callMethod(callStaticMethod, wechatEntity.delete_contact_method3, new Object[]{newInstance});
     }
 
-    public static void searchFriend(ClassLoader classLoader, WechatEntity wechatEntity, long j, String str, String str2, String str3, int i) throws Exception {
+    public static void searchFriend(ClassLoader classLoader, WechatEntity wechatEntity, long j, String str, String str2, String str3, int i, List<AddFriendEntitys> wechatIdList) throws Exception {
         MyFileUtil.writeToNewFile(AppConfig.APP_ADD , str2);
         MyFileUtil.writeNewProperties("addType",i+"",AppConfig.AddFriend);
         MyFileUtil.writeNewProperties("addMsg",str,AppConfig.AddFriend);
         MyFileUtil.writeNewProperties("addNo",str2,AppConfig.AddFriend);
         MyFileUtil.writeNewProperties("addRemark",str3,AppConfig.AddFriend);
 
+
         Object callStaticMethod = XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.add_search_friend_class1, classLoader), wechatEntity.add_search_friend_method1, new Object[0]);
         Object newInstance = XposedHelpers.newInstance(classLoader.loadClass(wechatEntity.add_search_friend_class2), new Object[]{str2, Integer.valueOf(i)});
+
+        String s = new Gson().toJson(newInstance);
+        XposedBridge.log("newInstancenewInstance::"+s);
         XposedHelpers.callMethod(callStaticMethod, wechatEntity.add_search_friend_method2, new Object[]{newInstance, Integer.valueOf(0)});
+
+
+        wechatIdList.remove(0);
+        String wechatIdListJson = JSON.toJSONString(wechatIdList);
+        MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/addFriendList",wechatIdListJson);
     }
 
 
