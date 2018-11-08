@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
+import com.mikuwxc.autoreply.wcutil.DownLoadWxResFromWxUtil;
 import com.mikuwxc.autoreply.xposed.MainHook;
 
 import org.greenrobot.eventbus.EventBus;
@@ -32,6 +33,7 @@ public class MomentHook {
                     context.sendBroadcast(intent);
 
                       WechatUsernameHook.hook();//获取微信昵称 微信号 用户名等
+                    DownLoadWxResFromWxUtil.downloadMomentPic(wxClassLoader,wechatEntity,"-5523728528802566015",1540543502);
 
 
                 }

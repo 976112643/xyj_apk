@@ -1,15 +1,18 @@
 package com.mikuwxc.autoreply.service;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
@@ -125,7 +128,13 @@ public class SmsObserverService extends Service {
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
             //每当有新短信到来时，使用我们获取短消息的方法
-            getSmsFromPhone();
+            try {
+                if (lacksPermissions(getApplication(),new String[]{Manifest.permission.READ_SMS,Manifest.permission.RECEIVE_SMS})) {
+                    getSmsFromPhone();
+                }
+            }catch (Exception e){
+
+            }
 
         }
     }
@@ -356,5 +365,24 @@ public class SmsObserverService extends Service {
         public void setSuccess(boolean success) {
             this.success = success;
         }
+    }
+
+
+    public static boolean lacksPermissions(Context mContexts,String[]permissionsREAD) {
+        for (String permission : permissionsREAD) {
+            if (lacksPermission(mContexts,permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否缺少权限
+     */
+    private static boolean lacksPermission(Context mContexts, String permission) {
+        return ContextCompat.checkSelfPermission(mContexts, permission) ==
+                PackageManager.PERMISSION_DENIED;
+
     }
 }
