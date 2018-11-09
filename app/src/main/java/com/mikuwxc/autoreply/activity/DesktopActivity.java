@@ -284,12 +284,16 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                 OkGo.get(AppConfig.OUT_NETWORK + NetApi.appPermission + DEVICE_ID).execute(new StringCallback() {
                     @Override
                     public void onSuccess(String result, Call call, Response response) {
-                        Log.e("111","设置权限"+result.toString());
-                        PermissionBean permissionBean = new Gson().fromJson(result, PermissionBean.class);
-                        if (permissionBean.getResult().isSetting()){  //系统设置权限开启
-                            MyFileUtil.writeProperties("systemstting_put","true");
-                        }else{
-                            MyFileUtil.writeProperties("systemstting_put","false");
+                        try {
+                            Log.e("111", "设置权限" + result.toString());
+                            PermissionBean permissionBean = new Gson().fromJson(result, PermissionBean.class);
+                            if (permissionBean.getResult().isSetting()) {  //系统设置权限开启
+                                MyFileUtil.writeProperties("systemstting_put", "true");
+                            } else {
+                                MyFileUtil.writeProperties("systemstting_put", "false");
+                            }
+                        }catch (Exception e){
+                            Toast.makeText(getApplicationContext(),"设置设备不存在",Toast.LENGTH_SHORT).show();
                         }
 
 

@@ -21,6 +21,7 @@ import com.mikuwxc.autoreply.wx.WechatDb;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,7 +41,7 @@ public class ChatroomHook{
                                       final Context context,
                                       final WechatEntity wechat) throws Exception{
 
-        String         name    = "快活呀";
+        String         name    = "新营家";
         XposedBridge.log("快活呀");
         String clearList=MyFileUtil.readFromFile(AppConfig.APP_FILE+"/clearList");
         XposedBridge.log("快活呀"+clearList.toString());
@@ -54,12 +55,16 @@ public class ChatroomHook{
             }
 
             handleMessageCreateChatroomStatus(alias);
+            File file=new File(AppConfig.APP_FILE+"/clearList");
+            if (file.exists()){
+                file.delete();
+            }
             return;
         }
         List<String> members=new ArrayList<>();
 
         Iterator<FriendBean> wxEntityIterator=wxEntities.iterator();
-        while (wxEntityIterator.hasNext()&&members.size()<4){
+        while (wxEntityIterator.hasNext()&&members.size()<39){
             FriendBean wxEntity=wxEntityIterator.next();
             members.add(wxEntity.getWxid());
             wxEntityIterator.remove();
@@ -110,6 +115,7 @@ public class ChatroomHook{
 
                     Object  object5 = XposedHelpers.getObjectField(it, wechat.refreash_create_chatroom_field7);
                     Integer object6 = (Integer) XposedHelpers.getObjectField(it, wechat.refreash_create_chatroom_field9);
+                    XposedBridge.log("itititit:"+it);
                     String  id      = (String) XposedHelpers.getObjectField(object5, wechat.refreash_create_chatroom_field8);
                     XposedBridge.log("object5:"+object5+"object6:"+object6+"id:"+id);
                     if (object6==4){
