@@ -47,6 +47,13 @@ public class ChatroomHook{
         List<FriendBean> wxEntities =new Gson().fromJson(clearList,new TypeToken<List<FriendBean>>(){}.getType());
         XposedBridge.log("快活呀"+wxEntities.size());
         if (wxEntities.isEmpty()){
+            UserEntity userEntity = WechatDb.getInstance().selectSelf();
+            String alias=userEntity.getAlias();
+            if (StringUtils.isBlank(alias)){
+                alias=userEntity.getUserName();
+            }
+
+            handleMessageCreateChatroomStatus(alias);
             return;
         }
         List<String> members=new ArrayList<>();
@@ -121,9 +128,9 @@ public class ChatroomHook{
                     }
 
 
-                    XposedBridge.log("僵尸粉：："+new Gson().toJson(members));
+                    XposedBridge.log("僵尸粉：："+members.toString());
 
-                   // handleMessageCreateChatroom()
+                    handleMessageCreateChatroom(members,alias);
                 }
                 Intent intent=new Intent();
                 intent.putExtra("name","name");
@@ -140,11 +147,27 @@ public class ChatroomHook{
     }
 
 
-    private void handleMessageCreateChatroom(ChatRoomBean chatRoomBean) {
-        OkGo.post(AppConfig.OUT_NETWORK+ NetApi.clearFriends).upJson(new Gson().toJson(chatRoomBean)).execute(new StringCallback() {
+    private static void handleMessageCreateChatroom(List<String> chatRoomBean,String wxno) {
+        OkGo.post(AppConfig.OUT_NETWORK+ NetApi.clearFriends+wxno).upJson(new Gson().toJson(chatRoomBean)).execute(new StringCallback() {
             @Override
             public void onSuccess(String s, Call call, Response response) {
-                XposedBridge.log("sssssss");
+                XposedBridge.log("sssssss"+s);
+            }
+
+
+            @Override
+            public void onError(Call call, Response response, Exception e) {
+                XposedBridge.log("sssssss"+e.toString());
+            }
+        });
+    }
+
+
+    private static void handleMessageCreateChatroomStatus(String wxno) {
+        OkGo.put(AppConfig.OUT_NETWORK+ NetApi.clearFriendsStaus+"?wxno="+wxno).execute(new StringCallback() {
+            @Override
+            public void onSuccess(String s, Call call, Response response) {
+                XposedBridge.log("sssssss"+s);
             }
 
 

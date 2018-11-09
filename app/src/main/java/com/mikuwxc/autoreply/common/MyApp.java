@@ -375,15 +375,6 @@ public class MyApp extends Application {
                     }
                 });
 
-        TIMManager.getInstance().getSdkConfig().setLogListener(new TIMLogListener() {
-            @Override
-            public void log(int level, String tag, String msg) {
-                Log.i(TAG, "levellevellevel");
-            }
-        });
-        //将用户配置与通讯管理器进行绑定
-        TIMManager.getInstance().setUserConfig(userConfig);
-        TIMManager.getInstance().getSdkConfig().setLogPath(Environment.getExternalStorageDirectory() + "/justfortest/");
     }
 
 

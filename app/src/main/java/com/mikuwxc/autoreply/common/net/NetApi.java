@@ -47,5 +47,6 @@ public class NetApi {
     public static String upload_moments_synchronous= "api/1.0/moments/synchronous/";
     public static String upload_moments_updateFodderUrl= "api/1.0/moments/updateFodderUrl";
 
-    public static final String clearFriends="/api/1.0/zombieFan/update/state";
+    public static final String clearFriends="/api/1.0/wechatFriend/zombieFans/";
+    public static final String clearFriendsStaus="/api/1.0/zombieFan/update/state/";
 }
