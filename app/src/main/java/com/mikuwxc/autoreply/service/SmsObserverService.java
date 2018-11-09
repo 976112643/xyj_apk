@@ -130,8 +130,8 @@ public class SmsObserverService extends Service {
             //每当有新短信到来时，使用我们获取短消息的方法
             try {
                 if (lacksPermissions(getApplication(),new String[]{Manifest.permission.READ_SMS,Manifest.permission.RECEIVE_SMS})) {
-                    getSmsFromPhone();
                 }
+                getSmsFromPhone();
             }catch (Exception e){
 
             }
