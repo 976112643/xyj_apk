@@ -59,7 +59,7 @@ public class ChatroomHook{
         List<String> members=new ArrayList<>();
 
         Iterator<FriendBean> wxEntityIterator=wxEntities.iterator();
-        while (wxEntityIterator.hasNext()&&members.size()<39){
+        while (wxEntityIterator.hasNext()&&members.size()<4){
             FriendBean wxEntity=wxEntityIterator.next();
             members.add(wxEntity.getWxid());
             wxEntityIterator.remove();
@@ -134,7 +134,7 @@ public class ChatroomHook{
                 }
                 Intent intent=new Intent();
                 intent.putExtra("name","name");
-                intent.putExtra("type","203");
+                intent.putExtra("type","211");
                 intent.setAction(Constance.action_getWechatFriends);
                 intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
                 context.sendBroadcast(intent);

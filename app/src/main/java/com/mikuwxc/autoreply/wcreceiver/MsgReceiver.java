@@ -743,7 +743,7 @@ public class MsgReceiver extends BroadcastReceiver {
                                             intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
                                             context.sendBroadcast(intent);
 
-                                        }else if (type.equals("202")){
+                                        }else if (type.equals("210")){
                                             intent.putExtra("name",messageBean.getWxid());
                                             intent.putExtra("type",type);
                                             intent.setAction(Constance.action_getWechatFriends);

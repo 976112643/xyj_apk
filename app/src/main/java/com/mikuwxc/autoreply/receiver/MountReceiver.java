@@ -291,14 +291,14 @@ public class MountReceiver extends XC_MethodHook {
                     }
 
 
-                }else if ("202".equals(type)){  //清除僵持粉检测
+                }else if ("210".equals(type)){  //清除僵持粉检测
                     XposedBridge.log("开始清理僵尸粉");
                     ArrayList<FriendBean> friends = WechatDb.getInstance().selectContactTree();
                     String friendsIdListJson = new Gson().toJson(friends);
                     MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/clearList",friendsIdListJson);
                     ChatroomHook.createChatroom(classLoader,context,create);
 
-                }else if ("203".equals(type)){
+                }else if ("211".equals(type)){
                     ChatroomHook.createChatroom(classLoader,context,create);
 
                 }else if("101".equals(type)){
