@@ -80,6 +80,7 @@ import com.mikuwxc.autoreply.modle.HttpImeiBean;
 import com.mikuwxc.autoreply.receiver.Constance;
 import com.mikuwxc.autoreply.utils.ContactsAccessPublic;
 import com.mikuwxc.autoreply.utils.FriendCircleShare;
+import com.mikuwxc.autoreply.utils.GetImeiUtil;
 import com.mikuwxc.autoreply.utils.HttpUtils;
 import com.mikuwxc.autoreply.utils.LogToFile;
 import com.mikuwxc.autoreply.utils.MJSONObjectRequest;
@@ -165,7 +166,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         //showUpdateDialog();
 
         //设置极光推送的别名
-        setTagAndAlias();
+        setTagAndAlias(this);
 
         //权限申请
         requestPermission(this);
@@ -541,15 +542,6 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-        }
-    };
-    Runnable runnable=new Runnable() {
-        @Override
-        public void run() {
-            // TODO Auto-generated method stub
-            //要做的事情
-            Alive();
-            handler.postDelayed(this, 20000);
         }
     };
 
@@ -1500,47 +1492,13 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
 
 
 
-    private void Alive() {
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            return;
-        }
-        String DEVICE_ID = tm.getDeviceId();
-        Log.e("111", DEVICE_ID);
-        //实时发送信息
-        OkGo.post(AppConfig.OUT_NETWORK + NetApi.loginImeiAlive + "?imei=" + DEVICE_ID).execute(new StringCallback() {
-            @Override
-            public void onSuccess(String s, Call call, okhttp3.Response response) {
-                Log.e("111", "result:" + s);
-                try {
-                    HttpImeiBean bean = new Gson().fromJson(s, HttpImeiBean.class);
-                    if (bean.isSuccess()) {
-                        Log.e("111", "保活IMEI信息成功:");
-                    } else {
-                        Log.e("111", "保活IMEI信息失败:");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("111", "保活IMEI信息失败:" + e.toString());
-                }
-            }
-
-            @Override
-            public void onError(Call call, okhttp3.Response response, Exception e) {
-                super.onError(call, response, e);
-                Log.e("111", "保活IMEI信息失败:");
-            }
-        });
-
-    }
 
 
 
     /**
      * 设置标签与别名
      */
-    private void setTagAndAlias() {
+    private void setTagAndAlias(Context context) {
         /**
          *这里设置了别名，在这里获取的用户登录的信息
          *并且此时已经获取了用户的userId,然后就可以用用户的userId来设置别名了
@@ -1549,13 +1507,12 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         //if (UserUtils.getTagAlias(getHoldingActivity()) == false) {
         Set<String> tags = new HashSet<String>();
         //这里可以设置你要推送的人，一般是用户uid 不为空在设置进去 可同时添加多个
-
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            return;
+        String DEVICE_ID  = null;
+        try {
+            DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        String DEVICE_ID = tm.getDeviceId();
         Log.e("111",DEVICE_ID);
         if (!TextUtils.isEmpty(DEVICE_ID)){
             tags.add(DEVICE_ID);//设置tag

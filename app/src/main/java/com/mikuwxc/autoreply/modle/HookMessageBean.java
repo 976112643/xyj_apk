@@ -13,6 +13,25 @@ public class HookMessageBean {
     private long conversationTime;//13位数的代表成功收到的时间,19位的是开始发送的时间,只有status为1的时候会有
     private String msgId;
 
+    private String userNameChatroom;//群消息的同步需要
+    private String sign;//标记是发送还是接收
+
+    public String getSign() {
+        return sign;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign;
+    }
+
+    public String getUserNameChatroom() {
+        return userNameChatroom;
+    }
+
+    public void setUserNameChatroom(String userNameChatroom) {
+        this.userNameChatroom = userNameChatroom;
+    }
+
     public HookMessageBean() {
 
     }

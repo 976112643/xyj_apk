@@ -30,4 +30,7 @@ public class Constance {
 
     public static String action_toast="action_toast";
     public static String str_toast="str_toast";
+
+    public static String getAction_hookmessage="getAction_hookmessage";
+    public static String receiver_message="com.mikuwxc.autoreply.wcreceiver.HookMessageReceiver";
 }

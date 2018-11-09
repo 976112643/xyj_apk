@@ -37,6 +37,7 @@ import com.mikuwxc.autoreply.wchook.MomentHook;
 import com.mikuwxc.autoreply.wchook.ReportDeleteWxMessageRiskOperateHook;
 import com.mikuwxc.autoreply.wchook.ReportVideoCallAndVoiceCallRiskOperateHook;
 import com.mikuwxc.autoreply.wchook.SensitiveHook;
+import com.mikuwxc.autoreply.wchook.VerifyFriendHook;
 import com.mikuwxc.autoreply.wchook.VersionParamNew;
 import com.mikuwxc.autoreply.wchook.WScanxHook;
 import com.mikuwxc.autoreply.wchook.WalletHook;
@@ -137,6 +138,8 @@ public class MainHook implements IXposedHookLoadPackage {
             WalletHook.hook(create, lpparam,classLoader1,mContext);
             //敏感词操作
             SensitiveHook.hook(create, lpparam,mContext);
+
+            VerifyFriendHook.hook(create,lpparam);
 
             ReportVideoCallAndVoiceCallRiskOperateHook.hook(lpparam);
             //监听创建聊天群

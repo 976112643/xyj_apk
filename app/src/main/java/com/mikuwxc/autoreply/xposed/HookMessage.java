@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
@@ -30,12 +31,14 @@ import com.mikuwxc.autoreply.modle.HookMessageBean;
 import com.mikuwxc.autoreply.modle.HttpBean;
 import com.mikuwxc.autoreply.receiver.Constance;
 import com.mikuwxc.autoreply.utils.DBManager;
+import com.mikuwxc.autoreply.utils.IntentUtil;
 import com.mikuwxc.autoreply.wcapi.WechatEntityFactory;
 import com.mikuwxc.autoreply.wcentity.AutoVerifyAllEntity;
 import com.mikuwxc.autoreply.wcentity.FileEntity;
 import com.mikuwxc.autoreply.wcentity.LuckyMoneyMessage;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
+import com.mikuwxc.autoreply.wcentity.WxEntity;
 import com.mikuwxc.autoreply.wcutil.AuthUtil;
 import com.mikuwxc.autoreply.wcutil.DownLoadWxResFromWxUtil;
 import com.mikuwxc.autoreply.wcutil.FriendUtil;
@@ -68,10 +71,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -283,7 +288,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
 
 
-                            if (sedVideoPath!=null&&field_msgType.equals("43")&&"1".equals(videostatus)&&sedImagin==null&&(field_conversationTime + "").length() != 19 ){
+                           /* if (sedVideoPath!=null&&field_msgType.equals("43")&&"1".equals(videostatus)&&sedImagin==null&&(field_conversationTime + "").length() != 19 ){
                                 sedImagin =sedVideoPath;
                                 XposedBridge.log("上传自己发送的视频"+sedVideoPath);
 
@@ -304,9 +309,9 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                     sedImagin=null;
                                 }
 
-                            }
+                            }*/
 
-                            if (reyVideoPath!=null&&field_msgType.equals("43")&& "3".equals(videostatus)&&reyImagin==null&&(field_conversationTime + "").length() != 19 ){
+                         /*   if (reyVideoPath!=null&&field_msgType.equals("43")&& "3".equals(videostatus)&&reyImagin==null&&(field_conversationTime + "").length() != 19 ){
                                 reyImagin =reyVideoPath;
                                 XposedBridge.log("上传对方发送的视频"+reyVideoPath);
 
@@ -326,10 +331,10 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                     //因为视频还没下载成功，所以文件会为空，此时就需要重新进这个判断方法，知道文件下载成功
                                     reyImagin=null;
                                 }
-                            }
+                            }*/
 
 
-                            if (newVoisePath!=null&&field_msgType.equals("34")&&newVoiseNull==null&&"1".equals(voisestatus)&&(field_conversationTime + "").length() != 19 ){
+                         /*   if (newVoisePath!=null&&field_msgType.equals("34")&&newVoiseNull==null&&"1".equals(voisestatus)&&(field_conversationTime + "").length() != 19 ){
                                 XposedBridge.log("上传自己发送的语音文件");
                                 //handleMessage(field_unReadCount, Integer.parseInt(voisestatus), field_username, "", field_msgType, field_conversationTime,msgId);
                                 String newVoisePathUrl = uploadAmr(newVoisePath,field_username,"Send",field_unReadCount, Integer.parseInt(voisestatus), field_username, field_msgType, field_conversationTime);
@@ -345,10 +350,10 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 //handleMessage(field_unReadCount, field_status, field_username, newVoisePathUrl, field_msgType, field_conversationTime);
                                 XposedBridge.log("$$$$$$$$$同步接收到的语音文件成功");
                                 newVoiseNull=newVoisePath;
-                            }
+                            }*/
 
 
-                            if (newImaginPath!=null&&field_msgType.equals("3")&&newImaginNull==null&&"1".equals(picstatus)&&(field_conversationTime + "").length() != 19 ){
+                          /*  if (newImaginPath!=null&&field_msgType.equals("3")&&newImaginNull==null&&"1".equals(picstatus)&&(field_conversationTime + "").length() != 19 ){
                                 newImaginNull=newImaginPath;
                                 File file=new File(newImaginPath);
                                 if (file.exists()){
@@ -365,7 +370,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 }
 
 
-                            }else if(newImaginPath!=null&&field_msgType.equals("3")&&newImaginNull==null&&"3".equals(picstatus)&&(field_conversationTime + "").length() != 19 /*&& field_status != 1*/){
+                            }else if(newImaginPath!=null&&field_msgType.equals("3")&&newImaginNull==null&&"3".equals(picstatus)&&(field_conversationTime + "").length() != 19 && field_status != 1){
                                 newImaginNull=newImaginPath;
                                 File file=new File(newImaginPath);
                                 if (file.exists()){
@@ -383,11 +388,11 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                     newImaginNull=null;
                                 }
 
-                            }
+                            }*/
 
 
 
-                            if (sendFilePath!=null&&field_msgType.equals("49")&&sendFileNull==null&&"1".equals(filestatus)&&(field_conversationTime + "").length() != 19 ){
+                          /*  if (sendFilePath!=null&&field_msgType.equals("49")&&sendFileNull==null&&"1".equals(filestatus)&&(field_conversationTime + "").length() != 19 ){
                                 sendFileNull=sendFilePath;
                                 XposedBridge.log("707120170"+sendFilePath);
                                 File file=new File(sendFilePath);
@@ -444,7 +449,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                     sendFileNullPhone=null;
                                 }
 
-                            }
+                            }*/
 
 
 
@@ -759,7 +764,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
         XposedHelpers.findAndHookMethod(paramWechatEntity.sqlitedatabase_class_name, classLoader, "insertWithOnConflict", new Object[] { String.class, String.class, ContentValues.class, Integer.TYPE, new XC_MethodHook()
         {
-            protected void afterHookedMethod(XC_MethodHook.MethodHookParam paramAnonymousMethodHookParam)
+            protected void afterHookedMethod(MethodHookParam paramAnonymousMethodHookParam)
                     throws Throwable
             {
                 ContentValues localContentValues;
@@ -802,12 +807,41 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
 
 
+
+
                         if ("1".equals(type)){
 
                             if ("1".equals(isSend)){
                                 statuss=1;
                             }
                             handleMessage(0, statuss, talker, content, type, field_conversationTime,msgId);
+
+
+                          /*  if ("我通过了你的朋友验证请求，现在我们可以开始聊天了".equals(content)){
+                                Set set=new HashSet();
+                                set.add(talker);
+                                List<WxEntity> wxEntities =WechatDb.getInstance().selectContacts(set);
+                                XposedBridge.log("wxEntities"+wxEntities.toString());
+                                if (wxEntities!=null&&!wxEntities.isEmpty()){
+                                    UserEntity userEntity = WechatDb.getInstance().selectSelf();
+                                    String userName = userEntity.getUserName();
+                                    String userTalker = userEntity.getUserTalker();
+                                    String headPic = userEntity.getHeadPic();
+                                    String alias = userEntity.getAlias();  //微信号
+                                    if (StringUtils.isBlank(alias)){
+                                        alias = userTalker;
+                                    }
+
+                                    FriendBean friendBean=new FriendBean();
+                                    friendBean.setNickname(wxEntities.get(0).getNickName());
+                                    friendBean.setHeadImgUrl(wxEntities.get(0).getHeadPic());
+                                    friendBean.setWxno(wxEntities.get(0).getAlias());
+                                    friendBean.setWxid(wxEntities.get(0).getUserName());
+                                    XposedBridge.log("FriendBeanFriendBean:::::"+new Gson().toJson(friendBean));
+                                    addNewFriend(alias, friendBean);
+                                }
+                            }*/
+
                         }
 
                         if ("50".equals(type)){
@@ -866,10 +900,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                         AutoVerifyAllEntity autoVerifyAllEntity=new Gson().fromJson(xmlToJson.toString(), AutoVerifyAllEntity.class);
 
-
-                       // handleMessage(0, 0, "", autoVerifyUser, "103", 0,msgId);
-
-
                         boolean verifyStaus_put = true;
                         verifyStaus_put = MyFileUtil.readProperties("verifyStaus_put");
 
@@ -896,16 +926,24 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                     }
 
-
+                    //发送的图片这里监听到
                     if ("20".equals(localContentValues.getAsString("msgSubType"))&&localContentValues.getAsString("path")!=null){
                         String sendImaginPath=localContentValues.getAsString("path");
                         String newsendImaginPath="/storage/emulated/0/tencent/MicroMsg/"+sendImaginPath;
                         File file=new File(newsendImaginPath);
                        boolean b= file.exists();
                        XposedBridge.log("QWER"+newsendImaginPath+"___"+b);
+                        XposedBridge.log("QWER"+localContentValues.getAsString("msgType")+"___");
+                        XposedBridge.log("QWER"+localContentValues.getAsString("username")+"___");
                        if (b){
                            newImaginPath=newsendImaginPath;
                            newImaginNull=null;
+                           int picstatus=1;
+                           IntentUtil.startNochatRoomBroadcastReceiver(newImaginPath,localContentValues.getAsString("msgtime"),msgId,picstatus,
+                                   localContentValues.getAsString("msgType"),localContentValues.getAsString("username"),mContext,"Send");
+
+
+
                        }
 
                     }else if("true".equals(localContentValues.getAsString("isUpload"))&&localContentValues.getAsString("fileFullPath")!=null){
@@ -913,6 +951,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         String filePath=localContentValues.getAsString("fileFullPath");
                         sendFilePathPhone=filePath;
                         sendFileNullPhone=null;
+                        XposedBridge.log("sendFilePathPhone：："+sendFilePathPhone);
+
                     }
 
                     i = -1;
@@ -920,7 +960,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     {
                         case 954925063:
                             if (!str.equals("message")) {
-                                //break label355;
                             }
                             i = 0;
                     }
@@ -935,7 +974,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                 if (str.equals("fmessage_msginfo"))
                 {
                     i = 1;
-                    //break label355;
                     ContentValues contentValues = (ContentValues)paramAnonymousMethodHookParam.args[2];
                     long l1 = contentValues.getAsLong("createTime").longValue();
                     long l2 = System.currentTimeMillis() - 300000L;
@@ -947,7 +985,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     }
                     XposedBridge.log("===== after handle[%s]"+ new Object[] { contentValues.toString() });
                     if (localContentValues.getAsString("talker").startsWith("gh_")) {
-                        //break label380;
                     }
                     i = localContentValues.getAsInteger("type").intValue();
                     paramAnonymousMethodHookParam1 = "";
@@ -972,58 +1009,45 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     XposedBridge.log("reserved3::"+reserved3);
 
                     //发送43视频type的时候，从相册那里选择的时候downloadWxVideoRes会报错，所以要加这个判断
-                    if (StringUtils.isNotBlank(reserved3)){
+                    if (StringUtils.isNotBlank(reserved3)&&!"0".equals(reserved3)){
                         sedImagin=null;
                         videostatus="1";
 
                         sedVideoPath=reserved3;
                         videoState=1;
+                        IntentUtil.startBroadcastReceiver(sedVideoPath,localContentValues.getAsString("createtime")+"000",localContentValues.getAsString("msglocalid"),videoState,"43",localContentValues.getAsString("user"),
+                                "","1",mContext,"Send");
                     }
 
 
                     if ("43".equals(type)){
                        String videPath= DownLoadWxResFromWxUtil.downloadWxVideoRes(classLoader, paramWechatEntity, paramAnonymousMethodHookParam1);
-
                         String reyvideoLast=videPath.replace(".jpg", ".mp4").replace(".tmp", "");
-
                         XposedBridge.log("videPathvidePathvidePathvidePath::"+videPath);
-
                         XposedBridge.log("shangchuanshipin"+reyvideoLast);
                         if ("1".equals(isSend)){
-
-
                             sedImagin=null;
                             videostatus="1";
-
                             sedVideoPath=reyvideoLast;
                             videoState=1;
-
                             sedVideopicPath=videPath;
 
-                            //String newPicPathUrl= uploadVideo(sedVideoPath,talker,"Send",000, Integer.parseInt(videostatus), talker, type, Long.parseLong(s));
+                            IntentUtil.startBroadcastReceiver(sedVideoPath,s,msgId,videoState,type,talker,
+                                    localContentValues.getAsString("content"),isSend,mContext,"Send");
+
                         }else{
                             reyImagin=null;
                             videostatus="3";
-
                             reyVideoPath=reyvideoLast;
                             videoState=3;
-
                             reyVideopicPath=videPath;
 
-                           /* File file=new File(reyVideoPath);
-                            if (file.exists()){
-                                String newPicPathUrl= uploadVideo(reyVideoPath,talker,"Receive",000, Integer.parseInt(videostatus), talker, type, Long.parseLong(s));
-                            }else{
-                                XposedBridge.log("接受的视频地址还不存在");
-                            }*/
-
-
+                            IntentUtil.startBroadcastReceiver(reyVideoPath,s,msgId,videoState,type,talker,
+                                    localContentValues.getAsString("content"),isSend,mContext,"Receive");
 
                         }
 
                     }else if("34".equals(type)) {
-
-                        XposedBridge.log("AAAAAAAAAAAAAAAAAAAAA" + type);
                         XposedBridge.log("QQQQQQQQQQQQQQQQQQQQQ" + DownLoadWxResFromWxUtil.downloadWxVoiceRes(classLoader, paramWechatEntity, paramAnonymousMethodHookParam1));
 
                         String voisePath = DownLoadWxResFromWxUtil.downloadWxVoiceRes(classLoader, paramWechatEntity, paramAnonymousMethodHookParam1);
@@ -1037,9 +1061,15 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                             if ("1".equals(isSend)){
                                 voisestatus="1";
-                               // String newVoisePathUrl = uploadAmr(newVoisePath,talker,"Send",000, Integer.parseInt(voisestatus), talker, type, Long.parseLong(s));
+                                int voisestatus=1;
+                                IntentUtil.startBroadcastReceiver(newVoisePath,s,msgId,voisestatus,type,talker,
+                                        localContentValues.getAsString("content"),isSend,mContext,"Send");
+
                             }else{
                                 voisestatus="3";
+                                int voisestatus=3;
+                                IntentUtil.startBroadcastReceiver(newVoisePath,s,msgId,voisestatus,type,talker,
+                                        localContentValues.getAsString("content"),isSend,mContext,"Receive");
                             }
                         }
                     }else if ("3".equals(type)){
@@ -1060,20 +1090,15 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                                 newImaginPath=newPicPath;
                                 newImaginNull=null;
-
                                 if ("1".equals(isSend)){
                                     picstatus="1";
 
-                                   // String newPicPathUrl= uploadPic(newImaginPath,talker,"Send",000, Integer.parseInt(picstatus), talker, type, Long.parseLong(s));
                                 }else{
                                     picstatus="3";
-                                    //String newPicPathUrl= uploadPic(newImaginPath,talker,"Receive",000, Integer.parseInt(picstatus), talker, type, Long.parseLong(s));
+                                    int picstatus=3;
+                                    IntentUtil.startBroadcastReceiver(newImaginPath,s,msgId,picstatus,type,talker,
+                                            localContentValues.getAsString("content"),isSend,mContext,"Receive");
                                 }
-                                //status = localContentValues.getAsString("status");
-                                XposedBridge.log("sssssssssssssss"+status);
-
-
-
                             }else {
 
                                 XposedBridge.log("msgSvrId:"+localContentValues.getAsString("msgSvrId")+"---msgId:"+String.valueOf(localContentValues.get("msgId")+"paramAnonymousMethodHookParam1"+paramAnonymousMethodHookParam1));
@@ -1094,8 +1119,12 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                                 if ("1".equals(isSend)){
                                     picstatus="1";
+                                    int picstatus=1;
                                 }else{
                                     picstatus="3";
+                                    int picstatus=3;
+                                    IntentUtil.startBroadcastReceiver(newImaginPath,s,msgId,picstatus,type,talker,
+                                            localContentValues.getAsString("content"),isSend,mContext,"Receive");
                                 }
                                 XposedBridge.log("sssssssssssssss"+status);
 
@@ -1120,10 +1149,32 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 sendFileNull=null;
 
 
+
+
                         if ("1".equals(isSend)){
                             filestatus="1";
+
+                            int filestatus=1;
+
+
+
+                            if (StringUtils.isNotBlank(sendFilePathPhone)){
+                                IntentUtil.startBroadcastReceiver(sendFilePathPhone,s,msgId,filestatus,type,talker,
+                                        localContentValues.getAsString("content"),isSend,mContext,"Send");
+                            }else{
+                                IntentUtil.startBroadcastReceiver(sendFilePath,s,msgId,filestatus,type,talker,
+                                        localContentValues.getAsString("content"),isSend,mContext,"Send");
+                            }
+                            sendFilePathPhone=null;
+
+
                         }else{
                             filestatus="3";
+                            int filestatus=3;
+
+
+                            IntentUtil.startBroadcastReceiver(sendFilePath,s,msgId,filestatus,type,talker,
+                                    localContentValues.getAsString("content"),isSend,mContext,"Receive");
                         }
 
                     }else if ("10000".equals(type)){//领取红包信息
@@ -1168,7 +1219,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                 }
             }
 
-            protected void beforeHookedMethod(XC_MethodHook.MethodHookParam paramAnonymousMethodHookParam)
+            protected void beforeHookedMethod(MethodHookParam paramAnonymousMethodHookParam)
             {
                 try
                 {
@@ -1468,8 +1519,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                 in.putExtra("msgId",msgId);
                 context.sendBroadcast(in);
 
-//                ToastUtil.showLongToast("保存第"+index+"条信息失败:" + e.getMessage());
-                //setAlarmToSyncMessage();
             }
         });
     }

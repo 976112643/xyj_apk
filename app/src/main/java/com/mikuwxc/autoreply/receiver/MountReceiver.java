@@ -447,15 +447,11 @@ public class MountReceiver extends XC_MethodHook {
                     String[] split = path.split(",");
 
                     for (int i = 0; i < split.length; i++) {
-                        String suffixes = "avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|htm|java|doc|amr";
-                        String file = split[i].substring(split[i].lastIndexOf('/') + 1);//截取url最后的数据
-                        Pattern pat = Pattern.compile("[\\w]+[\\.](" + suffixes + ")");//正则判断
-                        Matcher mc = pat.matcher(file);
-                        while (mc.find()) {
-                            //截取文件名后缀名
-                            substring = mc.group();
-                            XposedBridge.log("123456789" + substring);
-                        }
+                        XposedBridge.log("split::"+split[i]);
+
+                        int index = split[i].lastIndexOf("/");
+                        String substrings = split[i].substring(index + 1);
+
 
                         URL url = new URL(split[i]);
                         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -468,7 +464,7 @@ public class MountReceiver extends XC_MethodHook {
                             FileOutputStream fileOutputStream = null;//文件输出流
                             if (is != null) {
                                 FileUtils fileUtils = new FileUtils();
-                                fileOutputStream = new FileOutputStream(fileUtils.createFile(substring));//指定文件保存路径，代码看下一步
+                                fileOutputStream = new FileOutputStream(fileUtils.createFile(substrings));//指定文件保存路径，代码看下一步
                                 byte[] buf = new byte[1024];
                                 int ch;
                                 while ((ch = is.read(buf)) != -1) {
@@ -479,13 +475,14 @@ public class MountReceiver extends XC_MethodHook {
                                 fileOutputStream.flush();
                                 fileOutputStream.close();
 
-                                listPicMonet.add(picpach + substring);
+                                listPicMonet.add(picpach + substrings);
 
                             }
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    XposedBridge.log("下载图片错误：："+e.toString());
                 }
 
         return listPicMonet;
@@ -506,15 +503,8 @@ public class MountReceiver extends XC_MethodHook {
             String[] split = path.split(",");
 
             for (int i = 0; i < 1; i++) {
-                String suffixes = "avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|htm|java|doc|amr";
-                String file = split[i].substring(split[i].lastIndexOf('/') + 1);//截取url最后的数据
-                Pattern pat = Pattern.compile("[\\w]+[\\.](" + suffixes + ")");//正则判断
-                Matcher mc = pat.matcher(file);
-                while (mc.find()) {
-                    //截取文件名后缀名
-                    substring = mc.group();
-                    XposedBridge.log("123456789" + substring);
-                }
+                int index = split[i].lastIndexOf("/");
+                String substrings = split[i].substring(index + 1);
                 URL url = new URL(split[i]);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setReadTimeout(5000);
@@ -526,7 +516,7 @@ public class MountReceiver extends XC_MethodHook {
                     FileOutputStream fileOutputStream = null;//文件输出流
                     if (is != null) {
                         FileUtils fileUtils = new FileUtils();
-                        fileOutputStream = new FileOutputStream(fileUtils.createFile(substring));//指定文件保存路径，代码看下一步
+                        fileOutputStream = new FileOutputStream(fileUtils.createFile(substrings));//指定文件保存路径，代码看下一步
                         byte[] buf = new byte[1024];
                         int ch;
                         while ((ch = is.read(buf)) != -1) {
@@ -537,7 +527,7 @@ public class MountReceiver extends XC_MethodHook {
                         fileOutputStream.flush();
                         fileOutputStream.close();
 
-                        listPicMonet.add(picpach + substring);
+                        listPicMonet.add(picpach + substrings);
                     }
                 }
             }

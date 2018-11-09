@@ -570,7 +570,14 @@
         <receiver android:name=".receiver.AlarmReceiver"/>
         <service android:name=".service.SmsObserverService"/>
         <service android:name=".callrecorder.sources.service.CallRecordService"/>
-
+        <receiver android:name=".wcreceiver.HookMessageReceiver"
+            android:enabled="true"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
