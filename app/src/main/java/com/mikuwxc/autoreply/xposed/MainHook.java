@@ -26,6 +26,7 @@ import com.mikuwxc.autoreply.wcentity.LuckyMoneyMessage;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wchook.AddFriendHook;
 import com.mikuwxc.autoreply.wchook.ChatroomChangedHook;
+import com.mikuwxc.autoreply.wchook.ChatroomHook;
 import com.mikuwxc.autoreply.wchook.CreateChatroomHook;
 import com.mikuwxc.autoreply.wchook.DeleteContactsHook;
 import com.mikuwxc.autoreply.wchook.DonateHook;
@@ -141,6 +142,8 @@ public class MainHook implements IXposedHookLoadPackage {
 
             VerifyFriendHook.hook(create,lpparam);
 
+            ChatroomHook.hook(lpparam,mContext,create);
+
             ReportVideoCallAndVoiceCallRiskOperateHook.hook(lpparam);
             //监听创建聊天群
            // CreateChatroomHook.hook(create, lpparam);
@@ -215,6 +218,8 @@ public class MainHook implements IXposedHookLoadPackage {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 ContentValues contentValues = (ContentValues) param.args[2];
                 String tableName = (String) param.args[0];
+                XposedBridge.log("contentValuescontentValues::"+contentValues);
+                XposedBridge.log("tableNametableName::"+tableName);
                 if (TextUtils.isEmpty(tableName) || !tableName.equals("message")) {
                     return;
                 }

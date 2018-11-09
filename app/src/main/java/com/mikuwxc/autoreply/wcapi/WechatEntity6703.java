@@ -146,6 +146,7 @@ class WechatEntity6703 extends WechatEntity {
         this.refreash_create_chatroom_field6 = "svo";
         this.refreash_create_chatroom_field7 = "sQx";
         this.refreash_create_chatroom_field8 = "tFO";
+        this.refreash_create_chatroom_field9="tsR";
         this.refreash_create_chatroom_method1 = "a";
         this.remove_friend_in_chatroom_class1 = "com.tencent.mm.model.au";
         this.remove_friend_in_chatroom_method1 = "Dk";

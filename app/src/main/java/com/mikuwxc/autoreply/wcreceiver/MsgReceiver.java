@@ -595,8 +595,8 @@ public class MsgReceiver extends BroadcastReceiver {
         TIMSdkConfig config = new TIMSdkConfig(Integer.parseInt(sdkAppId))
                 .enableCrashReport(false)
                 .enableLogPrint(true)
-                .setLogLevel(TIMLogLevel.DEBUG)
-                .setLogPath(Environment.getExternalStorageDirectory().getParent() + "/justfortest/");
+                .setLogLevel(TIMLogLevel.DEBUG);
+                //.setLogPath(Environment.getExternalStorageDirectory().getParent() + "/justfortest/");
         //初始化SDK
         TIMManager.getInstance().init(context, config);
         //2.初始化SDK配置
@@ -737,6 +737,13 @@ public class MsgReceiver extends BroadcastReceiver {
                                             }.getType());
                                             String wechatIdListJson = JSON.toJSONString(wechatIdList);
                                             MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/addFriendList",wechatIdListJson);
+                                            intent.putExtra("name",messageBean.getWxid());
+                                            intent.putExtra("type",type);
+                                            intent.setAction(Constance.action_getWechatFriends);
+                                            intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
+                                            context.sendBroadcast(intent);
+
+                                        }else if (type.equals("202")){
                                             intent.putExtra("name",messageBean.getWxid());
                                             intent.putExtra("type",type);
                                             intent.setAction(Constance.action_getWechatFriends);

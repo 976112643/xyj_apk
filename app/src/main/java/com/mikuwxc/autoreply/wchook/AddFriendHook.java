@@ -111,6 +111,9 @@ public class AddFriendHook {
                             intent.setAction(Constance.action_getWechatFriends);
                             intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
                             context.sendBroadcast(intent);
+
+                          XposedBridge.log("error3:arg0[" + param.args[0].toString() + "]" + "arg1[" + param.args[1].toString() + "]" + "arg2[" + param.args[2].toString() + "]" + "arg3[" +param. args[3].toString() + "]");
+
                         } else {
                             XposedBridge.log("加好友"+param.args[0].toString());
                             Intent intent=new Intent();
@@ -119,6 +122,8 @@ public class AddFriendHook {
                             intent.setAction(Constance.action_getWechatFriends);
                             intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
                             context.sendBroadcast(intent);
+
+                            XposedBridge.log("error3:arg0[" + param.args[0].toString() + "]" + "arg1[" + param.args[1].toString() + "]" + "arg2[" + param.args[2].toString() + "]" + "arg3[" +param. args[3].toString() + "]");
                         }
                     }
                 }

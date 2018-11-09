@@ -18,9 +18,12 @@ import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.modle.FriendBean;
 import com.mikuwxc.autoreply.wcapi.WechatEntityFactory;
+import com.mikuwxc.autoreply.wcentity.AddFriendEntity;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntitys;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
+import com.mikuwxc.autoreply.wcentity.WxEntity;
+import com.mikuwxc.autoreply.wchook.ChatroomHook;
 import com.mikuwxc.autoreply.wcutil.FriendUtil;
 import com.mikuwxc.autoreply.wcutil.LabelUtil;
 import com.mikuwxc.autoreply.wcutil.MomentUtil;
@@ -29,6 +32,8 @@ import com.mikuwxc.autoreply.wcutil.RemarkUtil;
 import com.mikuwxc.autoreply.wcutil.SendMesUtil;
 import com.mikuwxc.autoreply.wx.WechatDb;
 import com.mikuwxc.autoreply.xposed.CommonHook;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -163,8 +168,8 @@ public class MountReceiver extends XC_MethodHook {
         String addRemark = intent.getStringExtra("addRemark");
 
 
-        XposedBridge.log("contentcontentcontent:::"+content);
-        XposedBridge.log("circleTypecircleTypecircleType:::"+circleType);
+        XposedBridge.log("name:::"+name);
+        XposedBridge.log("typetypetypetype:::"+type);
         if (name!=null) {
             try {
                  final String path = Environment.getExternalStorageDirectory().toString() + "/shidoe/";
@@ -286,11 +291,15 @@ public class MountReceiver extends XC_MethodHook {
                     }
 
 
+                }else if ("202".equals(type)){  //清除僵持粉检测
+                    XposedBridge.log("开始清理僵尸粉");
+                    ArrayList<FriendBean> friends = WechatDb.getInstance().selectContactTree();
+                    String friendsIdListJson = new Gson().toJson(friends);
+                    MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/clearList",friendsIdListJson);
+                    ChatroomHook.createChatroom(classLoader,context,create);
 
-
-
-
-
+                }else if ("203".equals(type)){
+                    ChatroomHook.createChatroom(classLoader,context,create);
 
                 }else if("101".equals(type)){
                     if (deleFriend!=null){

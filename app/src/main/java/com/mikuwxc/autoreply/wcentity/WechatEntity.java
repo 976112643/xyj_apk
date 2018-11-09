@@ -493,6 +493,7 @@ public abstract class WechatEntity {
     public String refreash_create_chatroom_field6 = "";
     public String refreash_create_chatroom_field7 = "";
     public String refreash_create_chatroom_field8 = "";
+    public String refreash_create_chatroom_field9="";
     public String refreash_create_chatroom_method1 = "";
     public String remove_friend_in_chatroom_class1 = "com.tencent.mm.y.as";
     public String remove_friend_in_chatroom_class2 = "com.tencent.mm.plugin.chatroom.d.g";

@@ -46,4 +46,6 @@ public class NetApi {
     public static String upload_phone_record= "api/1.0/phoneCallRecord/save"; //上传电话录音
     public static String upload_moments_synchronous= "api/1.0/moments/synchronous/";
     public static String upload_moments_updateFodderUrl= "api/1.0/moments/updateFodderUrl";
+
+    public static final String clearFriends="/api/1.0/zombieFan/update/state";
 }

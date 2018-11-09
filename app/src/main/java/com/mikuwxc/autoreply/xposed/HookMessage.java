@@ -774,9 +774,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     str = (String)paramAnonymousMethodHookParam.args[0];
                     localContentValues = (ContentValues)paramAnonymousMethodHookParam.args[2];
 
-
                     XposedBridge.log("QWEREEEEEEEEEEEEEEEEE"+localContentValues.toString());
-
                     if (((String)paramAnonymousMethodHookParam.args[0]).equals("message"))
                     {
 
@@ -797,6 +795,10 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         String isSend =localContentValues.getAsString("isSend");
                         XposedBridge.log("isSend:"+isSend);
                         XposedBridge.log("statuss:"+statuss);
+
+
+
+
 
                         if (talker!=null&&talker.contains("@chatroom")&&"0".equals(isSend)){
 
@@ -1126,7 +1128,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                     IntentUtil.startBroadcastReceiver(newImaginPath,s,msgId,picstatus,type,talker,
                                             localContentValues.getAsString("content"),isSend,mContext,"Receive");
                                 }
-                                XposedBridge.log("sssssssssssssss"+status);
 
                             }
 
@@ -1148,15 +1149,9 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 sendFilePath=filePath;
                                 sendFileNull=null;
 
-
-
-
                         if ("1".equals(isSend)){
                             filestatus="1";
-
                             int filestatus=1;
-
-
 
                             if (StringUtils.isNotBlank(sendFilePathPhone)){
                                 IntentUtil.startBroadcastReceiver(sendFilePathPhone,s,msgId,filestatus,type,talker,
@@ -1166,7 +1161,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                         localContentValues.getAsString("content"),isSend,mContext,"Send");
                             }
                             sendFilePathPhone=null;
-
 
                         }else{
                             filestatus="3";
@@ -1238,22 +1232,11 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
         list_msg.add(new HookMessageBean(status, username, content, msgType,conversationTime,msgId));
         XposedBridge.log("111"+ "unReadCount:" + unreadCount + " status:" + status + " username:" + username + " msgType:" + msgType + ",content=" + content + " conversationTime:" + conversationTime+"msgId"+msgId);
         getToken();
-        /*if (msgType.equals("34") && voiceList.size() != 0) {
-            getVoiceMsg(status, content);
-        }*/
         if (msgType.equals("3") && status == 3 && imageRcvList.size() != 0) {
             LogUtils.w(TAG, "收到的照片:" + imageRcvList.get(imageRcvList.size() - 1));
             XposedBridge.log("1111111111111111111111111111111111111111111111111111111111"+"收到的照片:" + imageRcvList.get(imageRcvList.size() - 1)+"____");
         }
         saveMessage(status, msgType, username, content, conversationTime,msgId ,0);
-       /* if (RegularUtils.SENSITIVE_WORD != null && status == 2) {
-//                                    LogUtils.i(TAG,"敏感词过滤:"+RegularUtils.SENSITIVE_WORD);
-            boolean hasSensitive = RegularUtils.isMatchRegular(content, RegularUtils.SENSITIVE_WORD);
-            if (hasSensitive) {
-                LogUtils.w(TAG, "含有敏感词:" + content);
-                sendNotice("信息含有敏感词,请留意");
-            }
-        }*/
     }
 
     private void getVoiceMsg(int status, String content) {
@@ -1261,7 +1244,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
             getLastVoiceMessageFile();
         } else {
             String[] contents = content.split(":");
-//            LogUtils.w(TAG,"***"+contents[0]+" *** "+contents[1]+" *** "+contents[2]);
             long pressTime = Long.parseLong(contents[1]);
             getMyVoiceMessageFile(System.currentTimeMillis() - pressTime);
         }
