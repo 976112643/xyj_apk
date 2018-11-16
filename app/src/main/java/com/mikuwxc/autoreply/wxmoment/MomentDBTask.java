@@ -40,7 +40,7 @@ public class MomentDBTask {
         protected void onPostExecute(Void voidParam) {
             super.onPostExecute(voidParam);
             if (this.error != null) {
-                ToastUtil.showLongToast( R.string.not_rooted);
+               // ToastUtil.showLongToast( R.string.not_rooted);
                 return;
             }
             Share.snsData = snsStat;

@@ -47,6 +47,7 @@ public class Constants {
     public static final String SETTING_PUT="setting_put";
     public static final String SAOYISAOSTAUS_PUT="saoyisaoStaus_put";
     public static final String CANSEEWXSTAUS_PUT="canSeewxStaus_put";
+    public static final String CANSEEPHONESTAUS_PUT="canSeePhoneStaus_put";
     public static final String VERIFYSTAUS_PUT="verifyStaus_put";
     public static final String MONEYSTAUS_PUT="moneyStaus_put";
     public static final String TEST_PUT="test_put";

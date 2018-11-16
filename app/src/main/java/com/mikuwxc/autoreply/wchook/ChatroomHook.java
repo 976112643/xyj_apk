@@ -112,10 +112,10 @@ public class ChatroomHook{
                 Iterator iterator = wechatIds.iterator();
                 while(iterator.hasNext()){
                     Object it = iterator.next();
-
+                    XposedBridge.log("itititit:"+new Gson().toJson(it));
                     Object  object5 = XposedHelpers.getObjectField(it, wechat.refreash_create_chatroom_field7);
                     Integer object6 = (Integer) XposedHelpers.getObjectField(it, wechat.refreash_create_chatroom_field9);
-                    XposedBridge.log("itititit:"+it);
+
                     String  id      = (String) XposedHelpers.getObjectField(object5, wechat.refreash_create_chatroom_field8);
                     XposedBridge.log("object5:"+object5+"object6:"+object6+"id:"+id);
                     if (object6==4){

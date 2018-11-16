@@ -23,6 +23,7 @@ public final class DeleteContactsHook {
         Intrinsics.checkParameterIsNotNull(loadPackageParam, "loadPackageParam");
         ClassLoader classLoader = loadPackageParam.classLoader;
         XposedHelpers.findAndHookConstructor(wechatEntity.delete_contact_class3, classLoader, new Object[]{String.class, new DeleteContactsHook$hook$1()});
+      //  XposedHelpers.findAndHookMethod(wechatEntity.delete_contact_class2, classLoader,wechatEntity.delete_contact_method3, new Object[]{new DeleteContactsHook$hook$1()});
         Class class_model_s = XposedHelpers.findClass(wechatEntity.forbidden_friend_class1, classLoader);
         Class class_storage_ab = XposedHelpers.findClass(wechatEntity.forbidden_friend_class2, classLoader);
         XposedHelpers.findAndHookMethod(class_model_s, wechatEntity.forbidden_friend_method1, new Object[]{class_storage_ab, new DeleteContactsHook$hook$2()});

@@ -1,5 +1,7 @@
 package com.mikuwxc.autoreply.wcreceiver;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +40,9 @@ import com.mikuwxc.autoreply.presenter.tasks.AsyncFriendTask;
 import com.mikuwxc.autoreply.receiver.Constance;
 import com.mikuwxc.autoreply.service.LoopService;
 import com.mikuwxc.autoreply.utils.GetImeiUtil;
+import com.mikuwxc.autoreply.utils.IntentUtil;
 import com.mikuwxc.autoreply.utils.ParseUtil;
+import com.mikuwxc.autoreply.utils.ReconnectWXutil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntity;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntitys;
@@ -72,6 +76,7 @@ import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -85,17 +90,11 @@ import static com.mikuwxc.autoreply.activity.RunningActivity.wxState;
 
 
 public class MsgReceiver extends BroadcastReceiver {
-    private static final String KEY_REPLY = "reply";
-    private static final String KEY_LUCKY_MONEY = "lucky_money";
-    private static final String KEY_SELECT_ID = "select_id";
-    private static final String KEY_AUTO_REPLY_TEXT = "reply_text";
-    private final List<String> mData = new ArrayList<>();
     private String sig;
     private String id;
     private String sdkAppId;
     private final String SDcardPath = "/storage/emulated/0/JCM/";
     ArrayList<FriendBean> beanArrayList=new ArrayList<>();
-    ArrayList<String> chatroomArray=new ArrayList<>();
     public static List<HookMessageBean> list_msgFail = new ArrayList<>();
     FriendBean friendBean;
     private String token;
@@ -171,10 +170,17 @@ public class MsgReceiver extends BroadcastReceiver {
      }else if (action.equals(Constance.action_canseewxno)){
          String canSeewxType = intent.getStringExtra("canSeewxType");
          Toast.makeText(context, "是否可以看微信号"+canSeewxType, Toast.LENGTH_LONG).show();
-
          action_canseewxno(context,canSeewxType);
 
-     }else if (action.equals(Constance.action_saoyisao)){
+     }else if(action.equals(Constance.action_canseephone)){
+         String canSeePhoneType = intent.getStringExtra("canSeePhoneType");
+         Toast.makeText(context, "是否可以看手机号"+canSeePhoneType, Toast.LENGTH_LONG).show();
+         action_canseephone(context,canSeePhoneType);
+     }
+
+
+
+     else if (action.equals(Constance.action_saoyisao)){
          String saoyisaoType = intent.getStringExtra("saoyisaoType");
          Toast.makeText(context, "是否打开扫一扫"+saoyisaoType, Toast.LENGTH_LONG).show();
 
@@ -196,27 +202,25 @@ public class MsgReceiver extends BroadcastReceiver {
          String deletefriendchatType = intent.getStringExtra("deletefriendchatType");
          Toast.makeText(context, "是否可以删除好友聊天记录"+deletefriendchatType, Toast.LENGTH_LONG).show();
          action_candeletefriendchat(context,deletefriendchatType);
+     }else if(action.equals(Constance.action_reconnenct_wx)){
+         ReconnectWXutil.open();
      }
 
     }
 
     private void action_candeletefriendchat(Context context,String deletefriendchatType) {
         if ("true".equals(deletefriendchatType)) {
-          //  ToastUtil.showLongToast("开启删除好友聊天权限");
             MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"true");
 
         } else {
-         //   ToastUtil.showLongToast("关闭删除好友聊天权限");
             MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"false");
         }
     }
 
     private void action_candeletefriend(Context context,String deletefriendType) {
         if ("true".equals(deletefriendType)) {
-         //   ToastUtil.showLongToast("开启删除好友权限");
             MyFileUtil.writeProperties(Constants.ONDELETEFRIENDSTAUS_PUT,"true");
         } else {
-          //  ToastUtil.showLongToast("关闭删除好友权限");
             MyFileUtil.writeProperties(Constants.ONDELETEFRIENDSTAUS_PUT,"false");
         }
     }
@@ -224,11 +228,9 @@ public class MsgReceiver extends BroadcastReceiver {
 
     private void action_receiveluckmoney(Context context,String receivemomyType) {
         if ("true".equals(receivemomyType)) {
-          //  ToastUtil.showLongToast("开启领取权限");
             MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"true");
 
         } else {
-         //   ToastUtil.showLongToast("关闭领取权限");
             MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"false");
         }
     }
@@ -249,12 +251,21 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_saoyisao(Context context,String saoyisaoType) {
         if ("true".equals(saoyisaoType)) {
             //重连微信并且更改红包是否能自动获取
-           // ToastUtil.showLongToast("开启微信扫一扫能权限");
             MyFileUtil.writeProperties(Constants.SAOYISAOSTAUS_PUT,"true");
 
         } else {
-         //   ToastUtil.showLongToast("关闭微信扫一扫权限");
             MyFileUtil.writeProperties(Constants.SAOYISAOSTAUS_PUT,"false");
+        }
+    }
+
+
+    private void action_canseephone(Context context,String canSeePhoneType) {
+        if ("true".equals(canSeePhoneType)) {
+            //重连微信并且更改红包是否能自动获取
+            MyFileUtil.writeProperties(Constants.CANSEEPHONESTAUS_PUT,"true");
+
+        } else {
+            MyFileUtil.writeProperties(Constants.CANSEEPHONESTAUS_PUT,"false");
         }
     }
 
@@ -265,7 +276,6 @@ public class MsgReceiver extends BroadcastReceiver {
             MyFileUtil.writeProperties(Constants.CANSEEWXSTAUS_PUT,"true");
 
         } else {
-          //  ToastUtil.showLongToast("关闭微信能否看微信号权限");
             MyFileUtil.writeProperties(Constants.CANSEEWXSTAUS_PUT,"false");
         }
     }
@@ -273,11 +283,9 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_verify_friend(Context context,String verifyType) {
         if ("true".equals(verifyType)) {
             //重连微信并且更改红包是否能自动获取
-           // ToastUtil.showLongToast("开启微信自动通过好友权限");
             MyFileUtil.writeProperties(Constants.VERIFYSTAUS_PUT,"true");
 
         } else {
-          //  ToastUtil.showLongToast("关闭微信自动通过好友权限");
             MyFileUtil.writeProperties(Constants.VERIFYSTAUS_PUT,"false");
         }
 
@@ -291,7 +299,6 @@ public class MsgReceiver extends BroadcastReceiver {
         private void action_returnRooms(Context context,String momyType) {
         if ("true".equals(momyType)){
             //重连微信并且更改红包是否能自动获取
-          //  ToastUtil.showLongToast("开启微信自动抢红包权限");
             MyFileUtil.writeProperties(Constants.MONEYSTAUS_PUT,"true");
 
         }else{
@@ -305,37 +312,6 @@ public class MsgReceiver extends BroadcastReceiver {
 
     //获取数据库的路径并复制去指定文件夹，和密码
     private void action_getWechatDB(Context context, Intent intent) {
-      /*  String dabase_Route=intent.getStringExtra(Constance.dabase_cpRoute);
-        Log.e("111","收到广播1"+dabase_Route);
-        String dabase_Password=intent.getStringExtra(Constance.dabase_cpPassword);
-        Log.e("111","收到广播2"+dabase_Password);
-        wxno = intent.getStringExtra("wxno");
-        Log.e("111","收到广播3"+wxno);
-        String wxid = intent.getStringExtra("wxid");
-        Log.e("111","收到广播4"+wxid);
-        if (StringUtils.isBlank(wxno)){
-            wxno=wxid;
-        }
-        String headImgUrl = intent.getStringExtra("headImgUrl");
-        Log.e("111","收到广播5"+headImgUrl);
-        String userName = intent.getStringExtra("userName");
-        Log.e("111","收到广播6"+userName);
-        Toast.makeText(context,"连接中",Toast.LENGTH_LONG).show();
-        String fileName = getFileName(dabase_Route);
-        Log.e("111","收到广播7"+fileName);
-        SQLiteDatabase.loadLibs(context);//引用SQLiteDatabase的方法之前必须先添加这句代码
-        File file=new File(SDcardPath+"EnMicroMsglyNew"+dabase_Password+".db");
-        if (file.exists()){
-            file.delete();
-        }
-        //解密复制出来的微信数据库得到没密码的数据库方便操作
-        String friendList=decrypt(fileName,"EnMicroMsglyNew"+dabase_Password+".db",dabase_Password,context);
-        if (friendList!=null){
-            sendWXFriendList(friendList,context, wxno,wxid,headImgUrl,userName);
-        }*/
-
-
-
         String friendBeans = MyFileUtil.readFromFile(AppConfig.APP_FILE + "/friendBeans");
         wxno = intent.getStringExtra("wxno");
         String wxid = intent.getStringExtra("wxid");
@@ -349,8 +325,6 @@ public class MsgReceiver extends BroadcastReceiver {
             Log.e("111","friendBeansJson：："+friendBeans);
             sendWXFriendList(friendBeans,context, wxno,wxid,headImgUrl,userName);
         }
-
-
     }
 
 
@@ -368,18 +342,12 @@ public class MsgReceiver extends BroadcastReceiver {
 
         //获取微信版本号传给后台
         String wxVersion = MyFileUtil.readFromFile(AppConfig.APP_FOLDER + "/version");
-        Log.e("wxVersion",wxVersion);
         String TAG = "系统参数：";
         SystemBean systemBean=new SystemBean();
         systemBean.setManufacturer(SystemUtil.getDeviceBrand());
-        Log.e(TAG, "手机型号：" + SystemUtil.getSystemModel());
         systemBean.setModel(SystemUtil.getSystemModel());
-        Log.e(TAG, "手机当前系统语言：" + SystemUtil.getSystemLanguage());
-        Log.e(TAG, "Android系统版本号：" + SystemUtil.getSystemVersion());
         systemBean.setAndroidVersion(SystemUtil.getSystemVersion());
-        Log.e(TAG, "当前软件版本：" + SystemUtil.getAppVersionName(context));
         systemBean.setAppVersion(SystemUtil.getAppVersionName(context));
-        Log.e(TAG, "当前手机号：" + SystemUtil.getPhone(context));
         systemBean.setPhone(SystemUtil.getPhone(context));
         systemBean.setPatchCode(VersionInfo.versionCode);
         //登录IM
@@ -642,6 +610,14 @@ public class MsgReceiver extends BroadcastReceiver {
                         Intent intent=new Intent(context,LoopService.class);
                         intent.putExtra("wxno",wxno);
                         context.startService(intent);
+
+
+                        Calendar cal = Calendar.getInstance();
+                        Intent intent1 = new Intent(context, LoopService.class);
+                        PendingIntent pintent = PendingIntent.getService(context, 0, intent1, 0);
+                        AlarmManager alarm = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+                        // 每分钟启动一次，这个时间值视具体情况而定
+                        alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 10*1000, pintent);
                     }
 
                     @Override
@@ -733,7 +709,7 @@ public class MsgReceiver extends BroadcastReceiver {
                                             context.sendBroadcast(intent);
                                           //  Toast.makeText(context,"发送广播朋友圈:"+Constance.action_getWechatFriends,Toast.LENGTH_LONG).show();
                                         }else if (type.equals("201")){   //加好友的type
-                                            List<FriendBean> wechatIdList = new Gson().fromJson(messageBean.getContent(), new TypeToken<List<AddFriendEntity>>() {
+                                            List<AddFriendEntity> wechatIdList = new Gson().fromJson(messageBean.getContent(), new TypeToken<List<AddFriendEntity>>() {
                                             }.getType());
                                             String wechatIdListJson = JSON.toJSONString(wechatIdList);
                                             MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/addFriendList",wechatIdListJson);

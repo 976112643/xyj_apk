@@ -15,6 +15,7 @@ import android.location.LocationManager;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -49,6 +50,7 @@ import com.mikuwxc.autoreply.receiver.MomentReceiver;
 import com.mikuwxc.autoreply.receiver.NetworkChangeReceiver;
 import com.mikuwxc.autoreply.service.MyReceiver;
 import com.mikuwxc.autoreply.service.SmsObserverService;
+import com.mikuwxc.autoreply.utils.CheckUtil;
 import com.mikuwxc.autoreply.utils.GetImeiUtil;
 import com.mikuwxc.autoreply.utils.Global;
 import com.mikuwxc.autoreply.utils.PreferenceUtil;
@@ -56,6 +58,7 @@ import com.mikuwxc.autoreply.utils.SystemUtil;
 import com.mikuwxc.autoreply.utils.UpdateAppUtil;
 import com.mikuwxc.autoreply.wxmoment.MomentDBTask;
 
+import org.apache.commons.lang3.StringUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -215,6 +218,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
             }
 
             String DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
+
             //登录IM
             //String DEVICE_ID1 = telephonyInfo.getImeiSIM1();
             Toast.makeText(this,DEVICE_ID,Toast.LENGTH_LONG).show();
@@ -514,6 +518,9 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     }
 
 
-
+ /*   protected void onResume() {
+        super.onResume();
+        CheckUtil.selectActivity(this);
+    }*/
 }
 

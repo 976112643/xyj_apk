@@ -6,7 +6,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -21,8 +20,6 @@ import com.mikuwxc.autoreply.R;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
-import com.mikuwxc.autoreply.common.util.RegularUtils;
-import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
 import com.mikuwxc.autoreply.receiver.AlarmReceiver;
 
 
@@ -61,10 +58,11 @@ public class LoopService extends Service{
        String wxno1 = intent.getStringExtra("wxno");
         if (wxno1!=null){
             wxno=wxno1;
-            Log.e("222","wxno为::"+wxno);
-            handlerAlive.postDelayed(runnableAlive, 10000);//每两秒执行一次runnable.
+            Log.e("LoopService","wxno为::"+wxno);
+           // handlerAlive.postDelayed(runnableAlive, 10000);//每两秒执行一次runnable.
         }else {
-            Log.e("222","wxno为空");
+            Log.e("LoopService","wxno为空");
+            Log.e("LoopService","60秒执行一次");
         }
 
 
@@ -87,7 +85,7 @@ public class LoopService extends Service{
 
     //是否保活权限
     private void permissionAlive() {
-        Log.e("222","123456789");
+        Log.e("LoopService","123456789");
         String aliveStaue = MyFileUtil.readFromFile(AppConfig.APP_FOLDER + "/updateAlive");
         if ("true".equals(aliveStaue)){
             aliveStaue="0";
@@ -95,22 +93,22 @@ public class LoopService extends Service{
             aliveStaue="1";
         }
         if (wxno!=null) {
-            Log.e("222","aliveStaue"+aliveStaue);
+            Log.e("LoopService","aliveStaue"+aliveStaue);
                 OkGo.post(AppConfig.OUT_NETWORK + NetApi.loginAlive + "?wxno=" + wxno+"&usingState="+aliveStaue).execute(new StringCallback() {
                     @Override
                     public void onSuccess(String s, Call call, okhttp3.Response response) {
-                        Log.e("222", "result:" + s);
+                        Log.e("LoopService", "result:" + s);
                         try {
                             if (wxState!=null) {
                                 wxState.setText("微信连接状态：true");
                                 tv3.setText("服务器连接状态：true");
                             }
-                            Log.e("222", "保活成功");
+                            Log.e("LoopService", "保活成功");
 
 
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Log.e("222", "保活信息失败:" + e.toString());
+                            Log.e("LoopService", "保活信息失败:" + e.toString());
                             if (wxState!=null) {
                                 wxState.setText("微信连接状态：false");
                                 tv3.setText("服务器连接状态：false");
@@ -121,7 +119,7 @@ public class LoopService extends Service{
                     @Override
                     public void onError(Call call, okhttp3.Response response, Exception e) {
                         super.onError(call, response, e);
-                        Log.e("222", "保活信息失败:" + e.toString());
+                        Log.e("LoopService", "保活信息失败:" + e.toString());
                         if (wxState!=null) {
                             wxState.setText("微信连接状态：false");
                             tv3.setText("服务器连接状态：false");
@@ -131,7 +129,7 @@ public class LoopService extends Service{
                 });
 
             }else {
-                Log.e("222","没有权限关闭保活");
+                Log.e("LoopService","没有权限关闭保活");
             }
     }
 

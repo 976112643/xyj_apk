@@ -1,21 +1,23 @@
 package com.mikuwxc.autoreply.wchook;
 
 import android.content.Context;
-import android.content.Intent;
 
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
-import com.mikuwxc.autoreply.receiver.Constance;
+import com.mikuwxc.autoreply.utils.IntentUtil;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcutil.FriendUtil;
-
-import java.io.File;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import kotlin.jvm.internal.Intrinsics;
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class AddFriendHook {
 
@@ -33,7 +35,7 @@ public class AddFriendHook {
                     String addNo=MyFileUtil.readNewProperties("addNo",AppConfig.AddFriend);
                     String addType=MyFileUtil.readNewProperties("addType",AppConfig.AddFriend);
                     String addRemark=MyFileUtil.readNewProperties("addRemark",AppConfig.AddFriend);
-
+                    String addId=MyFileUtil.readNewProperties("addId",AppConfig.AddFriend);
                     if (!"0".equals(addType)) {
                         if (Intrinsics.areEqual((Object) "Everything is OK", param.args[3].toString())) {
                             localObject3 = XposedHelpers.callMethod(param.thisObject, wechatEntity.add_search_friend_method4, new Object[0]);
@@ -50,30 +52,21 @@ public class AddFriendHook {
                                     XposedBridge.log("需要添加的好友已经存在");
                                 }
                             }else{
-                                XposedBridge.log("需要添加的好友已经存在");
-                                Intent intent=new Intent();
-                                intent.putExtra("name","name");
-                                intent.putExtra("type","201");
-                                intent.setAction(Constance.action_getWechatFriends);
-                                intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
-                                context.sendBroadcast(intent);
-                                MyFileUtil.writeNewProperties("addType", "0", AppConfig.AddFriend);
-                                MyFileUtil.writeNewProperties("addMsg", "", AppConfig.AddFriend);
-                                MyFileUtil.writeNewProperties("addNo", "", AppConfig.AddFriend);
-                                MyFileUtil.writeNewProperties("addRemark", "", AppConfig.AddFriend);
+                                IntentUtil.startAddFriendBroadcastReceiver(context);
+                                writeNewProperties();
+                                XposedBridge.log("需要添加的好友已经存在:[" + param.args[3].toString() + "]");
+                                handleAddFriendRecode(addId,param.args[3].toString());
+                                XposedBridge.log("error1:arg0[" + param.args[0].toString() + "]" + "arg1[" + param.args[1].toString() + "]" + "arg2[" + param.args[2].toString() + "]" + "arg3[" + param.args[3].toString() + "]");
                             }
                         }else{
-                            Intent intent=new Intent();
-                            intent.putExtra("name","name");
-                            intent.putExtra("type","201");
-                            intent.setAction(Constance.action_getWechatFriends);
-                            intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
-                            context.sendBroadcast(intent);
-                            MyFileUtil.writeNewProperties("addType", "0", AppConfig.AddFriend);
-                            MyFileUtil.writeNewProperties("addMsg", "", AppConfig.AddFriend);
-                            MyFileUtil.writeNewProperties("addNo", "", AppConfig.AddFriend);
-                            MyFileUtil.writeNewProperties("addRemark", "", AppConfig.AddFriend);
+                            IntentUtil.startAddFriendBroadcastReceiver(context);
+                            writeNewProperties();
+                            XposedBridge.log("微信返回1args:[" + param.args[3].toString() + "]");
+                            handleAddFriendRecode(addId,param.args[3].toString());
+                            XposedBridge.log("error2:arg0[" + param.args[0].toString() + "]" + "arg1[" + param.args[1].toString() + "]" + "arg2[" + param.args[2].toString() + "]" + "arg3[" + param.args[3].toString() + "]");
+
                         }
+
                     }
                 }
             }});
@@ -83,52 +76,56 @@ public class AddFriendHook {
                     String addContent = MyFileUtil.readFromFile(AppConfig.APP_ADD);
                     String addNo=MyFileUtil.readNewProperties("addNo",AppConfig.AddFriend);
                     String addType=MyFileUtil.readNewProperties("addType",AppConfig.AddFriend);
-                    String addRemark=MyFileUtil.readNewProperties("addRemark",AppConfig.AddFriend);
                     String addMsg=MyFileUtil.readNewProperties("addMsg",AppConfig.AddFriend);
+                    String addId=MyFileUtil.readNewProperties("addId",AppConfig.AddFriend);
                     if (!"0".equals(addType)) {
-                        XposedBridge.log("1111");
                         if (Integer.parseInt(param.args[1].toString()) == 4 && Intrinsics.areEqual((Object) "user need verify", param.args[3].toString())) {
-                            XposedBridge.log("222");
                             if (addContent != null) {
                                 FriendUtil.addFriend12(wxClassLoader, wechatEntity, localObject1.toString(), addMsg, Integer.parseInt(addType));   //15 是通过微信号加好友*/
                                 XposedBridge.log("addNo" + addNo + "addType::" + addType);
-                                Intent intent=new Intent();
-                                intent.putExtra("name","name");
-                                intent.putExtra("type","201");
-                                intent.setAction(Constance.action_getWechatFriends);
-                                intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
-                                context.sendBroadcast(intent);
-                                MyFileUtil.writeNewProperties("addType", "0", AppConfig.AddFriend);
-                                MyFileUtil.writeNewProperties("addMsg", "", AppConfig.AddFriend);
-                                MyFileUtil.writeNewProperties("addNo", "", AppConfig.AddFriend);
-                                MyFileUtil.writeNewProperties("addRemark", "", AppConfig.AddFriend);
+                                IntentUtil.startAddFriendBroadcastReceiver(context);
+                                writeNewProperties();
                             } else {
                             }
                         } else if (Integer.parseInt(param.args[1].toString()) == 0 && Integer.parseInt(param.args[2].toString()) == 0) {
-                            Intent intent=new Intent();
-                            intent.putExtra("name","name");
-                            intent.putExtra("type","201");
-                            intent.setAction(Constance.action_getWechatFriends);
-                            intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
-                            context.sendBroadcast(intent);
-
-                          XposedBridge.log("error3:arg0[" + param.args[0].toString() + "]" + "arg1[" + param.args[1].toString() + "]" + "arg2[" + param.args[2].toString() + "]" + "arg3[" +param. args[3].toString() + "]");
-
+                            IntentUtil.startAddFriendBroadcastReceiver(context);
                         } else {
                             XposedBridge.log("加好友"+param.args[0].toString());
-                            Intent intent=new Intent();
-                            intent.putExtra("name","name");
-                            intent.putExtra("type","201");
-                            intent.setAction(Constance.action_getWechatFriends);
-                            intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
-                            context.sendBroadcast(intent);
-
-                            XposedBridge.log("error3:arg0[" + param.args[0].toString() + "]" + "arg1[" + param.args[1].toString() + "]" + "arg2[" + param.args[2].toString() + "]" + "arg3[" +param. args[3].toString() + "]");
+                            IntentUtil.startAddFriendBroadcastReceiver(context);
                         }
+                        handleAddFriendRecode(addId,param.args[3].toString());
+                        XposedBridge.log("error3:arg0[" + param.args[0].toString() + "]" + "arg1[" + param.args[1].toString() + "]" + "arg2[" + param.args[2].toString() + "]" + "arg3[" + param.args[3].toString() + "]");
                     }
                 }
 
             }});
         }
+
+
+
+        private static void writeNewProperties(){
+            MyFileUtil.writeNewProperties("addType", "0", AppConfig.AddFriend);
+            MyFileUtil.writeNewProperties("addMsg", "", AppConfig.AddFriend);
+            MyFileUtil.writeNewProperties("addNo", "", AppConfig.AddFriend);
+            MyFileUtil.writeNewProperties("addRemark", "", AppConfig.AddFriend);
+            MyFileUtil.writeNewProperties("addId", "", AppConfig.AddFriend);
+        }
+
+
+         private static void handleAddFriendRecode(String id,String message) {
+            OkGo.put(AppConfig.OUT_NETWORK+ NetApi.addFriendMessage+id+"?"+"content="+message).execute(new StringCallback() {
+             @Override
+                public void onSuccess(String s, Call call, Response response) {
+                    XposedBridge.log("sssssss"+s);
+             }
+
+
+             @Override
+             public void onError(Call call, Response response, Exception e) {
+                 XposedBridge.log("sssssss"+e.toString());
+             }
+             });
+         }
+
 
 }

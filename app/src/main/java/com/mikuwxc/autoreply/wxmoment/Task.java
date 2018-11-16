@@ -101,7 +101,7 @@ public class Task {
             outputStream.flush();
             outputStream.close();
         } catch (Exception e) {
-            Toast.makeText(context, "设备未开启root权限,读取朋友圈数据失败", Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "设备未开启root权限,读取朋友圈数据失败", Toast.LENGTH_LONG).show();
         }
     }
 

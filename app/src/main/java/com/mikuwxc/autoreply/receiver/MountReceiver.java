@@ -7,16 +7,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 import com.mikuwxc.autoreply.Tools;
+import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.LogUtils;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
+import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
 import com.mikuwxc.autoreply.modle.FriendBean;
+import com.mikuwxc.autoreply.modle.HttpBean;
+import com.mikuwxc.autoreply.presenter.tasks.AsyncFriendTask;
+import com.mikuwxc.autoreply.utils.ReconnectWXutil;
 import com.mikuwxc.autoreply.wcapi.WechatEntityFactory;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntity;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntitys;
@@ -55,6 +64,8 @@ import java.util.regex.Pattern;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class MountReceiver extends XC_MethodHook {
 
@@ -264,26 +275,16 @@ public class MountReceiver extends XC_MethodHook {
                     in.putExtra("saoyisaoType",content);
                     context.sendBroadcast(in);
                 } else if (type.equals("201")){   //201代表加好友
-                    /*if ("3".equals(addType)){   //3代表微信号加好友
-                        XposedBridge.log("addWxid"+addWxid+"addMsg"+addMsg);
-                        FriendUtil.searchFriend(classLoader,create,0,addMsg,addWxid,addRemark,3);
-                        XposedBridge.log("addWxiddd"+addWxid+"addMsggg"+addMsg);
-                    }else if("15".equals(addType)){ //15代表手机号
-                        XposedBridge.log("addWxid"+addWxid+"addMsg"+addMsg);
-                        FriendUtil.searchFriend(classLoader,create,0,addMsg,addWxid,addRemark,15);
-                        XposedBridge.log("addWxiddd"+addWxid+"addMsggg"+addMsg);
-                    }*/
-
                     String addFriendList = MyFileUtil.readFromFile(AppConfig.APP_FILE + "/addFriendList");
-                    List<AddFriendEntitys> wechatIdList = new Gson().fromJson(addFriendList, new TypeToken<List<AddFriendEntitys>>() {
+                    List<AddFriendEntity> wechatIdList = new Gson().fromJson(addFriendList, new TypeToken<List<AddFriendEntity>>() {
                     }.getType());
                     if (wechatIdList.size()>0){
                         boolean phoneNumber = PatternUtil.isPhoneNumber(wechatIdList.get(0).getAddNo());
                         XposedBridge.log("phoneNumberphoneNumber::"+phoneNumber);
                         if (phoneNumber){
-                            FriendUtil.searchFriend(classLoader,create,0,wechatIdList.get(0).getMsg(),wechatIdList.get(0).getAddNo(),wechatIdList.get(0).getRemark(),15,wechatIdList);
+                            FriendUtil.searchFriend(classLoader,create,0,wechatIdList.get(0).getMsg(),wechatIdList.get(0).getAddNo(),wechatIdList.get(0).getRemark(),15,wechatIdList,wechatIdList.get(0).getId());
                         }else{
-                            FriendUtil.searchFriend(classLoader,create,0,wechatIdList.get(0).getMsg(),wechatIdList.get(0).getAddNo(),wechatIdList.get(0).getRemark(),3,wechatIdList);
+                            FriendUtil.searchFriend(classLoader,create,0,wechatIdList.get(0).getMsg(),wechatIdList.get(0).getAddNo(),wechatIdList.get(0).getRemark(),3,wechatIdList,wechatIdList.get(0).getId());
                         }
 
                     }else{
@@ -308,6 +309,23 @@ public class MountReceiver extends XC_MethodHook {
                             XposedBridge.log("deleFriend:"+ arrayList.get(i).toString());
                             FriendUtil.deleteFriend(classLoader, create, arrayList.get(i).toString());     //删除指定好友
                         }
+                        UserEntity userEntity = WechatDb.getInstance().selectSelf();
+                        String userName = userEntity.getUserName();
+                        String alias = userEntity.getAlias();  //微信号
+                        if(StringUtils.isBlank(alias)){
+                            alias=userName;
+                        }
+                        List<FriendBean> friendBeans = WechatDb.getInstance().selectAfterDeleteFriend();
+                        for (int i = 0; i < friendBeans.size(); i++) {
+                            FriendBean friendBean = friendBeans.get(i);
+                            XposedBridge.log(friendBean.getWxid()+":"+friendBean.getWxno());
+                        }
+
+                        Intent in=new Intent();
+                        in.setClassName(Constance.packageName_me,Constance.receiver_my);
+                        in.setAction(Constance.action_reconnenct_wx);
+                        context.sendBroadcast(in);
+
                     }else {
                         Toast.makeText(context,"删除好友列表为空",Toast.LENGTH_SHORT).show();
                     }
@@ -318,7 +336,11 @@ public class MountReceiver extends XC_MethodHook {
                 }else if ("207".equals(type)){  //设置好友电话号码
                     RemarkUtil.updateContactPhone(classLoader, create, name, content);
                 }else if ("111".equals(type)){ //是否显示电话号码
-
+                    Intent in=new Intent();
+                    in.setClassName(Constance.packageName_me,Constance.receiver_my);
+                    in.setAction(Constance.action_canseephone);
+                    in.putExtra("canSeePhoneType",content);
+                    context.sendBroadcast(in);
                 } else if ("112".equals(type)){  //是否能领红包
                     Intent in=new Intent();
                     in.setClassName(Constance.packageName_me,Constance.receiver_my);
@@ -628,5 +650,37 @@ public class MountReceiver extends XC_MethodHook {
         }
     }
 
+
+
+    public  void sendFriendList(String wxToken, List<FriendBean> friendList, final boolean onSvc) {
+        Gson gson = new Gson();
+        String listStr = gson.toJson(friendList);
+        XposedBridge.log("111"+ "sendFriendList---ip" + AppConfig.OUT_NETWORK);
+        try {
+            OkGo.post(AppConfig.OUT_NETWORK + NetApi.syncFriend + "/" + wxToken).headers("Content-Type", "application/json").upJson(listStr).execute(new StringCallback() {
+                @Override
+                public void onSuccess(String s, Call call, Response response) {
+                    try {
+                        HttpBean bean = new Gson().fromJson(s, HttpBean.class);
+                        if (bean.isSuccess()) {
+                            //showNotice(onSvc, "同步成功");
+                            XposedBridge.log("同步成功");
+                        } else {
+                        }
+                    } catch (Exception e) {
+                        XposedBridge.log("错误：：" + e.toString());
+                    }
+                }
+
+                @Override
+                public void onError(Call call, Response response, Exception e) {
+                    super.onError(call, response, e);
+                }
+            });
+        } catch (Exception e) {
+            XposedBridge.log("错误：：" + e.toString());
+        }
+
+    }
 
 }

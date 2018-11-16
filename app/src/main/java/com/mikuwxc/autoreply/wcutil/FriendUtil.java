@@ -5,11 +5,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
+import com.mikuwxc.autoreply.modle.FriendBean;
+import com.mikuwxc.autoreply.presenter.tasks.AsyncFriendTask;
+import com.mikuwxc.autoreply.wcentity.AddFriendEntity;
 import com.mikuwxc.autoreply.wcentity.AddFriendEntitys;
+import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcentity.WxEntity;
 import com.mikuwxc.autoreply.wcloop.ClearBlackFriendBasket;
 import com.mikuwxc.autoreply.wx.WechatDb;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,13 +148,13 @@ public class FriendUtil {
         XposedHelpers.callMethod(callStaticMethod, wechatEntity.delete_contact_method3, new Object[]{newInstance});
     }
 
-    public static void searchFriend(ClassLoader classLoader, WechatEntity wechatEntity, long j, String str, String str2, String str3, int i, List<AddFriendEntitys> wechatIdList) throws Exception {
+    public static void searchFriend(ClassLoader classLoader, WechatEntity wechatEntity, long j, String str, String str2, String str3, int i, List<AddFriendEntity> wechatIdList, String addId) throws Exception {
         MyFileUtil.writeToNewFile(AppConfig.APP_ADD , str2);
         MyFileUtil.writeNewProperties("addType",i+"",AppConfig.AddFriend);
         MyFileUtil.writeNewProperties("addMsg",str,AppConfig.AddFriend);
         MyFileUtil.writeNewProperties("addNo",str2,AppConfig.AddFriend);
-        MyFileUtil.writeNewProperties("addRemark",str3,AppConfig.AddFriend);
-
+        MyFileUtil.writeNewProperties("addRemark","",AppConfig.AddFriend);
+        MyFileUtil.writeNewProperties("addId",addId,AppConfig.AddFriend);
 
         Object callStaticMethod = XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.add_search_friend_class1, classLoader), wechatEntity.add_search_friend_method1, new Object[0]);
         Object newInstance = XposedHelpers.newInstance(classLoader.loadClass(wechatEntity.add_search_friend_class2), new Object[]{str2, Integer.valueOf(i)});

@@ -72,7 +72,7 @@ public class MomentChatMainActivity extends AppCompatActivity {
             ((Button) findViewById(R.id.launch_button)).setText(R.string.launch);
             ((Button) findViewById(R.id.launch_button)).setEnabled(true);
             if (this.error != null) {
-                Toast.makeText(MomentChatMainActivity.this, R.string.not_rooted, Toast.LENGTH_LONG).show();
+                //Toast.makeText(MomentChatMainActivity.this, R.string.not_rooted, Toast.LENGTH_LONG).show();
                 Log.e("wechatmomentstat", "exception", this.error);
 
                 try {

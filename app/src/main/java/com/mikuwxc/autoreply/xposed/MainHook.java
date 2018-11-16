@@ -27,9 +27,11 @@ import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wchook.AddFriendHook;
 import com.mikuwxc.autoreply.wchook.ChatroomChangedHook;
 import com.mikuwxc.autoreply.wchook.ChatroomHook;
+import com.mikuwxc.autoreply.wchook.ContactsChangedHook;
 import com.mikuwxc.autoreply.wchook.CreateChatroomHook;
 import com.mikuwxc.autoreply.wchook.DeleteContactsHook;
 import com.mikuwxc.autoreply.wchook.DonateHook;
+import com.mikuwxc.autoreply.wchook.ForbiddenWxRootCheck;
 import com.mikuwxc.autoreply.wchook.HiddenWechatIdAndPhoneNumberHook;
 import com.mikuwxc.autoreply.wchook.HideModule;
 import com.mikuwxc.autoreply.wchook.ItemHook;
@@ -44,6 +46,7 @@ import com.mikuwxc.autoreply.wchook.WScanxHook;
 import com.mikuwxc.autoreply.wchook.WalletHook;
 import com.mikuwxc.autoreply.wchook.WeChatWebLoginHook;
 import com.mikuwxc.autoreply.wchook.WechatUsernameHook;
+import com.mikuwxc.autoreply.wchook.WxXposedHook;
 import com.mikuwxc.autoreply.wcutil.PreferencesUtils;
 import com.mikuwxc.autoreply.wcutil.XmlToJson;
 
@@ -141,20 +144,22 @@ public class MainHook implements IXposedHookLoadPackage {
             SensitiveHook.hook(create, lpparam,mContext);
 
             VerifyFriendHook.hook(create,lpparam);
-
+            //清除僵尸粉
             ChatroomHook.hook(lpparam,mContext,create);
 
             ReportVideoCallAndVoiceCallRiskOperateHook.hook(lpparam);
             //监听创建聊天群
            // CreateChatroomHook.hook(create, lpparam);
             ChatroomChangedHook.hook(create,lpparam);
+            ContactsChangedHook.hook(create,lpparam);
             //扫一扫权限
             WScanxHook.hook(lpparam);
             //是否能领微信红包转账和聊天记录是否能删除
             ItemHook.hook(lpparam,create);
             //是否显示微信号
             HiddenWechatIdAndPhoneNumberHook.hookSystem(lpparam);
-            //HiddenWechatIdAndPhoneNumberHook.hookWechat(lpparam,create);
+            //是否显示微信电话号码，聊天页面的也会屏蔽
+           // HiddenWechatIdAndPhoneNumberHook.hookWechat(lpparam,create);
             //删除好友上报服务器
             DeleteContactsHook.hook(create, lpparam);
             //撤回消息统计
@@ -163,6 +168,11 @@ public class MainHook implements IXposedHookLoadPackage {
             WeChatWebLoginHook.hook(create, lpparam);
             //加好友时需要hook到
             AddFriendHook.hook(create, lpparam,mContext);
+
+            //
+            WxXposedHook.hook(create,lpparam);
+            ForbiddenWxRootCheck.hook(create,lpparam);
+
         //操作微信相关
             Class receiver=classLoader.loadClass(Constance.receiver_wechat);
             XposedBridge.hookAllMethods(receiver,"onReceive",new MountReceiver());

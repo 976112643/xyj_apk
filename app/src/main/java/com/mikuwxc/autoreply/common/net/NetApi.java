@@ -49,4 +49,5 @@ public class NetApi {
 
     public static final String clearFriends="/api/1.0/wechatFriend/zombieFans/";
     public static final String clearFriendsStaus="/api/1.0/zombieFan/update/state/";
+    public static final String addFriendMessage="/api/1.0/addContacts/";
 }

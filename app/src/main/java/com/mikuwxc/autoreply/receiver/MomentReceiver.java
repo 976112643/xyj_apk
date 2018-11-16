@@ -17,7 +17,7 @@ public class MomentReceiver extends BroadcastReceiver {
 
         String source = intent.getStringExtra("source");
         if("进入了当前朋友圈".equals(source)){
-            Toast.makeText(context, source, Toast.LENGTH_SHORT).show();
+           // Toast.makeText(context, source, Toast.LENGTH_SHORT).show();
             runHandle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -25,7 +25,7 @@ public class MomentReceiver extends BroadcastReceiver {
                 }
             },5*1000);
         }else if("进入了别人朋友圈".equals(source)){
-            Toast.makeText(context, source, Toast.LENGTH_SHORT).show();
+           // Toast.makeText(context, source, Toast.LENGTH_SHORT).show();
             runHandle.postDelayed(new Runnable() {
                 @Override
                 public void run() {

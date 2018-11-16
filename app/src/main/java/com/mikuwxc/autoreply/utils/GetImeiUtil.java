@@ -1,18 +1,13 @@
 package com.mikuwxc.autoreply.utils;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.telephony.TelephonyManager;
+import android.provider.Settings;
 
 
 public class GetImeiUtil {
     public static String getOnlyIdentification(Context context) throws Exception{
 
-        TelephonyManager tm = (TelephonyManager) context.getSystemService(Activity.TELEPHONY_SERVICE);
+       /* TelephonyManager tm = (TelephonyManager) context.getSystemService(Activity.TELEPHONY_SERVICE);
         if (tm != null) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -25,8 +20,8 @@ public class GetImeiUtil {
                 return "";
             }
             return tm.getDeviceId();
-        }
-        return null;
+        }*/
+        return  Settings.Secure.getString(context.getContentResolver(), "android_id").toUpperCase();
 
         // return Build.SERIAL;
     }

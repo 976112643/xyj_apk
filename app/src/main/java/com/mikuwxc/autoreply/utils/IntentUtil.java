@@ -55,4 +55,23 @@ public class IntentUtil {
         intent.putExtra("hookMessageBeanJson",hookMessageBeanJson);
         mContext.sendBroadcast(intent);
     }
+
+
+    public static void startAddFriendBroadcastReceiver(Context context){
+        Intent intent=new Intent();
+        intent.putExtra("name","name");
+        intent.putExtra("type","201");
+        intent.setAction(Constance.action_getWechatFriends);
+        intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
+        context.sendBroadcast(intent);
+    }
+
+    public static void startAddFriendBroadcastReceiverTest(Context context,String username){
+        Intent intent=new Intent();
+        intent.putExtra("name",username);
+        intent.putExtra("type","999");
+        intent.setAction(Constance.action_getWechatFriends);
+        intent.setClassName(Constance.packageName_wechat,Constance.receiver_wechat);
+        context.sendBroadcast(intent);
+    }
 }

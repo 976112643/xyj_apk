@@ -92,7 +92,7 @@ public class MyReceiver extends BroadcastReceiver {
                         ImMessageBean imMessageBean = new Gson().fromJson(message, ImMessageBean.class);
                         String content = imMessageBean.getContent();
                         String type = imMessageBean.getType();
-                        if ("202".equals(type)) {
+                        if ("202".equals(type)) {//重连微信
                            /* SharedPreferences sp = context.getSharedPreferences("test", Activity.MODE_WORLD_READABLE);
                             SharedPreferences.Editor ditor = sp.edit();
                             ditor.putBoolean("test_put", true).commit();*/
@@ -124,6 +124,9 @@ public class MyReceiver extends BroadcastReceiver {
                                     Toast.makeText(context,"brInteraction"+"为空",Toast.LENGTH_LONG).show();
                                 }
 
+                        }else if("212".equals(type)){  //更新android系统的设置权限
+                             Toast.makeText(context,"设置页面权限"+content,Toast.LENGTH_LONG).show();
+                             MyFileUtil.writeProperties("systemstting_put", content);
                         }
 
                     }catch (Exception e){

@@ -178,7 +178,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.0.2'
     implementation files('libs/dom4j-1.6.1.jar')
     implementation files('libs/commons-lang3-3.7.jar')
-    implementation files('libs/core-3.3.3.jar')
+    //implementation files('libs/core-3.3.3.jar')
     implementation 'com.orhanobut:logger:2.2.0'
     //破解微信数据库需要用到
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
@@ -189,6 +189,9 @@ dependencies {
     implementation 'org.greenrobot:greendao:3.2.0'
     implementation 'com.bfy:dualsim:1.0.1'
     implementation 'com.tencent.bugly:crashreport:2.6.5' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，
+
+    implementation 'com.journeyapps:zxing-android-embedded:3.5.0'  //Zxing
+    implementation 'com.google.zxing:core:3.3.0'
 }
 
 

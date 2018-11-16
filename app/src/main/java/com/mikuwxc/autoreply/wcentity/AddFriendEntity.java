@@ -5,6 +5,7 @@ public class AddFriendEntity {
     private String   msg;	//添加的消息
     private String   remark;  //备注
     private String   type;    //加好友形式
+    private String   id;     //
 
     public String getType() {
         return type;
@@ -38,5 +39,13 @@ public class AddFriendEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -114,16 +114,20 @@ public class HiddenWechatIdAndPhoneNumberHook {
     }
 
     public static void hookWechat(LoadPackageParam param, WechatEntity wechatEntity) {
+
         ClassLoader wxClassLoader = param.classLoader;
-        XposedHelpers.findAndHookMethod("com.tencent.mm.ui.AddressView", wxClassLoader, "setName", new Object[]{CharSequence.class, new XC_MethodHook() {
+      /*  XposedHelpers.findAndHookMethod("com.tencent.mm.ui.AddressView", wxClassLoader, "setName", new Object[]{CharSequence.class, new XC_MethodHook() {
             protected void beforeHookedMethod(MethodHookParam param) {
                 CharSequence value = (CharSequence) param.args[0];
                 if (value != null) {
                     String showWord = value.toString();
-                    if (AuthUtil.isForbiddenAuth(9) && !showWord.contains("退还")) {
-                        XposedBridge.log("退还退还退还");
+                   // if (AuthUtil.isForbiddenAuth(9) && !showWord.contains("退还")) {
+                    boolean canSeePhoneStaus_put = true;
+                    canSeePhoneStaus_put = MyFileUtil.readProperties("canSeePhoneStaus_put");
+                    if (canSeePhoneStaus_put) {
                         param.args[0] = HiddenWechatIdAndPhoneNumberHook.checkCellphone(showWord, FileIoUtil.getValueFromPath(GlobalUtil.WX_MATCHER_SAVE_PATH));
                     }
+                        //  }
                 }
             }
         }});
@@ -132,32 +136,39 @@ public class HiddenWechatIdAndPhoneNumberHook {
                 CharSequence value = (CharSequence) param.args[0];
                 if (value != null) {
                     String showWord = value.toString();
-                    if (AuthUtil.isForbiddenAuth(9) && !showWord.contains("退还")) {
-                        XposedBridge.log("退还退还退还111");
+                //    if (AuthUtil.isForbiddenAuth(9) && !showWord.contains("退还")) {
+                    boolean canSeePhoneStaus_put = true;
+                    canSeePhoneStaus_put = MyFileUtil.readProperties("canSeePhoneStaus_put");
+                    if (canSeePhoneStaus_put) {
                         param.args[0] = HiddenWechatIdAndPhoneNumberHook.checkCellphone(showWord, FileIoUtil.getValueFromPath(GlobalUtil.WX_MATCHER_SAVE_PATH));
                     }
+                //    }
                 }
             }
         }});
         XposedHelpers.findAndHookConstructor(wechatEntity.sns_forbidden_show_number_class1, wxClassLoader, new Object[]{SpannableString.class, new XC_MethodHook() {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 String mText = param.args[0].toString();
-                if (AuthUtil.isForbiddenAuth(9)) {
+               // if (AuthUtil.isForbiddenAuth(9)) {
                     mText = mText.replace(StringUtils.SPACE, "");
-                    if (!mText.contains("撤回") && !mText.contains("编辑") && !mText.contains("退还")) {
+               //     if (!mText.contains("撤回") && !mText.contains("编辑") && !mText.contains("退还")) {
                         XposedBridge.log("退还退还退还222");
                         param.args[0] = new SpannableString(HiddenWechatIdAndPhoneNumberHook.checkCellphone(mText, FileIoUtil.getValueFromPath(GlobalUtil.WX_MATCHER_SAVE_PATH)));
-                    }
-                }
+             //       }
+              //  }
             }
-        }});
+        }});*/
         XposedHelpers.findAndHookMethod(XposedHelpers.findClass("android.text.TextUtils", wxClassLoader), "stringOrSpannedString", new Object[]{CharSequence.class, new XC_MethodHook() {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 CharSequence value = (CharSequence) param.args[0];
                 if (value != null) {
+                    boolean canSeePhoneStaus_put = true;
+                    canSeePhoneStaus_put = MyFileUtil.readProperties("canSeePhoneStaus_put");
+
                     String showWord = value.toString();
-                    if (AuthUtil.isForbiddenAuth(8)) {
-                        XposedBridge.log("88888888888");
+                    XposedBridge.log("showWordshowWordshowWord:"+showWord);
+
+                    if (canSeePhoneStaus_put) {
                         param.args[0] = HiddenWechatIdAndPhoneNumberHook.checkCellphone(showWord, FileIoUtil.getValueFromPath(GlobalUtil.WX_MATCHER_SAVE_PATH));
                     }
                 }

@@ -774,7 +774,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     str = (String)paramAnonymousMethodHookParam.args[0];
                     localContentValues = (ContentValues)paramAnonymousMethodHookParam.args[2];
 
-                    XposedBridge.log("QWEREEEEEEEEEEEEEEEEE"+localContentValues.toString());
                     if (((String)paramAnonymousMethodHookParam.args[0]).equals("message"))
                     {
 
@@ -817,33 +816,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                 statuss=1;
                             }
                             handleMessage(0, statuss, talker, content, type, field_conversationTime,msgId);
-
-
-                          /*  if ("我通过了你的朋友验证请求，现在我们可以开始聊天了".equals(content)){
-                                Set set=new HashSet();
-                                set.add(talker);
-                                List<WxEntity> wxEntities =WechatDb.getInstance().selectContacts(set);
-                                XposedBridge.log("wxEntities"+wxEntities.toString());
-                                if (wxEntities!=null&&!wxEntities.isEmpty()){
-                                    UserEntity userEntity = WechatDb.getInstance().selectSelf();
-                                    String userName = userEntity.getUserName();
-                                    String userTalker = userEntity.getUserTalker();
-                                    String headPic = userEntity.getHeadPic();
-                                    String alias = userEntity.getAlias();  //微信号
-                                    if (StringUtils.isBlank(alias)){
-                                        alias = userTalker;
-                                    }
-
-                                    FriendBean friendBean=new FriendBean();
-                                    friendBean.setNickname(wxEntities.get(0).getNickName());
-                                    friendBean.setHeadImgUrl(wxEntities.get(0).getHeadPic());
-                                    friendBean.setWxno(wxEntities.get(0).getAlias());
-                                    friendBean.setWxid(wxEntities.get(0).getUserName());
-                                    XposedBridge.log("FriendBeanFriendBean:::::"+new Gson().toJson(friendBean));
-                                    addNewFriend(alias, friendBean);
-                                }
-                            }*/
-
                         }
 
                         if ("50".equals(type)){
@@ -914,7 +886,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         }
 
 
-                        UserEntity userEntity = WechatDb.getInstance().selectSelf();
+                       /* UserEntity userEntity = WechatDb.getInstance().selectSelf();
                         String userName = userEntity.getUserName();
                         String userTalker = userEntity.getUserTalker();
                         String headPic = userEntity.getHeadPic();
@@ -924,7 +896,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         }
                         FriendBean friendBean =friendAdviceParse(autoVerifyUser);
                         XposedBridge.log(friendBean.toString());
-                        addNewFriend(alias, friendBean); //新的好友,通知后台
+                        addNewFriend(alias, friendBean); //新的好友,通知后台*/
 
                     }
 
@@ -1011,7 +983,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     XposedBridge.log("reserved3::"+reserved3);
 
                     //发送43视频type的时候，从相册那里选择的时候downloadWxVideoRes会报错，所以要加这个判断
-                    if (StringUtils.isNotBlank(reserved3)&&!"0".equals(reserved3)){
+                    if (StringUtils.isNotBlank(reserved3)&&!"0".equals(reserved3)&&StringUtils.isNotBlank(localContentValues.getAsString("createtime"))){
                         sedImagin=null;
                         videostatus="1";
 
@@ -1329,7 +1301,11 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
     private void getToken() {
         if (token == null) {
             token = MyFileUtil.readFromFile(AppConfig.APP_FOLDER + "/token");
-            token = token.substring(1, token.length() - 1);
+            if (token!=null) {
+                token = token.substring(1, token.length() - 1);
+            }else {
+              XposedBridge.log("token为null");
+            }
 //            LogUtils.w(TAG, "token:" + token);
         }
     }
@@ -1402,7 +1378,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
             }
 
 
-            UserEntity userEntity = WechatDb.getInstance().selectSelf();
+            /*UserEntity userEntity = WechatDb.getInstance().selectSelf();
             String userName = userEntity.getUserName();
             String userTalker = userEntity.getUserTalker();
             String headPic = userEntity.getHeadPic();
@@ -1410,7 +1386,7 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
             FriendBean friendBean = new FriendBean();
             friendBean.setNickname(nickname);
             friendBean.setWxid(username);
-            addNewFriend(alias, friendBean); //新的好友,通知后台
+            addNewFriend(alias, friendBean); //新的好友,通知后台*/
         }
         Gson gson = new Gson();
         XposedBridge.log(token+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");

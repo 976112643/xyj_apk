@@ -490,6 +490,14 @@
             android:launchMode="singleInstance"
             android:exported="true"/>
 
+        <activity android:name=".activity.ZxingActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullImmerseMode"
+            android:launchMode="singleInstance">
+        </activity>
+
+        <activity android:name=".activity.CaptureActivity"/>
+
         <activity
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"/>
