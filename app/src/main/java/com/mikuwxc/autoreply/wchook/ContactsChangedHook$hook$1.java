@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/* compiled from: ContactsChangedHook.kt */
 public final class ContactsChangedHook$hook$1 extends XC_MethodHook {
     final /* synthetic */ Throttle $throttle;
 
@@ -46,14 +45,11 @@ public final class ContactsChangedHook$hook$1 extends XC_MethodHook {
             }
         }
         String table = (String) param.args[0];
-        XposedBridge.log("111111111111111111111111111table:" + table);
         if (table == null) {
             throw new TypeCastException("null cannot be cast to non-null type kotlin.String");
         }
         Object table2 = table;
-        XposedBridge.log("111111111111111111111111111table2:" + table2);
         ContentValues values = (ContentValues) param.args[2];
-        XposedBridge.log("111111111111111111111111111values:" + values);
         if (values == null) {
             throw new TypeCastException("null cannot be cast to non-null type android.content.ContentValues");
         }
@@ -61,7 +57,6 @@ public final class ContactsChangedHook$hook$1 extends XC_MethodHook {
 
         if ((Intrinsics.areEqual((Object) "rcontact", table2) ^ true) == false){
             String username = values.getAsString("username");
-            XposedBridge.log("11111111111111111111111111username:" + username);
             if (!StringUtils.isBlank(username)) {
                 Intrinsics.checkExpressionValueIsNotNull(username, "username");
                 if (!StringUtils.startsWith(username, "fake_") && !StringUtils.endsWith(username, "@stranger")) {

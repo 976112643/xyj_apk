@@ -23,6 +23,8 @@ import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.receiver.AlarmReceiver;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import okhttp3.Call;
 
 import static com.mikuwxc.autoreply.activity.RunningActivity.tv3;
@@ -55,8 +57,9 @@ public class LoopService extends Service{
 
     @SuppressLint("WrongConstant")
     public int onStartCommand(Intent intent, int flags, int startId) {
-       String wxno1 = intent.getStringExtra("wxno");
-        if (wxno1!=null){
+      // String wxno1 = intent.getStringExtra("wxno");
+        String wxno1 = MyFileUtil.readFromFile(AppConfig.APP_FILE + "/wxno");
+        if (StringUtils.isNotBlank(wxno1)){
             wxno=wxno1;
             Log.e("LoopService","wxno为::"+wxno);
            // handlerAlive.postDelayed(runnableAlive, 10000);//每两秒执行一次runnable.
@@ -104,8 +107,6 @@ public class LoopService extends Service{
                                 tv3.setText("服务器连接状态：true");
                             }
                             Log.e("LoopService", "保活成功");
-
-
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e("LoopService", "保活信息失败:" + e.toString());
@@ -115,7 +116,6 @@ public class LoopService extends Service{
                             }
                         }
                     }
-
                     @Override
                     public void onError(Call call, okhttp3.Response response, Exception e) {
                         super.onError(call, response, e);

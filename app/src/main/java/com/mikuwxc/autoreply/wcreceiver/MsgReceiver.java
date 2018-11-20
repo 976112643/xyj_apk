@@ -122,13 +122,8 @@ public class MsgReceiver extends BroadcastReceiver {
     };
 
     private String[] search = {
-            //  "input keyevent 3",// 返回到主界面，数值与按键的对应关系可查阅KeyEvent
-            // "sleep 1",// 等待1秒
-            // 打开微信的启动界面，am命令的用法可自行百度、Google// 等待3秒
             "am force-stop com.tencent.mm",
             "am start -a com.tencent.mm.action.BIZSHORTCUT -f 67108864"
-            // "am  start  service  com.mikuwxc.autoreply.AutoReplyService"// 打开微信的搜索
-            // 像搜索框中输入123，但是input不支持中文，蛋疼，而且这边没做输入法处理，默认会自动弹出输入法
     };
     private String wxno;
     private Context context1;
@@ -216,7 +211,6 @@ public class MsgReceiver extends BroadcastReceiver {
             MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"false");
         }
     }
-
     private void action_candeletefriend(Context context,String deletefriendType) {
         if ("true".equals(deletefriendType)) {
             MyFileUtil.writeProperties(Constants.ONDELETEFRIENDSTAUS_PUT,"true");
@@ -224,8 +218,6 @@ public class MsgReceiver extends BroadcastReceiver {
             MyFileUtil.writeProperties(Constants.ONDELETEFRIENDSTAUS_PUT,"false");
         }
     }
-
-
     private void action_receiveluckmoney(Context context,String receivemomyType) {
         if ("true".equals(receivemomyType)) {
             MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"true");
@@ -234,9 +226,6 @@ public class MsgReceiver extends BroadcastReceiver {
             MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"false");
         }
     }
-
-
-
     private void action_settings(Context context,String saoyisaoType) {
         if ("true".equals(saoyisaoType)) {
           //  ToastUtil.showLongToast("开启设置权限");
@@ -247,7 +236,6 @@ public class MsgReceiver extends BroadcastReceiver {
             MyFileUtil.writeProperties(Constants.SETTING_PUT,"false");
         }
     }
-
     private void action_saoyisao(Context context,String saoyisaoType) {
         if ("true".equals(saoyisaoType)) {
             //重连微信并且更改红包是否能自动获取
@@ -257,8 +245,6 @@ public class MsgReceiver extends BroadcastReceiver {
             MyFileUtil.writeProperties(Constants.SAOYISAOSTAUS_PUT,"false");
         }
     }
-
-
     private void action_canseephone(Context context,String canSeePhoneType) {
         if ("true".equals(canSeePhoneType)) {
             //重连微信并且更改红包是否能自动获取
@@ -268,8 +254,6 @@ public class MsgReceiver extends BroadcastReceiver {
             MyFileUtil.writeProperties(Constants.CANSEEPHONESTAUS_PUT,"false");
         }
     }
-
-
     private void action_canseewxno(Context context,String canSeewxType) {
         if ("true".equals(canSeewxType)) {
             //重连微信并且更改红包是否能自动获取
@@ -279,7 +263,6 @@ public class MsgReceiver extends BroadcastReceiver {
             MyFileUtil.writeProperties(Constants.CANSEEWXSTAUS_PUT,"false");
         }
     }
-
     private void action_verify_friend(Context context,String verifyType) {
         if ("true".equals(verifyType)) {
             //重连微信并且更改红包是否能自动获取
@@ -292,11 +275,7 @@ public class MsgReceiver extends BroadcastReceiver {
     }
 
 
-
-
-
-
-        private void action_returnRooms(Context context,String momyType) {
+    private void action_returnRooms(Context context,String momyType) {
         if ("true".equals(momyType)){
             //重连微信并且更改红包是否能自动获取
             MyFileUtil.writeProperties(Constants.MONEYSTAUS_PUT,"true");
@@ -318,6 +297,7 @@ public class MsgReceiver extends BroadcastReceiver {
         if (StringUtils.isBlank(wxno)){
             wxno=wxid;
         }
+        MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/wxno",wxno);
         String headImgUrl = intent.getStringExtra("headImgUrl");
         String userName = intent.getStringExtra("userName");
         Toast.makeText(context,"连接中",Toast.LENGTH_LONG).show();
@@ -520,7 +500,6 @@ public class MsgReceiver extends BroadcastReceiver {
         //将请求加入全局队列中
         MyApp.getHttpQueues().add(request);
     }
-
 
 
 
@@ -843,15 +822,7 @@ public class MsgReceiver extends BroadcastReceiver {
             };
             SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(databaseFile, key, null,hook);
             Cursor cursor = database.rawQuery("select r.username,r.alias,r.conRemark,r.nickname,r.pyInitial,r.quanPin,r.lvbuff,r.encryptUsername,r.contactLabelIds,i.reserved1,i.reserved2 from rcontact r left join img_flag i on r.username = i.username  where (r.type & 1 != 0 and r.type & 8 = 0 and r.type & 32 = 0 and r.verifyFlag & 8 = 0 and r.username not like '%@%' and r.username != 'filehelper' ) ",(Object[]) null);
-           // Cursor c = database.query("rcontact", null, null, null, null, null, null);
             while (cursor.moveToNext()) {
-              /*  String nickname = c.getString(c.getColumnIndex("nickname"));
-                String alias = c.getString(c.getColumnIndex("alias"));
-                String username = c.getString(c.getColumnIndex("username"));
-                String conRemark = c.getString(c.getColumnIndex("conRemark"));
-                String encryptUsername = c.getString(c.getColumnIndex("encryptUsername"));*/
-
-
                 String username       = cursor.getString(0);
                 String alias       = cursor.getString(1);
                 String conRemark = cursor.getString(2);
@@ -859,17 +830,7 @@ public class MsgReceiver extends BroadcastReceiver {
                 byte[] blob       = cursor.getBlob(6);
                 String reserved1  = cursor.getString(9);
                 String reserved2  = cursor.getString(10);
-
-
                 friendBean=new FriendBean();
-               /* Cursor s = database.query("img_flag", new String[]{"reserved1"}, "username=?",  new String[]{username}, null, null, null);
-                while (s.moveToNext()) {
-                    if (s!=null&&s.getCount()>0) {
-                        String HeadImgUrl = s.getString(s.getColumnIndex("reserved1"));
-                        friendBean.setHeadImgUrl(HeadImgUrl);
-                    }
-                }*/
-                //s.close();
                 friendBean.setNickname(nickname);
                 friendBean.setWxid(username);
                 friendBean.setRemarkname(conRemark);
@@ -890,23 +851,9 @@ public class MsgReceiver extends BroadcastReceiver {
                 }else{
                     friendBean.setWxno(alias);
                 }
-             /*   Log.e("111","encryptUsernameencryptUsername::"+encryptUsername);
-                if (StringUtils.isNotBlank(encryptUsername)){
-                    beanArrayList.add(friendBean);
-                }*/
              beanArrayList.add(friendBean);
 
             }
-
-    /*        //获取群聊信息传给后台
-            Cursor chatroom = database.query("chatroom", null, null, null, null, null, null);
-            while (chatroom.moveToNext()){
-                String roomowner = chatroom.getString(chatroom.getColumnIndex("roomowner"));
-                chatroomArray.add(roomowner);
-            }
-
-            String  chatroomString= JSON.toJSONString(chatroomArray);
-            Log.e("111","chatroomString:::"+chatroomString);*/
             String s = JSON.toJSONString(beanArrayList);
             Log.e("111",s);
             File decrypteddatabaseFile = context.getDatabasePath(SDcardPath + decryptedName);
@@ -916,9 +863,7 @@ public class MsgReceiver extends BroadcastReceiver {
             database.rawExecSQL("SELECT sqlcipher_export('"+ decryptedName.split("\\.")[0] +"');");
             database.rawExecSQL("DETACH DATABASE "+ decryptedName.split("\\.")[0] +";");
             SQLiteDatabase decrypteddatabase = SQLiteDatabase.openOrCreateDatabase(decrypteddatabaseFile, "", null);
-            //decrypteddatabase.setVersion(database.getVersion());
 
-           // chatroom.close();
             cursor.close();
             decrypteddatabase.close();
             database.close();
@@ -973,54 +918,56 @@ public class MsgReceiver extends BroadcastReceiver {
     }
 
     //是否保活权限
-    private void permissionAlive(String wxno, final Context context) {
+    private void permissionAlive(String wxno1, final Context context) {
         String aliveStaue = MyFileUtil.readFromFile(AppConfig.APP_FOLDER + "/updateAlive");
+        String wxno = MyFileUtil.readFromFile(AppConfig.APP_FILE + "/wxno");
         if ("true".equals(aliveStaue)){
             aliveStaue="0";
         }else{
             aliveStaue="1";
         }
-
-        OkGo.post(AppConfig.OUT_NETWORK + NetApi.loginAlive + "?wxno=" + wxno+"&usingState="+aliveStaue).execute(new StringCallback() {
-            @Override
-            public void onSuccess(String s, Call call, okhttp3.Response response) {
-                Log.e("111", "result:" + s);
-                try {
-                    Date date = new Date();
-
-                    Log.e("111","保活成功"+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date)+list_msgFail.size());
-
-                    if (wxState!=null) {
-                        wxState.setText("微信连接状态：true");
-                        tv3.setText("服务器连接状态：true");
+        if (StringUtils.isNotBlank(wxno)) {
+            Log.e("111","wxno:"+wxno);
+            OkGo.post(AppConfig.OUT_NETWORK + NetApi.loginAlive + "?wxno=" + wxno + "&usingState=" + aliveStaue).execute(new StringCallback() {
+                @Override
+                public void onSuccess(String s, Call call, okhttp3.Response response) {
+                    Log.e("111", "result:" + s);
+                    try {
+                        Date date = new Date();
+                        Log.e("111", "保活成功" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date) + list_msgFail.size());
+                        if (wxState != null) {
+                            wxState.setText("微信连接状态：true");
+                            tv3.setText("服务器连接状态：true");
+                        }
+                        if (list_msgFail.size() > 0) {
+                            handleFailedMessage(list_msgFail);
+                        } else {
+                            Log.e("111", "保活成功::没有缓存失败的信息");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.e("111", "保活信息失败:" + e.toString());
+                        if (wxState != null) {
+                            wxState.setText("微信连接状态：false");
+                            tv3.setText("服务器连接状态：false");
+                        }
                     }
+                }
 
-                    if (list_msgFail.size()>0){
-                        handleFailedMessage(list_msgFail);
-                    }else {
-                        Log.e("111","保活成功::没有缓存失败的信息");
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("111", "保活信息失败:" + e.toString());
-                    if (wxState!=null) {
+                @Override
+                public void onError(Call call, okhttp3.Response response, Exception e) {
+                    super.onError(call, response, e);
+                    Log.e("111", "保活信息失败:");
+                    if (wxState != null) {
                         wxState.setText("微信连接状态：false");
                         tv3.setText("服务器连接状态：false");
                     }
-                }
-            }
-            @Override
-            public void onError(Call call, okhttp3.Response response, Exception e) {
-                super.onError(call, response, e);
-                Log.e("111", "保活信息失败:");
-                if (wxState!=null) {
-                    wxState.setText("微信连接状态：false");
-                    tv3.setText("服务器连接状态：false");
-                }
 
-            }
-        });
+                }
+            });
+        }else {
+            Log.e("111","保活失败，微信号为空");
+        }
     }
 
 

@@ -44,6 +44,7 @@ import com.mikuwxc.autoreply.wchook.VerifyFriendHook;
 import com.mikuwxc.autoreply.wchook.VersionParamNew;
 import com.mikuwxc.autoreply.wchook.WScanxHook;
 import com.mikuwxc.autoreply.wchook.WalletHook;
+import com.mikuwxc.autoreply.wchook.WeChatLogoutHook;
 import com.mikuwxc.autoreply.wchook.WeChatWebLoginHook;
 import com.mikuwxc.autoreply.wchook.WechatUsernameHook;
 import com.mikuwxc.autoreply.wchook.WxXposedHook;
@@ -169,7 +170,7 @@ public class MainHook implements IXposedHookLoadPackage {
             WeChatWebLoginHook.hook(create, lpparam);
             //加好友时需要hook到
             AddFriendHook.hook(create, lpparam,mContext);
-
+            WeChatLogoutHook.hook(create, lpparam);
             //
            /* WxXposedHook.hook(create,lpparam);
             ForbiddenWxRootCheck.hook(create,lpparam);*/
