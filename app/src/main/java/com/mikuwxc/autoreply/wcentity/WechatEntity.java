@@ -856,4 +856,11 @@ public abstract class WechatEntity {
     public String delete_single_friend_chat_record_method="onClick";  //禁止删除会话聊天记录
     public String delete_selected_friend_chat_record_method="onMMMenuItemSelected";  //禁止删除单个聊天记录
 
+
+    public String add_friend_behavior_method1="ecE";    //微信加好友动作统计方法
+    public String add_friend_behavior_method2="ecN";
+    public String add_friend_behavior_method3="syV";
+    public String add_friend_behavior_method4="tRZ";
+    public String add_friend_behavior_method5="nFs";
+
 }

@@ -44,4 +44,15 @@ public class Throttle<T> {
             }
         }
     }
+
+
+    final /* synthetic */ void lambda$call$0$Throttle() {
+        Set<T> copyParams;
+        this.firstTimestamp = 0;
+        synchronized (this.params) {
+            copyParams = new HashSet(this.params);
+            this.params.clear();
+        }
+        this.action.call(copyParams);
+    }
 }

@@ -202,25 +202,21 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
 
     }
 
-
     public void getAppList(final Context context) {
+        String s= "{\"msg\":\"查询成功\",\"code\":\"200\",\"success\":true,\"result\":[{\"name\":\"设置\",\"packageName\":\"com.mikuwxc.autoreply\",\"type\":false,\"createTime\":1536321317000,\"updateTime\":1539164001000,\"id\":\"72ca762aec1e4acca4d0cc7b28b770fa\"}]}";
+        PreferenceUtil.setWxAccessToken(context, s);
+
         try{
             if (Build.VERSION.SDK_INT >= 23) {
                 telephonyInfo = TelephonyManagement.getInstance().updateTelephonyInfo(this).getTelephonyInfo(this);
             } else {
                 isDualSimOrNot();
-
             }
-
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 return;
             }
-
             String DEVICE_ID = GetImeiUtil.getOnlyIdentification(context);
-
-            //登录IM
-            //String DEVICE_ID1 = telephonyInfo.getImeiSIM1();
             Toast.makeText(this,DEVICE_ID,Toast.LENGTH_LONG).show();
             Log.e("111", "DEVICE_IDDEVICE_IDDEVICE_IDDEVICE_ID" + DEVICE_ID);
             if (DEVICE_ID != null) {
@@ -245,6 +241,8 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                                         e.printStackTrace();
                                     }
                                 }
+                            }else{
+                                newBean.add(new ApphttpBean.ResultBean("com.mikuwxc.autoreply"));
                             }
                             adapter = new RecycleHomeAdapter(getApplicationContext(), newBean);
                             recycleV.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
@@ -284,7 +282,6 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                 });
 
 
-
                 OkGo.get(AppConfig.OUT_NETWORK + NetApi.appPermission + DEVICE_ID).execute(new StringCallback() {
                     @Override
                     public void onSuccess(String result, Call call, Response response) {
@@ -299,22 +296,17 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                         }catch (Exception e){
                             Toast.makeText(getApplicationContext(),"设置设备不存在",Toast.LENGTH_SHORT).show();
                         }
-
-
                     }
-
                     @Override
                     public void onError(Call call, Response response, Exception e) {
                         super.onError(call, response, e);
                         Log.e("111","设置权限22"+e.toString());
                     }
                 });
-
             }
         }catch (Exception e){
             Log.e("111",e.toString());
         }
-
     }
 
     @Override

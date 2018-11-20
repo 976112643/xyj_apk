@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +14,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 public class XmlParseUtil
 {
@@ -191,7 +194,56 @@ public class XmlParseUtil
     paramString1.close();
     return localJSONObject;
   }
-  
+
+  public static long parseVideoThumbSize(String content) throws Exception {
+    long videoThumbSize = 0;
+    XmlPullParser parser = initParser(content);
+    for (int eventType = parser.getEventType(); eventType != 1; eventType = parser.next()) {
+      if (eventType == 2 && "videomsg".equals(parser.getName())) {
+        for (int m = 0; m < parser.getAttributeCount(); m++) {
+          String attributeName = parser.getAttributeName(m);
+          String attributeValue = parser.getAttributeValue(m);
+          if ("cdnthumblength".equals(attributeName)) {
+            videoThumbSize = Long.parseLong(handle(attributeValue));
+          }
+        }
+      }
+    }
+    return videoThumbSize;
+  }
+
+
+
+  private static XmlPullParser initParser(String content) throws Exception {
+    if (content.contains("<msg")) {
+      if (content.contains("</msg>")) {
+        content = content.substring(content.indexOf("<msg"), content.lastIndexOf("</msg>") + "</msg>".length());
+      } else {
+        content = content.substring(content.indexOf("<msg"));
+      }
+    }
+    if (content.contains("<sysmsg")) {
+      content = content.substring(content.indexOf("<sysmsg"), content.lastIndexOf("</sysmsg>") + "</sysmsg>".length());
+    }
+    XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
+    parser.setInput(new StringReader(content));
+    return parser;
+  }
+
+
+
+
+  private static String handle(String str) {
+    if (str == null) {
+      return str;
+    }
+    str = str.trim();
+    if (str.contains("[") && str.contains("]")) {
+      return str.substring(str.lastIndexOf("[") + 1, str.indexOf("]"));
+    }
+    return str;
+  }
+
   /*public static JSONObject parseLink(String paramString)
     throws Exception
   {

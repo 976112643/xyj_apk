@@ -15,6 +15,18 @@ public class HookMessageBean {
 
     private String userNameChatroom;//群消息的同步需要
     private String sign;//标记是发送还是接收
+    private long fileSize;
+
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+
 
     public String getSign() {
         return sign;

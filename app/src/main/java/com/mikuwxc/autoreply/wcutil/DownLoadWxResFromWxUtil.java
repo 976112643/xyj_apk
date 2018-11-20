@@ -88,10 +88,14 @@ public class DownLoadWxResFromWxUtil {
         return fileEntity;
     }
 
-    public static void downloadWxFileRes(ClassLoader classLoader, WechatEntity wechatEntity, long j, boolean z) throws Exception {
+    public static FileEntity downloadWxFileRes(ClassLoader classLoader, WechatEntity wechatEntity, long j, boolean z) throws Exception {
         Object callMethod = XposedHelpers.callMethod(XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.download_file_class1, classLoader), wechatEntity.download_file_method1, new Object[0]), wechatEntity.download_file_method2, new Object[]{Long.valueOf(j)});
+        XposedBridge.log("$$$$$$$$$$$$$$"+callMethod.toString());
         boolean isChatroom = isChatroom(XposedHelpers.getObjectField(callMethod, wechatEntity.download_file_field1).toString());
         Object objectField = XposedHelpers.getObjectField(callMethod, wechatEntity.download_file_field2);
+        XposedBridge.log("$$$$$$$$$$$$$$"+objectField.toString());
+        JSONObject jsonObject = XmlParseUtil.parseFile(objectField.toString());
+        FileEntity fileEntity = new Gson().fromJson(jsonObject.toJSONString(), FileEntity.class);
         if (isChatroom && XposedHelpers.getIntField(callMethod, wechatEntity.download_file_field3) == 0) {
             objectField = XposedHelpers.getObjectField(callMethod, wechatEntity.download_file_field2);
             if (isChatroom && objectField != null) {
@@ -99,6 +103,7 @@ public class DownLoadWxResFromWxUtil {
             }
         }
         callMethod = XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.download_file_class3, classLoader), wechatEntity.download_file_method4, new Object[]{objectField});
+        XposedBridge.log("$$$$$$$$$$$$$$"+callMethod.toString());
         String handleNull = handleNull(XposedHelpers.getObjectField(callMethod, wechatEntity.download_bigfile_field8).toString());
         String handleNull2 = handleNull(XposedHelpers.getObjectField(callMethod, wechatEntity.download_bigfile_field9).toString());
         String toLowerCase = handleNull(XposedHelpers.getObjectField(callMethod, wechatEntity.download_bigfile_field10).toString()).toLowerCase();
@@ -110,14 +115,21 @@ public class DownLoadWxResFromWxUtil {
         FileIoUtil.setValueToPath(String.valueOf(j), false, "/mnt/sdcard/msgId.txt");
         Class findClass = XposedHelpers.findClass(wechatEntity.download_bigfile_class8, classLoader);
         callMethod = getCsE(classLoader, wechatEntity, findClass, j, handleNull);
+        XposedBridge.log("$$$$$$$$$$$$$$"+callMethod.toString());
         if (OtherUtils.isEmpty(callMethod)) {
-            XposedHelpers.callStaticMethod(findClass, wechatEntity.download_bigfile_method9, new Object[]{Long.valueOf(j), objectField, null});
+            String str2 = wechatEntity.wx_version;
+            if (str2.hashCode()==51294852){ //等于6.7.3
+                XposedHelpers.callStaticMethod(findClass, wechatEntity.download_bigfile_method9, new Object[]{Long.valueOf(j), objectField});
+            }else{
+                XposedHelpers.callStaticMethod(findClass, wechatEntity.download_bigfile_method9, new Object[]{Long.valueOf(j), objectField, null});
+            }
             objectField = getCsE(classLoader, wechatEntity, findClass, j, handleNull);
         } else {
             objectField = callMethod;
         }
         objectField = XposedHelpers.newInstance(XposedHelpers.findClass(wechatEntity.download_bigfile_class9, classLoader), new Object[]{objectField, handleNull5, handleNull3, handleNull2, toLowerCase, handleNull4});
         XposedHelpers.callMethod(XposedHelpers.callStaticMethod(XposedHelpers.findClass(wechatEntity.download_bigfile_class10, classLoader), wechatEntity.download_bigfile_method10, new Object[0]), wechatEntity.download_bigfile_method11, new Object[]{objectField, Integer.valueOf(0)});
+        return fileEntity;
     }
 
     public static String downloadWxPicRes(ClassLoader classLoader, WechatEntity wechatEntity, String str, String str2, String str3) throws Throwable {

@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.mikuwxc.autoreply.modle.HookMessageBean;
 import com.mikuwxc.autoreply.receiver.Constance;
 import com.mikuwxc.autoreply.utils.UpYunUtil;
+import com.mikuwxc.autoreply.wcutil.Tag;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -40,22 +41,41 @@ public class HookMessageReceiver extends BroadcastReceiver {
         }
     }
 
-    private void parseFileInfo(HookMessageBean hookMessageBean) {
-        File file=new File(hookMessageBean.getContent());
-        if (!file.exists()){
-            try {
-                Thread.sleep(5000);
-                UpYunUtil.uploadFile(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
-                        hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
-                        hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    private void parseFileInfo(final HookMessageBean hookMessageBean) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long fileSize = hookMessageBean.getFileSize();
+                File file=new File(hookMessageBean.getContent());
+
+                while (file.length()<fileSize){
+                    file=new File(hookMessageBean.getContent());
+                    Log.e(TAG,"文件大小"+file.length()+"<"+fileSize);
+                }
+                if (file.length()<fileSize){
+                    Log.e(TAG,"文件大小"+file.length()+"<"+fileSize);
+                }else{
+                    Log.e(TAG,"文件大小"+file.length()+">="+fileSize);
+                    if (!file.exists()){
+                        try {
+                            Thread.sleep(5000);
+                            UpYunUtil.uploadFile(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
+                                    hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
+                                    hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        UpYunUtil.uploadFile(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
+                                hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
+                                hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
+                    }
+                }
             }
-        }else{
-            UpYunUtil.uploadFile(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
-                    hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
-                    hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
-        }
+        }).start();
+
+
+
     }
 
     private void parseVoiseInfo(HookMessageBean hookMessageBean) {
@@ -84,12 +104,31 @@ public class HookMessageReceiver extends BroadcastReceiver {
 
     }
 
-    private void parseVideoInfo(HookMessageBean hookMessageBean) {
+    private void parseVideoInfo(final HookMessageBean hookMessageBean) {
         UpYunUtil.handleMessage(0, hookMessageBean.getStatus(), hookMessageBean.getUsername(), "", hookMessageBean.getMsgType(),
                 hookMessageBean.getConversationTime(),hookMessageBean.getMsgId(),mContext);
-        UpYunUtil.uploadVideo(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
-                hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
-                hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long fileSize = hookMessageBean.getFileSize();
+                File file=new File(hookMessageBean.getContent());
+                while (file.length()<fileSize){
+                    file=new File(hookMessageBean.getContent());
+                    Log.e(TAG,"文件大小"+file.length()+"<"+fileSize);
+                }
+                if (file.length()<fileSize){
+                    Log.e(TAG,"文件大小"+file.length()+"<"+fileSize);
+                }else {
+                    Log.e(TAG, "文件大小" + file.length() + ">=" + fileSize);
+                    UpYunUtil.uploadVideo(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
+                            hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
+                            hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
+                }
+
+
+            }
+        }).start();
+
     }
 
 

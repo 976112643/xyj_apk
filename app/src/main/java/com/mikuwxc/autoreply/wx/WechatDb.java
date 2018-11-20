@@ -15,6 +15,7 @@ import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WxEntity;
 import com.mikuwxc.autoreply.wcutil.MatchUtil;
 import com.mikuwxc.autoreply.wcutil.OtherUtils;
+import com.mikuwxc.autoreply.wcutil.XmlParseUtil;
 import com.orhanobut.logger.Logger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -918,23 +919,36 @@ public class WechatDb extends AbstractWeChatDb {
     }
 
 
-    public long getVideoThumbSizeFromVideoInfo(String paramString)
+    public long getVideoThumbSizeFromVideoInfo(String msglocalId)
             throws Exception
     {
-        long l1 = 0L;
-        paramString = "select msglocalid,reserved4 from videoinfo2 where msglocalid = '" + paramString + "'";
-        Logger.i("===== videoThumbSize:" + paramString, new Object[0]);
-        Cursor query   = query(paramString);
-        long l2 = l1;
-        if (query != null)
-        {
-            while (query.moveToNext()) {
-                //l1 = XmlParseUtil.parseVideoThumbSize(query.getString(1));
+        Throwable th = null;
+        long videoThumbSize = 0;
+        String sql = "select msglocalid,reserved4 from videoinfo2 where msglocalid = '" + msglocalId + "'";
+        Logger.i("===== videoThumbSize:" + sql, new Object[0]);
+        Cursor c = query(sql);
+        Throwable th2 = null;
+        while (c.moveToNext()) {
+            try {
+                videoThumbSize = XmlParseUtil.parseVideoThumbSize(c.getString(1));
+            } catch (Throwable th22) {
+                Throwable th3 = th22;
+                th22 = th;
+                th = th3;
             }
-            query.close();
-            l2 = l1;
         }
-        return l2;
+        if (c != null) {
+            if (th22 != null) {
+                try {
+                    c.close();
+                } catch (Throwable th4) {
+                    th22.addSuppressed(th4);
+                }
+            } else {
+                c.close();
+            }
+        }
+        return videoThumbSize;
     }
 
 

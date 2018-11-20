@@ -45,7 +45,7 @@ public final class ChatroomChangedHook$hook$3 extends XC_MethodHook {
             if (params == null) {
                 throw new TypeCastException("null cannot be cast to non-null type kotlin.Array<kotlin.String>");
             }
-            this.$throttle.call(params[0]);
+            //this.$throttle.call(params[0]);
             for (int i = 0; i < params.length; i++) {
               //  XposedBridge.log("params[0]33::"+params[i]);
             }

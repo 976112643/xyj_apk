@@ -196,6 +196,15 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
         bt_updateapp = (Button) findViewById(R.id.bt_updateapp);
         tvLastVersion = (TextView) findViewById(R.id.tvLastVersion);
         tvHotVersion = (TextView) findViewById(R.id.tvHotVersion);
+        TextView tvImei =(TextView) findViewById(R.id.tvImei);
+
+
+        try {
+            tvImei.setText("设备IMEI："+GetImeiUtil.getOnlyIdentification(this));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         tvHotVersion.setText("当前补丁版本："+VersionInfo.versionCode);
         UpdateAppUtil.getAppVersionState(this,tvLastVersion);

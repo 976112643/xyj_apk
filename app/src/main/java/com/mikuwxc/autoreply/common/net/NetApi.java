@@ -50,4 +50,6 @@ public class NetApi {
     public static final String clearFriends="/api/1.0/wechatFriend/zombieFans/";
     public static final String clearFriendsStaus="/api/1.0/zombieFan/update/state/";
     public static final String addFriendMessage="/api/1.0/addContacts/";
+    public static final String handleAdvice="/api/1.0/logger/wechatFriend/advice/";   //同步好友申请统计
+    public static final String handleAddFriend="/api/1.0/logger/wechatFriend/add/";   //同步加好友动作统计
 }

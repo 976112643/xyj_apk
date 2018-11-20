@@ -55,6 +55,7 @@ public final class ContactsChangedHook$hook$2 extends XC_MethodHook {
         XposedBridge.log("2222222222222222222222table2:"+table2);
         ContentValues values = (ContentValues) param.args[1];
         XposedBridge.log("222222222222222222222values:"+values);
+        XposedBridge.log("type::"+values.getAsString("type"));
         if (values == null) {
             throw new TypeCastException("null cannot be cast to non-null type android.content.ContentValues");
         }
@@ -69,9 +70,9 @@ public final class ContactsChangedHook$hook$2 extends XC_MethodHook {
         XposedBridge.log("22222222222222222222222where2:"+where2);
         String[] params = (String[]) param.args[3];
 
-        if (table2.equals("rcontact")||where2.equals("username=?")){
+       // if ((table2.equals("rcontact")/*&&where2.equals("username=?"))&&!table2.equals("rconversation")*/)){
 
-       // if ((Intrinsics.areEqual((Object) "rcontact", table2) ^ true) == false || (Intrinsics.areEqual((Object) "username=?", where2) ^ true) == false) {
+        if ((Intrinsics.areEqual((Object) "rcontact", table2) ^ true) == false || (Intrinsics.areEqual((Object) "username=?", where2) ^ true) == false) {
             String username = values.getAsString("username");
             XposedBridge.log("222222222222222222222username:"+username);
             if (!StringUtils.isBlank(username)) {
@@ -85,11 +86,16 @@ public final class ContactsChangedHook$hook$2 extends XC_MethodHook {
                     List<WxEntity> wxEntities = WechatDb.getInstance().selectContacts(set);
                     XposedBridge.log("wxEntities::::::::"+wxEntities.toString());
                     if (wxEntities.get(0).getOpType()==2){
-                        $throttle.call(username);
+
+                        if ("3".equals(values.getAsString("type"))){
+                            $throttle.call(username);
+                        }
                     }
                 }
             }
         }
+
+
     }
 
 

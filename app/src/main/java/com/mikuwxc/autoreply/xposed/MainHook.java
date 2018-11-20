@@ -151,6 +151,7 @@ public class MainHook implements IXposedHookLoadPackage {
             //监听创建聊天群
            // CreateChatroomHook.hook(create, lpparam);
             ChatroomChangedHook.hook(create,lpparam);
+            //监听新增好友统计
             ContactsChangedHook.hook(create,lpparam);
             //扫一扫权限
             WScanxHook.hook(lpparam);
@@ -170,8 +171,8 @@ public class MainHook implements IXposedHookLoadPackage {
             AddFriendHook.hook(create, lpparam,mContext);
 
             //
-            WxXposedHook.hook(create,lpparam);
-            ForbiddenWxRootCheck.hook(create,lpparam);
+           /* WxXposedHook.hook(create,lpparam);
+            ForbiddenWxRootCheck.hook(create,lpparam);*/
 
         //操作微信相关
             Class receiver=classLoader.loadClass(Constance.receiver_wechat);
@@ -230,6 +231,10 @@ public class MainHook implements IXposedHookLoadPackage {
                 String tableName = (String) param.args[0];
                 XposedBridge.log("contentValuescontentValues::"+contentValues);
                 XposedBridge.log("tableNametableName::"+tableName);
+
+
+
+
                 if (TextUtils.isEmpty(tableName) || !tableName.equals("message")) {
                     return;
                 }

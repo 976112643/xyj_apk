@@ -845,5 +845,13 @@ class WechatEntity6703 extends WechatEntity {
         this.delete_friend_chat_record_method="onClick";  //禁止微信里面删除好友聊天记录
         this.delete_single_friend_chat_record_method="onClick";  //禁止删除会话聊天记录
         this.delete_selected_friend_chat_record_method="onMMMenuItemSelected";  //禁止删除单个聊天记录
+
+
+        this.add_friend_behavior_method1="ecE";
+        this.add_friend_behavior_method2="ecN";
+        this.add_friend_behavior_method3="syV";
+        this.add_friend_behavior_method4="tRZ";
+        this.add_friend_behavior_method5="nFs";
+
     }
 }

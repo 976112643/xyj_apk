@@ -38,7 +38,7 @@ public final class ChatroomChangedHook$hook$2 extends XC_MethodHook {
             if (values == null) {
                 throw new TypeCastException("null cannot be cast to non-null type android.content.ContentValues");
             }
-            this.$throttle.call(values.getAsString("chatroomname"));
+            //this.$throttle.call(values.getAsString("chatroomname"));
       //  XposedBridge.log("values.getAsString(\"chatroomname\")::"+values.getAsString("chatroomname"));
         }
     }

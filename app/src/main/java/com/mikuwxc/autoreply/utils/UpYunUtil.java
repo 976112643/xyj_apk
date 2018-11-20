@@ -281,6 +281,10 @@ public class UpYunUtil {
                 String newSavePath= AppConfig.YOUPAIYUN+savePath;
                 handleMessage(field_unReadCount, field_status, field_username, userNameChatroom+newSavePath, field_msgType, field_conversationTime,msgId,context);
 
+                if (finalTemp.exists()){
+                    finalTemp.delete();
+                }
+
             }
         };
 

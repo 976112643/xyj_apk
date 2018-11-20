@@ -102,11 +102,11 @@ android {
             signingConfig signingConfigs.config
         }
     }
-    sourceSets {
+   /* sourceSets {
         main {
             jniLibs.srcDirs('libs/im/imso', 'libs/share/weiboso', 'libs')
         }
-    }
+    }*/
     productFlavors {
     }
 

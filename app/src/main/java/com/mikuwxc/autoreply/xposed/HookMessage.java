@@ -36,12 +36,14 @@ import com.mikuwxc.autoreply.wcapi.WechatEntityFactory;
 import com.mikuwxc.autoreply.wcentity.AutoVerifyAllEntity;
 import com.mikuwxc.autoreply.wcentity.FileEntity;
 import com.mikuwxc.autoreply.wcentity.LuckyMoneyMessage;
+import com.mikuwxc.autoreply.wcentity.MessageEntity;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcentity.WxEntity;
 import com.mikuwxc.autoreply.wcutil.AuthUtil;
 import com.mikuwxc.autoreply.wcutil.DownLoadWxResFromWxUtil;
 import com.mikuwxc.autoreply.wcutil.FriendUtil;
+import com.mikuwxc.autoreply.wcutil.XmlParseUtil;
 import com.mikuwxc.autoreply.wcutil.XmlToJson;
 import com.mikuwxc.autoreply.wx.WechatDb;
 import com.tencent.imsdk.TIMConversation;
@@ -764,6 +766,9 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
         XposedHelpers.findAndHookMethod(paramWechatEntity.sqlitedatabase_class_name, classLoader, "insertWithOnConflict", new Object[] { String.class, String.class, ContentValues.class, Integer.TYPE, new XC_MethodHook()
         {
+
+            private String totallen;
+
             protected void afterHookedMethod(MethodHookParam paramAnonymousMethodHookParam)
                     throws Throwable
             {
@@ -773,6 +778,43 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                 {
                     str = (String)paramAnonymousMethodHookParam.args[0];
                     localContentValues = (ContentValues)paramAnonymousMethodHookParam.args[2];
+                    XposedBridge.log("_________________________________::"+localContentValues.toString());
+
+
+                    if ("videoinfo2".equals(str)){
+                        final ContentValues finalLocalContentValues = localContentValues;
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String msgId = finalLocalContentValues.getAsString("msglocalid");
+                                    XposedBridge.log("===== videoThumbSizemsgId:" + msgId);
+                                    MessageEntity messageEntity = WechatDb.getInstance().selectMessageFromMsgLocalId(msgId);
+                                    XposedBridge.log("===== videoThumbSizeMessageEntity:" + messageEntity.toString());
+                                    long videoThumbSize = WechatDb.getInstance().getVideoThumbSizeFromVideoInfo(msgId);
+                                    XposedBridge.log("===== videoThumbSize:" + videoThumbSize+"--"+new Object[0]);
+                                    messageEntity.setFileSize(videoThumbSize);
+                                    if (messageEntity != null && !messageEntity.isSend()) {
+                                        XposedBridge.log("===== reyVideoPath:" + reyVideoPath+"--");
+                                        IntentUtil.startFileBroadcastReceiver(reyVideoPath,messageEntity.getCreateTime()+"",msgId,3,messageEntity.getType()+"",messageEntity.getTalker(),
+                                                messageEntity.getContent(),messageEntity.isSend()+"",mContext,"Send",videoThumbSize);
+                                    }else{
+
+                                    }
+
+
+
+
+
+
+
+                                }catch (Exception e){
+                                    XposedBridge.log("===== videoThumbSize:"+e.toString());
+                                }
+
+                            }
+                        }).start();
+                    }
 
                     if (((String)paramAnonymousMethodHookParam.args[0]).equals("message"))
                     {
@@ -794,6 +836,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         String isSend =localContentValues.getAsString("isSend");
                         XposedBridge.log("isSend:"+isSend);
                         XposedBridge.log("statuss:"+statuss);
+
+
 
 
 
@@ -886,17 +930,16 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         }
 
 
-                       /* UserEntity userEntity = WechatDb.getInstance().selectSelf();
-                        String userName = userEntity.getUserName();
+                        UserEntity userEntity = WechatDb.getInstance().selectSelf();
                         String userTalker = userEntity.getUserTalker();
-                        String headPic = userEntity.getHeadPic();
                         String alias = userEntity.getAlias();  //微信号
                         if (StringUtils.isBlank(alias)){
                             alias = userTalker;
                         }
                         FriendBean friendBean =friendAdviceParse(autoVerifyUser);
                         XposedBridge.log(friendBean.toString());
-                        addNewFriend(alias, friendBean); //新的好友,通知后台*/
+                        //新的好友,通知后台
+                        handleAdvice(alias,friendBean.getWxid());
 
                     }
 
@@ -995,7 +1038,11 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
 
                     if ("43".equals(type)){
-                       String videPath= DownLoadWxResFromWxUtil.downloadWxVideoRes(classLoader, paramWechatEntity, paramAnonymousMethodHookParam1);
+
+                       long  getVideoThumb= WechatDb.getInstance().getVideoThumbSizeFromVideoInfo(msgId);
+                        XposedBridge.log("getVideoThumb+++++++++++++++++++"+getVideoThumb);
+
+                        String videPath= DownLoadWxResFromWxUtil.downloadWxVideoRes(classLoader, paramWechatEntity, paramAnonymousMethodHookParam1);
                         String reyvideoLast=videPath.replace(".jpg", ".mp4").replace(".tmp", "");
                         XposedBridge.log("videPathvidePathvidePathvidePath::"+videPath);
                         XposedBridge.log("shangchuanshipin"+reyvideoLast);
@@ -1006,8 +1053,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             videoState=1;
                             sedVideopicPath=videPath;
 
-                            IntentUtil.startBroadcastReceiver(sedVideoPath,s,msgId,videoState,type,talker,
-                                    localContentValues.getAsString("content"),isSend,mContext,"Send");
+                            IntentUtil.startFileBroadcastReceiver(sedVideoPath,s,msgId,videoState,type,talker,
+                                    localContentValues.getAsString("content"),isSend,mContext,"Send",0);
 
                         }else{
                             reyImagin=null;
@@ -1016,8 +1063,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             videoState=3;
                             reyVideopicPath=videPath;
 
-                            IntentUtil.startBroadcastReceiver(reyVideoPath,s,msgId,videoState,type,talker,
-                                    localContentValues.getAsString("content"),isSend,mContext,"Receive");
+                           /* IntentUtil.startBroadcastReceiver(reyVideoPath,s,msgId,videoState,type,talker,
+                                    localContentValues.getAsString("content"),isSend,mContext,"Receive");*/
 
                         }
 
@@ -1107,8 +1154,18 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             XposedBridge.log(e.toString()+"图片代码引发的错误");
                         }
                     }else if ("49".equals(type)){
+
+
+
+                        long fileSize = XmlParseUtil.parseFile(localContentValues.getAsString("content")).getLong("totalLen").longValue();
+                        FileEntity fileEntity=new FileEntity();
+                        if (fileSize > 26214400) {
+                             fileEntity= DownLoadWxResFromWxUtil.downloadWxFileRes(classLoader, paramWechatEntity, (Long) localContentValues.get("msgId"), true);
+                        } else {
+                             fileEntity= DownLoadWxResFromWxUtil.downloadWxFileRes(classLoader, paramWechatEntity, (Long) localContentValues.get("msgId"));
+                        }
                                 XposedBridge.log("kkkkkkkkkkkkk"+(Long) localContentValues.get("msgId"));
-                                FileEntity fileEntity= DownLoadWxResFromWxUtil.downloadWxFileRes(classLoader, paramWechatEntity, (Long) localContentValues.get("msgId"));
+                               // FileEntity fileEntity= DownLoadWxResFromWxUtil.downloadWxFileRes(classLoader, paramWechatEntity, (Long) localContentValues.get("msgId"));
                                 String filePath="/storage/emulated/0/tencent/MicroMsg/Download/"+fileEntity.getTitle();
                                 XposedBridge.log(filePath);
                                 File file=new File(filePath);
@@ -1125,12 +1182,14 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             filestatus="1";
                             int filestatus=1;
 
+                            XposedBridge.log("sendFileSize::"+String.valueOf(XmlParseUtil.parseFile(localContentValues.getAsString("content")).getLong("totalLen").longValue()));
                             if (StringUtils.isNotBlank(sendFilePathPhone)){
-                                IntentUtil.startBroadcastReceiver(sendFilePathPhone,s,msgId,filestatus,type,talker,
-                                        localContentValues.getAsString("content"),isSend,mContext,"Send");
+
+                                IntentUtil.startFileBroadcastReceiver(sendFilePathPhone,s,msgId,filestatus,type,talker,
+                                        localContentValues.getAsString("content"),isSend,mContext,"Send",fileSize);
                             }else{
-                                IntentUtil.startBroadcastReceiver(sendFilePath,s,msgId,filestatus,type,talker,
-                                        localContentValues.getAsString("content"),isSend,mContext,"Send");
+                                IntentUtil.startFileBroadcastReceiver(sendFilePath,s,msgId,filestatus,type,talker,
+                                        localContentValues.getAsString("content"),isSend,mContext,"Send",fileSize);
                             }
                             sendFilePathPhone=null;
 
@@ -1139,8 +1198,9 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             int filestatus=3;
 
 
-                            IntentUtil.startBroadcastReceiver(sendFilePath,s,msgId,filestatus,type,talker,
-                                    localContentValues.getAsString("content"),isSend,mContext,"Receive");
+                            XposedBridge.log("receiveFileSize::"+String.valueOf(XmlParseUtil.parseFile(localContentValues.getAsString("content")).getLong("totalLen").longValue()));
+                            IntentUtil.startFileBroadcastReceiver(sendFilePath,s,msgId,filestatus,type,talker,
+                                    localContentValues.getAsString("content"),isSend,mContext,"Receive",fileSize);
                         }
 
                     }else if ("10000".equals(type)){//领取红包信息
@@ -1807,6 +1867,22 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
             @Override
             public void onError(Call call, Response response, Exception e) {
                 super.onError(call, response, e);
+                XposedBridge.log("sssssss"+e.toString());
+            }
+        });
+    }
+
+
+    private static void handleAdvice(String wxno,String friendWxId) {
+        OkGo.post(AppConfig.OUT_NETWORK+ NetApi.handleAdvice+"?wxno="+wxno+"&friendWxid="+friendWxId).execute(new StringCallback() {
+            @Override
+            public void onSuccess(String s, Call call, Response response) {
+                XposedBridge.log("sssssss"+s);
+            }
+
+
+            @Override
+            public void onError(Call call, Response response, Exception e) {
                 XposedBridge.log("sssssss"+e.toString());
             }
         });

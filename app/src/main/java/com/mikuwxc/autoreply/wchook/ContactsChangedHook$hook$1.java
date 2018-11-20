@@ -59,7 +59,7 @@ public final class ContactsChangedHook$hook$1 extends XC_MethodHook {
         }
         values = values;
 
-        if ("rcontact".equals(table2)){
+        if ((Intrinsics.areEqual((Object) "rcontact", table2) ^ true) == false){
             String username = values.getAsString("username");
             XposedBridge.log("11111111111111111111111111username:" + username);
             if (!StringUtils.isBlank(username)) {
