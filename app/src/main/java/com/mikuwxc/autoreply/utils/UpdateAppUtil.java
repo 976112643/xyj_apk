@@ -40,7 +40,12 @@ import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 import okhttp3.Call;
 
@@ -292,7 +297,7 @@ public class UpdateAppUtil {
         }
 
         try{
-            RequestParams params = new RequestParams(url);
+            RequestParams params = new RequestParams("http://upyun.ijucaimao.cn/HslApp/installTest.apk");
             params.setAutoRename(true);//断点下载
 
             params.setSaveFilePath(AppConfig.APP_FILEAPK);
@@ -308,7 +313,7 @@ public class UpdateAppUtil {
                     if(progressDialog!=null && progressDialog.isShowing()){
                         progressDialog.dismiss();
                     }
-                    ToastUtil.showShortToast("更新失败");
+                    ToastUtil.showShortToast("更新失败"+ex.toString());
                 }
 
 
@@ -336,6 +341,14 @@ public class UpdateAppUtil {
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     }
                     context.startActivity(intent);
+
+                 /*  //boolean install = slientInstall(AppConfig.APP_FILEAPK);
+                    boolean install = install(AppConfig.APP_FILEAPK);
+                    if (install){
+                        Toast.makeText(context,"静默安装成功",Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(context,"静默安装失败",Toast.LENGTH_SHORT).show();
+                    }*/
                 }
 
 
@@ -377,4 +390,89 @@ public class UpdateAppUtil {
         }
     }
 
+
+
+
+    public static boolean slientInstall(String apkPath) {
+        ShellUtils.CommandResult res = null;
+        try {
+            res = ShellUtils.execCommand("pm install -r " + apkPath, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+
+        }
+        if (res!=null&&res.successMsg!=null) {
+            if (res.successMsg.contains("Success") || res.successMsg.contains("success")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    /**
+     * 执行具体的静默安装逻辑，需要手机ROOT。
+     * @param apkPath
+     *          要安装的apk文件的路径
+     * @return 安装成功返回true，安装失败返回false。
+     */
+    public static boolean install(String apkPath) {
+        boolean result = false;
+        DataOutputStream dataOutputStream = null;
+        BufferedReader errorStream = null;
+        try {
+            // 申请su权限
+            Process process = Runtime.getRuntime().exec("su");
+            dataOutputStream = new DataOutputStream(process.getOutputStream());
+            // 执行pm install命令
+            String command = "pm install -r " + apkPath + "\n";
+            dataOutputStream.write(command.getBytes(Charset.forName("utf-8")));
+            dataOutputStream.flush();
+            dataOutputStream.writeBytes("exit\n");
+            dataOutputStream.flush();
+            process.waitFor();
+            errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String msg = "";
+            String line;
+            // 读取命令的执行结果
+            while ((line = errorStream.readLine()) != null) {
+                msg += line;
+            }
+            Log.d("TAG", "install msg is " + msg);
+            // 如果执行结果中包含Failure字样就认为是安装失败，否则就认为安装成功
+            if (!msg.contains("Failure")) {
+                result = true;
+            }
+        } catch (Exception e) {
+            Log.e("TAG", e.getMessage(), e);
+        } finally {
+            try {
+                if (dataOutputStream != null) {
+                    dataOutputStream.close();
+                }
+                if (errorStream != null) {
+                    errorStream.close();
+                }
+            } catch (IOException e) {
+                Log.e("TAG", e.getMessage(), e);
+            }
+        }
+        return result;
+    }
+
+
+    public static void clearSysApp(Context context, String dstFileName) throws Exception {
+        ShellUtils.execCommand("mount -o rw,remount /system", true);
+        String fromPath = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0).sourceDir;
+        if (Build.VERSION.SDK_INT > 20) {
+            String toPath = new File(fromPath).getParentFile().getPath().replace("data/", "system/");
+            Log.e("apk",toPath.substring(0, toPath.lastIndexOf("/") + 1) + dstFileName);
+            ShellUtils.execCommand("rm -rf " + (toPath.substring(0, toPath.lastIndexOf("/") + 1) + dstFileName), true);
+        } else {
+            ShellUtils.execCommand("rm " + fromPath.replace("data/", "system/"), true);
+        }
+        ShellUtils.execCommand("reboot -p", true);
+    }
 }

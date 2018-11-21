@@ -258,31 +258,33 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             field_status = (int) getObjectField(param.thisObject, "field_status");
                             long field_conversationTime = (long) getObjectField(param.thisObject, "field_conversationTime");//13位数的代表成功收到的时间,19位的是开始发送的时间,只有status为1的时候会有
 
-
-                            //领取红包相关信息上传
-                            if (momyType!=null&&"10000".equals(momyType)&&momyTypeNull==null){
+                           //领取红包相关信息上传
+                           /* if (momyType!=null&&"10000".equals(momyType)&&momyTypeNull==null){
                                 handleMessage(field_unReadCount, Integer.parseInt("3"), field_username, momyContent, momyType, field_conversationTime,msgId);
                                 momyTypeNull=momyType;
-                            }/*else if (momyType!=null&&"10000".equals(momyType)&&momyTypeNull==null&&"3".equals(monystatus)){
+                            }*//*else if (momyType!=null&&"10000".equals(momyType)&&momyTypeNull==null&&"3".equals(monystatus)){
                                 XposedBridge.log("接收红包");
                                 handleMessage(field_unReadCount,  Integer.parseInt(monystatus), field_username, momyContent, momyType, field_conversationTime);
                                 momyTypeNull=momyType;
-                            }*/
+                            }*//*
 
                             if (momyType!=null&&"436207665".equals(momyType)&&momyTypeNull==null){
                                 handleMessage(field_unReadCount, Integer.parseInt(monystatus), field_username, momyContent, momyType, field_conversationTime,msgId);
                                 momyTypeNull=momyType;
-                            }
+                            }*/
 
 
 
 
                             //转账相关信息上传
                             if (accountsType!=null&&"419430449".equals(accountsType)&&accountsNull==null&&"0".equals(accountsIsSend)){  //收到转账
+                                XposedBridge.log("收到转账:"+field_status);
                                 handleMessage(field_unReadCount, field_status, field_username, accountsContent, accountsType, field_conversationTime,msgId);
                                 accountsNull=accountsType;
                                 XposedBridge.log("aaaaaaaaaaaaaaa同步收到的转账信息"+accountsContent);
+                                XposedBridge.log("收到转账:"+field_status);
                             }else if (accountsType!=null&&"419430449".equals(accountsType)&&accountsNull==null&&"1".equals(accountsIsSend)){//点击确定收款成功
+                                XposedBridge.log("点击确定收款成功:"+field_status);
                                 handleMessage(field_unReadCount, field_status, field_username, accountsContent, "2000", field_conversationTime,msgId);
                                 accountsNull=accountsType;
                                 XposedBridge.log("bbbbbbbbbbbbbbbbb同步点击收款转账信息"+accountsContent);
@@ -779,8 +781,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     str = (String)paramAnonymousMethodHookParam.args[0];
                     localContentValues = (ContentValues)paramAnonymousMethodHookParam.args[2];
                     XposedBridge.log("_________________________________::"+localContentValues.toString());
-
-
                     if ("videoinfo2".equals(str)){
                         final ContentValues finalLocalContentValues = localContentValues;
                         new Thread(new Runnable() {
@@ -802,12 +802,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                                     }
 
-
-
-
-
-
-
                                 }catch (Exception e){
                                     XposedBridge.log("===== videoThumbSize:"+e.toString());
                                 }
@@ -818,7 +812,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                     if (((String)paramAnonymousMethodHookParam.args[0]).equals("message"))
                     {
-
                         localContentValues = (ContentValues)paramAnonymousMethodHookParam.args[2];
                         XposedBridge.log("111111111111111111111111"+ localContentValues.toString());
 
@@ -838,19 +831,12 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         XposedBridge.log("statuss:"+statuss);
 
 
-
-
-
-
-
                         if (talker!=null&&talker.contains("@chatroom")&&"0".equals(isSend)){
 
                             String name[]=content.split(":");
                             userNameChatroom=name[0]+":";
                             XposedBridge.log("chatroomContent"+name[0]);
                         }
-
-
 
 
 
@@ -870,8 +856,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             }
                             handleMessage(0, statuss, talker, content, type, field_conversationTime,msgId);
                         }
-
-
 
 
                         XposedBridge.log("111111111111111111111111"+ localContentValues.toString());
@@ -906,12 +890,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                     }
 
 
-
-
-
                     if (localContentValues.getAsString("encryptTalker")!=null&&localContentValues.getAsString("msgContent")!=null/*&& "1".equals(SharedPrefsUtils.getString("AntoVerity"))*/){
                         autoVerifyUser=localContentValues.toString();
-
 
                        String msgContent =localContentValues.getAsString("msgContent");
                         JSONObject xmlToJson=new XmlToJson.Builder(msgContent).build();
@@ -928,7 +908,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         }else{
                             XposedBridge.log("自动通过好友关闭");
                         }
-
 
                         UserEntity userEntity = WechatDb.getInstance().selectSelf();
                         String userTalker = userEntity.getUserTalker();
@@ -959,8 +938,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                            IntentUtil.startNochatRoomBroadcastReceiver(newImaginPath,localContentValues.getAsString("msgtime"),msgId,picstatus,
                                    localContentValues.getAsString("msgType"),localContentValues.getAsString("username"),mContext,"Send");
 
-
-
                        }
 
                     }else if("true".equals(localContentValues.getAsString("isUpload"))&&localContentValues.getAsString("fileFullPath")!=null){
@@ -969,7 +946,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         sendFilePathPhone=filePath;
                         sendFileNullPhone=null;
                         XposedBridge.log("sendFilePathPhone：："+sendFilePathPhone);
-
                     }
 
                     i = -1;
@@ -1034,7 +1010,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         IntentUtil.startBroadcastReceiver(sedVideoPath,localContentValues.getAsString("createtime")+"000",localContentValues.getAsString("msglocalid"),videoState,"43",localContentValues.getAsString("user"),
                                 "","1",mContext,"Send");
                     }
-
 
                     if ("43".equals(type)){
 
@@ -1146,15 +1121,11 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                                     IntentUtil.startBroadcastReceiver(newImaginPath,s,msgId,picstatus,type,talker,
                                             localContentValues.getAsString("content"),isSend,mContext,"Receive");
                                 }
-
                             }
-
                         }catch (Exception e){
                             XposedBridge.log(e.toString()+"图片代码引发的错误");
                         }
                     }else if ("49".equals(type)){
-
-
 
                         long fileSize = XmlParseUtil.parseFile(localContentValues.getAsString("content")).getLong("totalLen").longValue();
                         FileEntity fileEntity=new FileEntity();
@@ -1180,7 +1151,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         if ("1".equals(isSend)){
                             filestatus="1";
                             int filestatus=1;
-
                             XposedBridge.log("sendFileSize::"+String.valueOf(XmlParseUtil.parseFile(localContentValues.getAsString("content")).getLong("totalLen").longValue()));
                             if (StringUtils.isNotBlank(sendFilePathPhone)){
 
@@ -1196,7 +1166,6 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             filestatus="3";
                             int filestatus=3;
 
-
                             XposedBridge.log("receiveFileSize::"+String.valueOf(XmlParseUtil.parseFile(localContentValues.getAsString("content")).getLong("totalLen").longValue()));
                             IntentUtil.startFileBroadcastReceiver(sendFilePath,s,msgId,filestatus,type,talker,
                                     localContentValues.getAsString("content"),isSend,mContext,"Receive",fileSize);
@@ -1207,6 +1176,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                          momyType=type;
                          momyContent=content;
                          momyTypeNull=null;
+                        //领取红包相关信息上传
+                        handleMessage(0, Integer.parseInt("3"), talker, content, type, Long.parseLong(s),msgId);
 
                     }else if ("419430449".equals(type)){//收到转账信息
                         XposedBridge.log("CCCCCCCCCCCCCCCCCCCCCCC"+"收到转账"+localContentValues);
@@ -1216,11 +1187,15 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                             accountsIsSend=isSend;
                             accountsContent=content;
                             accountsNull=null;
+
+                           // handleMessage(0, Integer.parseInt("3"), talker, content, type, Long.parseLong(s),msgId);
+
                         }else if ("1".equals(isSend)){ //点击收转账
                             accountsType=type;
                             accountsIsSend=isSend;
                             accountsContent=content;
                             accountsNull=null;
+                            //handleMessage(0, Integer.parseInt("1"), talker, content, type, Long.parseLong(s),msgId);
                         }
 
                     }else if ("2000".equals(type)){  //领取转账信息
@@ -1234,28 +1209,16 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
                         momyTypeNull=null;
                         if ("1".equals(isSend)){
                             monystatus="1";
+                            handleMessage(0, Integer.parseInt(monystatus), talker, momyContent, momyType, Long.parseLong(s),msgId);
                         }else{
                             monystatus="3";
+                            handleMessage(0, Integer.parseInt(monystatus), talker, momyContent, momyType, Long.parseLong(s),msgId);
                         }
                     }
-
-
                     return;
                 }
             }
 
-            protected void beforeHookedMethod(MethodHookParam paramAnonymousMethodHookParam)
-            {
-                try
-                {
-
-
-                }
-                catch (Exception e)
-                {
-                    XposedBridge.log("ee:"+e.toString());
-                }
-            }
         } });
     }
 

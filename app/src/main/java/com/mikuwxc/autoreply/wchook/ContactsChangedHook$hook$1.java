@@ -60,7 +60,7 @@ public final class ContactsChangedHook$hook$1 extends XC_MethodHook {
             if (!StringUtils.isBlank(username)) {
                 Intrinsics.checkExpressionValueIsNotNull(username, "username");
                 if (!StringUtils.startsWith(username, "fake_") && !StringUtils.endsWith(username, "@stranger")) {
-                    this.$throttle.call(username);
+                  //  this.$throttle.call(username);
                 }
                 }
             }

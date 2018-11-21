@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -33,6 +35,7 @@ import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcentity.WxEntity;
 import com.mikuwxc.autoreply.wchook.ChatroomHook;
+import com.mikuwxc.autoreply.wcutil.BitmapPathUtil;
 import com.mikuwxc.autoreply.wcutil.FriendUtil;
 import com.mikuwxc.autoreply.wcutil.LabelUtil;
 import com.mikuwxc.autoreply.wcutil.MomentUtil;
@@ -222,7 +225,15 @@ public class MountReceiver extends XC_MethodHook {
                             public void run() {
                                 List<String> listMonentVideo = downLoadPicMonet(fodderUrl, circleText, classLoader, create, "", path, type, context);
                                 XposedBridge.log("发视频朋友圈：："+listMonentVideo.get(0)+"::"+listMonentVideo.get(1));
-                                MomentUtil.sendVideoMoment(classLoader,create,circleText,0,null,listMonentVideo.get(0),listMonentVideo.get(1));
+
+
+                                MediaMetadataRetriever media = new MediaMetadataRetriever();
+                                media.setDataSource(listMonentVideo.get(1));// videoPath 本地视频的路径
+                                Bitmap bitmap  = media.getFrameAtTime(1, MediaMetadataRetriever.OPTION_CLOSEST_SYNC );
+                                String picPath = BitmapPathUtil.saveBitmap(context, bitmap);
+                                XposedBridge.log("picPathpicPath::::::++"+picPath);
+
+                                MomentUtil.sendVideoMoment(classLoader,create,circleText,0,null,picPath,listMonentVideo.get(1));
                             }
                         }).start();
 

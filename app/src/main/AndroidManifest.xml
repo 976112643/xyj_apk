@@ -99,6 +99,10 @@
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
 
+    <!-- -->
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES"
+        tools:ignore="ProtectedPermissions" />
+
     <!-- IM需要的权限 -->
     <application
         android:name="com.mikuwxc.autoreply.common.MyApp"
@@ -108,9 +112,9 @@
         android:supportsRtl="true"
         tools:replace="android:icon,android:theme,android:allowBackup"
         android:theme="@style/BaseTheme"
-        android:persistent="true"
-        android:killAfterRestore="true">
 
+        android:killAfterRestore="true">
+      <!--  android:persistent="true"-->    <!--这里加上的话就是 在Android系统中，有一种永久性应用  但是系统应用静默更新会导致更新失败-->
         <!-- Ali热更新 -->
         <meta-data
             android:name="com.taobao.android.hotfix.IDSECRET"
