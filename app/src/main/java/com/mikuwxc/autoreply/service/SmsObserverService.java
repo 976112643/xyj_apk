@@ -3,11 +3,13 @@ package com.mikuwxc.autoreply.service;
 import android.Manifest;
 import android.app.Service;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
@@ -29,6 +31,7 @@ import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.common.util.RegularUtils;
 import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
+import com.mikuwxc.autoreply.db.MyDBHelper;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -46,7 +49,7 @@ import okhttp3.Response;
 /**
  *
  * create by : 喻敏航
- * create time : 8018-10-13
+ * create time : 2018-10-13
  * description : 短信监听服务
  *
  * **/
@@ -201,10 +204,16 @@ public class SmsObserverService extends Service {
 
 
     private  void uploadSmsMessage(final SmsObserverBean obj) {
+        MyDBHelper myDBHelper = new MyDBHelper(getApplicationContext());
+        final SQLiteDatabase db = myDBHelper.getWritableDatabase();
+        final Cursor cursor = db.rawQuery("select * from tb_sms where time=? and imei=? and content=? and type=? and phoneNum=?", new String[]{String.valueOf(obj.getTime()), SystemUtil.getIMEI(MyApp.getAppContext()), obj.getContent(), obj.getType(), obj.getPhoneNum()});
+        if(cursor.getCount()>0){
+            return;
+        }
         SPHelper.init(MyApp.getAppContext());
         String url=AppConfig.OUT_NETWORK+NetApi.upload_sms_message;
         String type="2".equals(obj.getType())?"true":"false";
-        SmsBean smsBean=new SmsBean(SystemUtil.getIMEI(MyApp.getAppContext()),obj.getContent(),type,obj.getPhoneNum(),String.valueOf(obj.getTime()));
+        final SmsBean smsBean=new SmsBean(SystemUtil.getIMEI(MyApp.getAppContext()),obj.getContent(),type,obj.getPhoneNum(),String.valueOf(obj.getTime()));
         OkGo.<String>post(url)
                 .tag(this)
                 .upJson(new Gson().toJson(smsBean))
@@ -216,6 +225,15 @@ public class SmsObserverService extends Service {
                         if("200".equals(smsSuccessBean.getCode())){
                             //上传成功
                             //Toast.makeText(SmsObserverService.this, "短信上传成功", Toast.LENGTH_SHORT).show();
+                            ContentValues cv=new ContentValues();
+                            cv.put("content",smsBean.getContent());
+                            cv.put("type",smsBean.getType());
+                            cv.put("phoneNum",smsBean.getPhone());
+                            cv.put("time",smsBean.getTime());
+                            cv.put("imei",smsBean.getImei());
+                            long tb_sms = db.insert("tb_sms", null, cv);
+                            cursor.close();
+                            db.close();
                         }else{
                             String sms_list_data = SPHelper.getInstance().getString("SMS_LIST_DATA");
                             SharePerSmsBean perSmsBean = new Gson().fromJson(sms_list_data, SharePerSmsBean.class);
@@ -238,6 +256,9 @@ public class SmsObserverService extends Service {
                                 String json = new Gson().toJson(perSmsBean);
                                 SPHelper.getInstance().putString("SMS_LIST_DATA",json);
                             }
+
+                            cursor.close();
+                            db.close();
 
                         }
                     }
@@ -266,6 +287,9 @@ public class SmsObserverService extends Service {
                             String json = new Gson().toJson(perSmsBean);
                             SPHelper.getInstance().putString("SMS_LIST_DATA",json);
                         }
+                        cursor.close();
+                        db.close();
+
                     }
                 });
     }
