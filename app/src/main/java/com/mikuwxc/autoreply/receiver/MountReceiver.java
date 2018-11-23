@@ -310,7 +310,7 @@ public class MountReceiver extends XC_MethodHook {
                     MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/clearList",friendsIdListJson);
                     ChatroomHook.createChatroom(classLoader,context,create);
 
-                }else if ("211".equals(type)){
+                }else if ("211".equals(type)){  //因为要创建群才能检测僵尸粉
                     ChatroomHook.createChatroom(classLoader,context,create);
 
                 }else if("101".equals(type)){

@@ -120,11 +120,17 @@ public class HookMessageReceiver extends BroadcastReceiver {
                     Log.e(TAG,"文件大小"+file.length()+"<"+fileSize);
                 }else {
                     Log.e(TAG, "文件大小" + file.length() + ">=" + fileSize);
-                    UpYunUtil.uploadVideo(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
-                            hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
-                            hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
-                }
 
+                    if (1==hookMessageBean.getStatus()){   //发送的视频不需要复制去jcm文件夹
+                        UpYunUtil.uploadSendVideo(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
+                                hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
+                                hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
+                    }else{                                //接收到的视频需要复制到JCM文件夹
+                        UpYunUtil.uploadVideo(hookMessageBean.getContent(),hookMessageBean.getUsername(),hookMessageBean.getSign(),0,
+                                hookMessageBean.getStatus(),hookMessageBean.getUsername(),hookMessageBean.getMsgType(),hookMessageBean.getConversationTime(),
+                                hookMessageBean.getUserNameChatroom(),hookMessageBean.getMsgId(),mContext);
+                    }
+                }
 
             }
         }).start();

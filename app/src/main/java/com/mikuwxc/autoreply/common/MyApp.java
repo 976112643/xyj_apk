@@ -124,7 +124,7 @@ public class MyApp extends Application {
         //设置极光推送的别名
         //setTagAndAlias();
         x.Ext.init(this);
-//        CrashReport.initCrashReport(getApplicationContext(), "7bca0364df", false);
+        CrashReport.initCrashReport(getApplicationContext(), "7bca0364df", false);
         ContextHolder.initial(this);
         // 获取Runtime对象  获取root权限
         Runtime runtime = Runtime.getRuntime();
@@ -154,10 +154,6 @@ public class MyApp extends Application {
         Log.e("222",AppConfig.Registration_Id);
         //initTMConfig();
         initTIMUserConfig();
-
-
-
-
 
 
         //init for api client sync cookie

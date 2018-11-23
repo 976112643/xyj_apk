@@ -61,7 +61,7 @@ public class UpdateAppUtil {
                     if (bean.isSuccess()) {
                         //获取当前app版本号与后台对比后台版本号大于本地app版本号时进行更新
                         if(bean.getResult().getVersionCode() > getAppVersionCode(context)){
-                            ToastUtil.showShortToast("当前软件不是最新版本");
+                            Toast.makeText(context,"当前软件不是最新版本",Toast.LENGTH_SHORT).show();
                         }
                         Log.e("111", "获取App版本信息成功:"+bean.getResult());
                     }else {

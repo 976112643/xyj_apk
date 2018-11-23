@@ -108,6 +108,77 @@ public class UpYunUtil {
 
 
 
+    //上传自己发送的视频
+    public static String uploadSendVideo(String sendVideoPath, final String username, final String sign, final int field_unReadCount,
+                                     final int field_status, final String field_username, final String field_msgType, final long field_conversationTime , final String userNameChatroom, final String msgId, final Context context) {
+
+        try {
+           /* Thread.sleep(10000);
+            int index       = sendVideoPath.lastIndexOf("/");
+            String fileName = sendVideoPath.substring(index);
+            String copyFile = "/storage/emulated/0/JCM" + fileName;
+            try{
+                FileInputStream input  = new FileInputStream(sendVideoPath);
+                FileOutputStream output = new FileOutputStream(copyFile);
+
+                byte[] buffer = new byte[4096];
+                int    length = 0;
+                while((length = input.read(buffer)) > 0){
+                    output.write(buffer, 0, length);
+                }
+            }catch(Exception e){
+                Log.e("111","FileFile::"+e.toString());
+            }*/
+            File temp = null;
+            temp = new File(sendVideoPath);
+            final Map<String, Object> paramsMap = new HashMap<>();
+            //上传又拍云的命名空间
+            paramsMap.put(Params.BUCKET, "cloned");
+            final String newVideoLast = sendVideoPath.substring(sendVideoPath.lastIndexOf("/")+1);
+            SimpleDateFormat formatter = new SimpleDateFormat ("yyyyMMdd");
+            Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+            String str = formatter.format(curDate);
+            //又拍云的保存路径，任选其中一个
+            final String savePath="/videoforapp/"+username+"/"+sign+"/"+str+"/"+newVideoLast;
+            paramsMap.put(Params.SAVE_KEY, savePath);
+            //时间戳加上15秒
+            paramsMap.put(Params.EXPIRATION, System.currentTimeMillis()+15);
+            final boolean[] flag = {false};
+            //进度回调，可为空
+            UpProgressListener progressListener = new UpProgressListener() {
+                @Override
+                public void onRequestProgress(final long bytesWrite, final long contentLength) {
+                    Log.e(TAG, (100 * bytesWrite) / contentLength + "%");
+                    Log.e(TAG, bytesWrite + "::" + contentLength);
+                }
+            };
+            //结束回调，不可为空
+            final File finalTemp = temp;
+            UpCompleteListener completeListener = new UpCompleteListener() {
+                @Override
+                public void onComplete(boolean isSuccess, String result) {
+                    // textView.setText(isSuccess + ":" + result);
+                    Log.e(TAG, isSuccess + ":" + result);
+                    String newSavePath= AppConfig.YOUPAIYUN+savePath;
+
+                    handleMessage(field_unReadCount, field_status, field_username, userNameChatroom+newSavePath, field_msgType, field_conversationTime,msgId,context);
+
+                }
+
+
+
+
+            };
+            //表单上传（本地签名方式）
+            UploadEngine.getInstance().formUpload(temp,paramsMap , "unesmall", UpYunUtils.md5("unesmall123456"), completeListener, progressListener);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+
+
 
     public static String uploadFile(String newFilePath, final String username, final String sign, final int field_unReadCount,
                               final int field_status, final String field_username, final String field_msgType, final long field_conversationTime, final String userNameChatroom, final String msgId, final Context context) {

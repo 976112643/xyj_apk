@@ -65,4 +65,58 @@ public class ChatroomUtil {
         XposedBridge.log(localObject1.toString());
         return localObject1;
     }
+
+
+    public static void quitChatroom(ClassLoader pluginLoader, WechatEntity wechatEntity, String chatroomId) {
+        if (OtherUtils.isEmpty(wechatEntity.wx_version)) {
+            Class class_c = XposedHelpers.findClass(wechatEntity.quit_chatroom_class1, pluginLoader);
+            Class class_aq_b = XposedHelpers.findClass(wechatEntity.quit_chatroom_class2, pluginLoader);
+            Class class_aq_c = XposedHelpers.findClass(wechatEntity.quit_chatroom_class3, pluginLoader);
+            Class class_aq_n = XposedHelpers.findClass(wechatEntity.quit_chatroom_class4, pluginLoader);
+            Object object_FQ = XposedHelpers.callStaticMethod(class_c, wechatEntity.quit_chatroom_method2, new Object[0]);
+            Object object_aq_b = XposedHelpers.newInstance(class_aq_b, new Object[]{chatroomId});
+            XposedHelpers.callMethod(object_FQ, wechatEntity.quit_chatroom_method1, new Object[]{object_aq_b});
+            XposedHelpers.callMethod(XposedHelpers.callStaticMethod(class_c, wechatEntity.quit_chatroom_method3, new Object[0]), wechatEntity.quit_chatroom_method4, new Object[]{chatroomId});
+            Object object_aq_c = XposedHelpers.newInstance(class_aq_c, new Object[]{chatroomId});
+            XposedHelpers.callMethod(object_FQ, wechatEntity.quit_chatroom_method1, new Object[]{object_aq_c});
+            Object object_DT = XposedHelpers.callStaticMethod(class_c, wechatEntity.quit_chatroom_method5, new Object[0]);
+            String str = wechatEntity.quit_chatroom_method6;
+            Integer[] numArr = (Integer[]) new Object[]{Integer.valueOf(2), null};
+            Object object_aq_n = XposedHelpers.newInstance(class_aq_n, new Object[]{(String) XposedHelpers.callMethod(object_DT, str, numArr), chatroomId});
+            XposedHelpers.callMethod(object_FQ, wechatEntity.quit_chatroom_method1, new Object[]{object_aq_n});
+            return;
+        }
+        String str2 = wechatEntity.wx_version;
+        int obj = -1;
+        switch (str2.hashCode()) {
+            case 51294851:
+                if (str2.equals("6.7.2")) {
+                    obj = 0;
+                    break;
+                }
+                break;
+            case 51294852:
+                if (str2.equals("6.7.3")) {
+                    obj = 1;
+                    break;
+                }
+                break;
+        }
+        switch (obj) {
+            case 0:
+            case 1:
+                Class class_kernal_g = XposedHelpers.findClass(wechatEntity.quit_chatroom_class1, pluginLoader);
+                Class class_foundation_a_j = XposedHelpers.findClass(wechatEntity.quit_chatroom_class2, pluginLoader);
+                Class class_chatroom_e_a = XposedHelpers.findClass(wechatEntity.quit_chatroom_class3, pluginLoader);
+                Class class_roomsdk_a_b = XposedHelpers.findClass(wechatEntity.quit_chatroom_class4, pluginLoader);
+                Object object_chatroom_e_a = XposedHelpers.newInstance(class_chatroom_e_a, new Object[]{chatroomId});
+                Object Object_foundation_a_j = XposedHelpers.callStaticMethod(class_kernal_g, wechatEntity.quit_chatroom_method1, new Object[]{class_foundation_a_j});
+                XposedHelpers.callMethod(XposedHelpers.callMethod(Object_foundation_a_j, wechatEntity.quit_chatroom_method2, new Object[0]), wechatEntity.quit_chatroom_method3, new Object[]{object_chatroom_e_a});
+                XposedHelpers.callMethod(XposedHelpers.callMethod(Object_foundation_a_j, wechatEntity.quit_chatroom_method4, new Object[0]), wechatEntity.quit_chatroom_method5, new Object[]{chatroomId});
+                XposedHelpers.callMethod(XposedHelpers.callMethod(XposedHelpers.callStaticMethod(class_roomsdk_a_b, wechatEntity.quit_chatroom_method6, new Object[]{chatroomId}), wechatEntity.quit_chatroom_method7, new Object[]{chatroomId}), wechatEntity.quit_chatroom_method8, new Object[0]);
+                return;
+            default:
+                return;
+        }
+    }
 }

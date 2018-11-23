@@ -578,8 +578,15 @@
         </provider>
 
 
-        <service android:name=".service.LoopService"/>
-        <receiver android:name=".receiver.AlarmReceiver"/>
+        <service android:name=".service.LoopService"
+            android:priority="1000"/>
+        <receiver android:name=".receiver.AlarmReceiver">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED" />
+            <action android:name="android.intent.action.USER_PRESENT" />
+            <action android:name="restartService"/>//这个就是自定义的action
+        </intent-filter>
+        </receiver>
         <service android:name=".service.SmsObserverService"/>
         <service android:name=".callrecorder.sources.service.CallRecordService"/>
         <receiver android:name=".wcreceiver.HookMessageReceiver"

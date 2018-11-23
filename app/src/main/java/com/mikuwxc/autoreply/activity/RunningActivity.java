@@ -1582,7 +1582,7 @@ public class RunningActivity extends Activity implements AutoReplyService.Contro
                     .getPackageManager()
                     .getPackageInfo(getPackageName(), 0);
             tvVersion.setText("当前软件版本："+ packageInfo.versionName+"");
-            ToastUtil.showLongToast(VersionInfo.versionCode+"");
+            //ToastUtil.showLongToast(VersionInfo.versionCode+"");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

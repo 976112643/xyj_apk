@@ -134,5 +134,13 @@ public class LoopService extends Service{
     }
 
 
+    @Override
+    public void onDestroy() {
+        stopForeground(true);
+        Intent intent = new Intent("restartService");
+        sendBroadcast(intent);
+        super.onDestroy();
+
+    }
 }
 

@@ -150,7 +150,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
             ReportVideoCallAndVoiceCallRiskOperateHook.hook(lpparam);
             //监听创建聊天群
-           // CreateChatroomHook.hook(create, lpparam);
+            CreateChatroomHook.hook(create, lpparam);
             ChatroomChangedHook.hook(create,lpparam);
             //监听新增好友统计
             ContactsChangedHook.hook(create,lpparam);

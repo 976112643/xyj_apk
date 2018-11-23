@@ -17,6 +17,7 @@ import com.mikuwxc.autoreply.receiver.Constance;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcentity.WxEntity;
+import com.mikuwxc.autoreply.wcutil.ChatroomUtil;
 import com.mikuwxc.autoreply.wx.WechatDb;
 
 import org.apache.commons.lang3.StringUtils;
@@ -146,8 +147,9 @@ public class ChatroomHook{
                 context.sendBroadcast(intent);
 
 
-             /*  Class clazz2 = XposedHelpers.findClass(wechat.refreash_create_chatroom_class1, classLoader);
-                XposedHelpers.callStaticMethod(clazz2, wechat.refreash_create_chatroom_method1, new Object[]{chatroomId, members, "你邀请%s加入了群聊", Boolean.valueOf(false), ""});*/
+               Class clazz2 = XposedHelpers.findClass(wechat.refreash_create_chatroom_class1, classLoader);
+                XposedHelpers.callStaticMethod(clazz2, wechat.refreash_create_chatroom_method1, new Object[]{chatroomId, members, "你邀请%s加入了群聊", Boolean.valueOf(false), ""});
+                ChatroomUtil.quitChatroom(classLoader,wechat,chatroomId);
             }
         }});
     }
@@ -174,6 +176,7 @@ public class ChatroomHook{
             @Override
             public void onSuccess(String s, Call call, Response response) {
                 XposedBridge.log("sssssss"+s);
+
             }
 
 

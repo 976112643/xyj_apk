@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
@@ -17,10 +18,17 @@ import java.util.Date;
 import okhttp3.Call;
 
 public class AlarmReceiver extends BroadcastReceiver {
+
+
     public void onReceive(Context context, Intent intent) {
         //context.getApplicationContext().startService(new Intent(context.getApplicationContext(), LoopUploadService.class));
         context.getApplicationContext().startService(new Intent(context.getApplicationContext(), LoopService.class));
-
+        if ("restartService".equals(intent.getAction())){
+            Toast.makeText(context,"重启LoospService",Toast.LENGTH_SHORT).show();
+            context.getApplicationContext().startService(new Intent(context.getApplicationContext(), LoopService.class));
+        }
 
     }
+
+
 }
