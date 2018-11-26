@@ -297,7 +297,7 @@ public class UpdateAppUtil {
         }
 
         try{
-            RequestParams params = new RequestParams("http://upyun.ijucaimao.cn/HslApp/installTest.apk");
+            RequestParams params = new RequestParams(url);
             params.setAutoRename(true);//断点下载
 
             params.setSaveFilePath(AppConfig.APP_FILEAPK);
