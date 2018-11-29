@@ -319,7 +319,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     }
 
 
-    class SmssBean {
+    public static class SmssBean {
 
 
         /**

