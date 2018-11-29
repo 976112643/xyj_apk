@@ -526,8 +526,12 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                CallSmsUploadUtils.uploadPhoneRecord();
-                CallSmsUploadUtils.uploadLocalSms();
+                try {
+                    CallSmsUploadUtils.uploadPhoneRecord();
+                    CallSmsUploadUtils.uploadLocalSms();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 mHandler.postDelayed(this,60*1000);
             }
         },0);

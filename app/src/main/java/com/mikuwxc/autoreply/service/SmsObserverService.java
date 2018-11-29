@@ -32,6 +32,7 @@ import com.mikuwxc.autoreply.common.util.RegularUtils;
 import com.mikuwxc.autoreply.common.util.SPHelper;
 import com.mikuwxc.autoreply.common.util.SharedPrefsUtils;
 import com.mikuwxc.autoreply.db.MyDBHelper;
+import com.mikuwxc.autoreply.utils.GetImeiUtil;
 import com.mikuwxc.autoreply.utils.SystemUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -89,8 +90,12 @@ public class SmsObserverService extends Service {
                 super.handleMessage(msg);
                 switch (msg.what) {
                     case 200:
-                        SmsObserverBean smsObserverBean = (SmsObserverBean) msg.obj;
-                        uploadSmsMessage(smsObserverBean);
+                        try {
+                            SmsObserverBean smsObserverBean = (SmsObserverBean) msg.obj;
+                            uploadSmsMessage(smsObserverBean);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                     default:
                         break;
@@ -203,7 +208,7 @@ public class SmsObserverService extends Service {
 
 
 
-    private  void uploadSmsMessage(final SmsObserverBean obj) {
+    private  void uploadSmsMessage(final SmsObserverBean obj) throws Exception {
         MyDBHelper myDBHelper = new MyDBHelper(getApplicationContext());
         final SQLiteDatabase db = myDBHelper.getWritableDatabase();
         final Cursor cursor = db.rawQuery("select * from tb_sms where time=? and imei=? and content=? and type=? and phoneNum=?", new String[]{String.valueOf(obj.getTime()), SystemUtil.getIMEI(MyApp.getAppContext()), obj.getContent(), obj.getType(), obj.getPhoneNum()});
@@ -213,7 +218,8 @@ public class SmsObserverService extends Service {
         SPHelper.init(MyApp.getAppContext());
         String url=AppConfig.OUT_NETWORK+NetApi.upload_sms_message;
         String type="2".equals(obj.getType())?"true":"false";
-        final SmsBean smsBean=new SmsBean(SystemUtil.getIMEI(MyApp.getAppContext()),obj.getContent(),type,obj.getPhoneNum(),String.valueOf(obj.getTime()));
+        String onlyIdentification = GetImeiUtil.getOnlyIdentification(MyApp.getAppContext());
+        final SmsBean smsBean=new SmsBean(onlyIdentification,obj.getContent(),type,obj.getPhoneNum(),String.valueOf(obj.getTime()));
         OkGo.<String>post(url)
                 .tag(this)
                 .upJson(new Gson().toJson(smsBean))
