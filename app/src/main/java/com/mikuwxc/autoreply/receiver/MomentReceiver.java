@@ -21,7 +21,7 @@ public class MomentReceiver extends BroadcastReceiver {
             runHandle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    MomentDBTask.run();
+//                    MomentDBTask.run();
                 }
             },5*1000);
         }else if("进入了别人朋友圈".equals(source)){
@@ -29,7 +29,7 @@ public class MomentReceiver extends BroadcastReceiver {
             runHandle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    MomentDBTask.run();
+//                    MomentDBTask.run();
                 }
             },5*1000);
         }

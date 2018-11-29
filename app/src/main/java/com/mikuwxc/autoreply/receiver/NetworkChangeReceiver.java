@@ -69,7 +69,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             //检查是否有短信可上传
             uploadLocalSms();
             //检查是否有朋友圈数据可上传
-            uploadMoment();
+//            uploadMoment();
 
         } else {
             /**

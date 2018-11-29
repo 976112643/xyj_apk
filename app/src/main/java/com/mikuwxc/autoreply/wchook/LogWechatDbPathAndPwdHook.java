@@ -68,6 +68,12 @@ public class LogWechatDbPathAndPwdHook {
                         in.putExtra("userName",userName);
                         List<FriendBean> friendBeans = WechatDb.getInstance().selectContactTree();
 
+
+
+                        List<ChatroomEntity> chatroomEntities    = WechatDb.getInstance().selectChatroomss(null);
+                        XposedBridge.log("群成员：："+chatroomEntities.toString());
+
+
                         String friendBeansJson = JSON.toJSONString(friendBeans);
                         //in.putExtra("friendBeans",friendBeansJson);
                         //判断路径是否存在，不存在则创建

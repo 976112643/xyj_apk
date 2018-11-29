@@ -283,14 +283,14 @@ public class SendMesUtil
             XposedBridge.log("abcabc5");
             XposedHelpers.callStaticMethod(r6, wechatEntity.sendAmr_method_3, new Object[]{r4, Integer.valueOf(r5), Integer.valueOf(0)});
             XposedBridge.log("abcabc6");
-            // WechatDb.getInstance().updateVoiceInfo(r5, duration, r4);
+             WechatDb.getInstance().updateVoiceInfo(r5, duration, r4);
             XposedBridge.log("abcabc7");
             activity.runOnUiThread(new AmrRun(classLoader, wechatEntity, r4));
             XposedBridge.log("abcabc8");
             saveMsgId(r4, Long.valueOf(localMsgId));
             return true;
         } catch (Throwable e) {
-            XposedBridge.log("===== SEND AMR ===== ERROR!!!"+new Object[0]);
+            XposedBridge.log("===== SEND AMR ===== ERROR!!!"+e.toString());
             return false;
         }
     }

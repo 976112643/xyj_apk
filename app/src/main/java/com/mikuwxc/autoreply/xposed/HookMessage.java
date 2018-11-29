@@ -844,6 +844,8 @@ public class HookMessage extends BaseHook implements MultiFileObserver.MessagePa
 
                             if ("1".equals(isSend)){
                                 statuss=1;
+                            }else {
+                                statuss=3;
                             }
                             handleMessage(0, statuss, talker, content, type, field_conversationTime,msgId);
                         }

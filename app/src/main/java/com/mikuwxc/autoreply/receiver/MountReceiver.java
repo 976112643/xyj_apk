@@ -224,16 +224,16 @@ public class MountReceiver extends XC_MethodHook {
                             @Override
                             public void run() {
                                 List<String> listMonentVideo = downLoadPicMonet(fodderUrl, circleText, classLoader, create, "", path, type, context);
-                                XposedBridge.log("发视频朋友圈：："+listMonentVideo.get(0)+"::"+listMonentVideo.get(1));
+                                XposedBridge.log("发视频朋友圈：："+listMonentVideo.toString());
 
 
                                 MediaMetadataRetriever media = new MediaMetadataRetriever();
-                                media.setDataSource(listMonentVideo.get(1));// videoPath 本地视频的路径
+                                media.setDataSource(listMonentVideo.get(0));// videoPath 本地视频的路径
                                 Bitmap bitmap  = media.getFrameAtTime(1, MediaMetadataRetriever.OPTION_CLOSEST_SYNC );
                                 String picPath = BitmapPathUtil.saveBitmap(context, bitmap);
                                 XposedBridge.log("picPathpicPath::::::++"+picPath);
 
-                                MomentUtil.sendVideoMoment(classLoader,create,circleText,0,null,picPath,listMonentVideo.get(1));
+                                MomentUtil.sendVideoMoment(classLoader,create,circleText,0,null,picPath,listMonentVideo.get(0));
                             }
                         }).start();
 

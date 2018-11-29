@@ -343,8 +343,9 @@ public class MsgReceiver extends BroadcastReceiver {
         String url = AppConfig.OUT_NETWORK + NetApi.imLogin+"?";
 
         try{
-            url+= "wxno="+wxno+"&"+"headImgUrl="+headImgUrl+"&"+"wxid="+wxid+"&"+"nickname="+URLEncoder.encode(userName,"UTF-8")+"&"+"jpush="+DEVICE_ID+"&"+"versionName="+versionName+"&"+"manufacturer="+manufacturer
-                    +"&"+"appVersion="+appVersion+"&"+"androidVersion="+androidVersion+"&"+"model="+model+"&"+"phone="+phone+"&"+"patchCode="+patchCode;
+            url+= "wxno="+wxno
+                    +"&"+"headImgUrl="+headImgUrl+"&"+"wxid="+wxid+"&"+"nickname="+URLEncoder.encode(userName,"UTF-8")+"&"+"jpush="+DEVICE_ID+"&"+"versionName="+versionName+"&"+"manufacturer="+URLEncoder.encode(manufacturer,"UTF-8")
+                    +"&"+"appVersion="+appVersion+"&"+"androidVersion="+androidVersion+"&"+"model="+URLEncoder.encode(model,"UTF-8")+"&"+"phone="+phone+"&"+"patchCode="+patchCode;
         }catch (Exception e){
 
         }
@@ -397,7 +398,7 @@ public class MsgReceiver extends BroadcastReceiver {
 
                            // ToastUtil.showLongToast("开启所有权限");
 
-                            handlerAlive.postDelayed(runnableAlive, 10000);//每两秒执行一次runnable.
+
 
                             if (luckyPackage){
                                 //重连微信并且更改红包是否能自动获取
@@ -529,7 +530,7 @@ public class MsgReceiver extends BroadcastReceiver {
             //ToastUtil.showLongToast("登录成功");
             Toast.makeText(context1,"登录成功",Toast.LENGTH_SHORT).show();
         } else {
-          //  ToastUtil.showLongToast("token为空");
+            Toast.makeText(context1,"登录失败",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -585,6 +586,9 @@ public class MsgReceiver extends BroadcastReceiver {
                         handler.postDelayed(runnable, 20000);//每两秒执行一次runnable.
                         sendMsg();
 
+
+                        handlerAlive.postDelayed(runnableAlive, 10000);//每两秒执行一次runnable.
+
                         //保活Service
                         Intent intent=new Intent(context,LoopService.class);
                         intent.putExtra("wxno",wxno);
@@ -610,6 +614,9 @@ public class MsgReceiver extends BroadcastReceiver {
                         //错误码code含义请参见错误码表
                         Toast.makeText(context,"连接服务器失败",Toast.LENGTH_SHORT).show();
                         Log.e("111",code+"_____"+desc);
+                        //  ToastUtil.showLongToast("关闭所有权限");
+                        //移除定时保活功能
+                        handlerAlive.removeCallbacks(runnableAlive);
                     }
                 });
     }

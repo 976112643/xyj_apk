@@ -230,7 +230,7 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                             PreferenceUtil.setWxAccessToken(context, s);
                             newBean = new ArrayList<>();
                             if (resultBean != null) {
-                                //newBean.add(resultBean.get(0));
+                                newBean.add(new ApphttpBean.ResultBean("com.mikuwxc.autoreply"));
                                 for (int i = 0; i < resultBean.size(); i++) {
                                     PackageManager pm = getApplicationContext().getPackageManager();
                                     try {

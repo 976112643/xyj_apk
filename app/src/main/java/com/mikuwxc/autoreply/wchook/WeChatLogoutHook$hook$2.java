@@ -1,5 +1,7 @@
 package com.mikuwxc.autoreply.wchook;
 
+import com.mikuwxc.autoreply.common.util.AppConfig;
+import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.orhanobut.logger.Logger;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -23,6 +25,8 @@ public final class WeChatLogoutHook$hook$2 extends XC_MethodHook {
         objArr[0] = param.args[1];
         XposedBridge.log(str+objArr);
         XposedBridge.log("===== com.tencent.mm.ui.base.h %s"+ param.args[2]);
+
+        MyFileUtil.writeToNewFile(AppConfig.APP_FILE+"/wxno","");
         Object obj = param.args[1];
         if (obj == null) {
             throw new TypeCastException("null cannot be cast to non-null type kotlin.String");

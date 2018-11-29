@@ -114,9 +114,6 @@ public class UpdateAppUtil {
     }
 
 
-
-
-
     public static void getAppVersionState(final Context context, final TextView textView){
         OkGo.get(AppConfig.OUT_NETWORK + NetApi.upDateAppVersion).execute(new StringCallback() {
             @Override
@@ -143,9 +140,6 @@ public class UpdateAppUtil {
             }
         });
     }
-
-
-
 
 
     public static void getHotAppVersion(final Context context){
@@ -389,7 +383,6 @@ public class UpdateAppUtil {
             file.delete();
         }
     }
-
 
 
 

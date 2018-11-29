@@ -375,7 +375,9 @@ public class UpYunUtil {
 
     private static String getToken() {
           String  token = MyFileUtil.readFromFile(AppConfig.APP_FOLDER + "/token");
-            token = token.substring(1, token.length() - 1);
+          if (token!=null) {
+              token = token.substring(1, token.length() - 1);
+          }
 
             return token;
     }
