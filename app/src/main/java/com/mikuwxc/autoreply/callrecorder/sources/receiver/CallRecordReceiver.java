@@ -83,6 +83,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
             String absolutePath = audioFile.getAbsolutePath();
             int i = absolutePath.lastIndexOf("/")+1;
             String name=absolutePath.substring(i);
+            name=name.replace(" ","");
             String[] split = name.split("_");
 
             int amrDuration = CallDateUtils.getAmrDuration(audioFile);//时长 单位s
