@@ -238,14 +238,19 @@ public class DesktopActivity extends PermissionsActivity implements BaseOnRecycl
                             if (resultBean != null) {
                                 newBean.add(new ApphttpBean.ResultBean("com.mikuwxc.autoreply"));
                                 for (int i = 0; i < resultBean.size(); i++) {
-                                    PackageManager pm = getApplicationContext().getPackageManager();
-                                    try {
-                                        ApplicationInfo appInfo = pm.getApplicationInfo(resultBean.get(i).getPackageName(), PackageManager.GET_META_DATA);
-                                        Drawable appIcon = pm.getApplicationIcon(appInfo);
-                                        newBean.add(resultBean.get(i));
-                                    } catch (PackageManager.NameNotFoundException e) {
-                                        e.printStackTrace();
+                                    if ("com.mikuwxc.autoreply".equals(resultBean.get(i).getPackageName())){
+
+                                    }else{
+                                        PackageManager pm = getApplicationContext().getPackageManager();
+                                        try {
+                                            ApplicationInfo appInfo = pm.getApplicationInfo(resultBean.get(i).getPackageName(), PackageManager.GET_META_DATA);
+                                            Drawable appIcon = pm.getApplicationIcon(appInfo);
+                                            newBean.add(resultBean.get(i));
+                                        } catch (PackageManager.NameNotFoundException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
+
                                 }
                             }else{
                                 newBean.add(new ApphttpBean.ResultBean("com.mikuwxc.autoreply"));

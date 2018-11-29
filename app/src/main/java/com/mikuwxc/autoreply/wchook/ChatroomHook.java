@@ -52,7 +52,7 @@ public class ChatroomHook{
             UserEntity userEntity = WechatDb.getInstance().selectSelf();
             String alias=userEntity.getAlias();
             if (StringUtils.isBlank(alias)){
-                alias=userEntity.getUserName();
+                alias=userEntity.getUserTalker();
             }
 
             handleMessageCreateChatroomStatus(alias);
@@ -131,7 +131,7 @@ public class ChatroomHook{
                     UserEntity userEntity = WechatDb.getInstance().selectSelf();
                     String alias=userEntity.getAlias();
                     if (StringUtils.isBlank(alias)){
-                        alias=userEntity.getUserName();
+                        alias=userEntity.getUserTalker();
                     }
 
 

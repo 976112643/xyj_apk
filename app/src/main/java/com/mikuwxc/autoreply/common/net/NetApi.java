@@ -52,4 +52,6 @@ public class NetApi {
     public static final String addFriendMessage="/api/1.0/addContacts/";
     public static final String handleAdvice="/api/1.0/logger/wechatFriend/advice/";   //同步好友申请统计
     public static final String handleAddFriend="/api/1.0/logger/wechatFriend/add/";   //同步加好友动作统计
+
+    public static final String synchronChatroom="/api/1.0/chatroom/synchronize/";  //同步群内容
 }

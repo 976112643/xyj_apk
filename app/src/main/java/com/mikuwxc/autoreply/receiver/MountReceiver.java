@@ -321,7 +321,7 @@ public class MountReceiver extends XC_MethodHook {
                             FriendUtil.deleteFriend(classLoader, create, arrayList.get(i).toString());     //删除指定好友
                         }
                         UserEntity userEntity = WechatDb.getInstance().selectSelf();
-                        String userName = userEntity.getUserName();
+                        String userName = userEntity.getUserTalker();
                         String alias = userEntity.getAlias();  //微信号
                         if(StringUtils.isBlank(alias)){
                             alias=userName;
