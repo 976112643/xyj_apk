@@ -14,6 +14,7 @@ import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
 import com.mikuwxc.autoreply.modle.FriendBean;
 import com.mikuwxc.autoreply.receiver.Constance;
+import com.mikuwxc.autoreply.wcentity.ChatroomEntity;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcentity.WechatEntity;
 import com.mikuwxc.autoreply.wcentity.WxEntity;
@@ -24,10 +25,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -42,7 +45,7 @@ public class ChatroomHook{
                                       final Context context,
                                       final WechatEntity wechat) throws Exception{
 
-        String         name    = "新营家";
+        String         name    = "检验群";
         XposedBridge.log("快活呀");
         String clearList=MyFileUtil.readFromFile(AppConfig.APP_FILE+"/clearList");
         XposedBridge.log("快活呀"+clearList.toString());
@@ -108,6 +111,7 @@ public class ChatroomHook{
                 String     chatroomId = (String) XposedHelpers.getObjectField(object4, wechat.refreash_create_chatroom_field5);
                 LinkedList wechatIds  = (LinkedList) XposedHelpers.getObjectField(object3, wechat.refreash_create_chatroom_field6);
 
+
                 List<String> members = new ArrayList<String>();
 
                 Iterator iterator = wechatIds.iterator();
@@ -148,8 +152,20 @@ public class ChatroomHook{
 
 
                Class clazz2 = XposedHelpers.findClass(wechat.refreash_create_chatroom_class1, classLoader);
-                XposedHelpers.callStaticMethod(clazz2, wechat.refreash_create_chatroom_method1, new Object[]{chatroomId, members, "你邀请%s加入了群聊", Boolean.valueOf(false), ""});
-                ChatroomUtil.quitChatroom(classLoader,wechat,chatroomId);
+               XposedHelpers.callStaticMethod(clazz2, wechat.refreash_create_chatroom_method1, new Object[]{chatroomId, members, "你邀请%s加入了群聊", Boolean.valueOf(false), ""});
+               // ChatroomUtil.quitChatroom(classLoader,wechat,chatroomId);
+
+                Set set=new HashSet();
+                set.add(chatroomId);
+                List<ChatroomEntity> list = WechatDb.getInstance().selectChatroomss(set);
+                String nickname=list.get(0).getNickName();
+                XposedBridge.log("查看群是否有name:"+nickname);
+                if ("检验群".equals(nickname)){
+                    ChatroomUtil.quitChatroom(classLoader,wechat,chatroomId);
+                    XposedBridge.log("删除僵尸粉群成功:"+nickname);
+                }
+
+
             }
         }});
     }

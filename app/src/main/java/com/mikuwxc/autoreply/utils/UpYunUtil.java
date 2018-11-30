@@ -113,7 +113,7 @@ public class UpYunUtil {
                                      final int field_status, final String field_username, final String field_msgType, final long field_conversationTime , final String userNameChatroom, final String msgId, final Context context) {
 
         try {
-           /* Thread.sleep(10000);
+            Thread.sleep(10000);
             int index       = sendVideoPath.lastIndexOf("/");
             String fileName = sendVideoPath.substring(index);
             String copyFile = "/storage/emulated/0/JCM" + fileName;
@@ -128,9 +128,9 @@ public class UpYunUtil {
                 }
             }catch(Exception e){
                 Log.e("111","FileFile::"+e.toString());
-            }*/
+            }
             File temp = null;
-            temp = new File(sendVideoPath);
+            temp = new File(copyFile);
             final Map<String, Object> paramsMap = new HashMap<>();
             //上传又拍云的命名空间
             paramsMap.put(Params.BUCKET, "cloned");

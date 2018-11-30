@@ -23,10 +23,10 @@ public class AppConfig {
     public static final String APP_FILE = ROOT + "/JCM";
     public static final String APP_FILEAPK = ROOT + "/JCM/hsl.apk";
 
-    //public static String OUT_NETWORK = "http://192.168.5.176:8080/";
+    //public static String OUT_NETWORK = "http://192.168.5.172:8080/";
 
-   //public static String OUT_NETWORK = "http://120.24.102.187:8066/";
-    public static String OUT_NETWORK = "http://47.107.77.220:8080/";
+   public static String OUT_NETWORK = "http://120.24.102.187:8066/";
+    //public static String OUT_NETWORK = "http://47.107.77.220:8080/";
     public static String Registration_Id = null;
     public static final String YOUPAIYUN ="http://upyun.ijucaimao.cn";
 

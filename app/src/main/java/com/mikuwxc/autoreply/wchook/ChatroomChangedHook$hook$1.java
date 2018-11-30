@@ -10,6 +10,7 @@ import com.mikuwxc.autoreply.bean.ChatRoomBean;
 import com.mikuwxc.autoreply.common.net.NetApi;
 import com.mikuwxc.autoreply.common.util.AppConfig;
 import com.mikuwxc.autoreply.common.util.MyFileUtil;
+import com.mikuwxc.autoreply.wcentity.ChatroomEntity;
 import com.mikuwxc.autoreply.wcentity.UserEntity;
 import com.mikuwxc.autoreply.wcutil.Throttle;
 import com.mikuwxc.autoreply.wx.WechatDb;
@@ -18,6 +19,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -65,7 +69,19 @@ public final class ChatroomChangedHook$hook$1 extends XC_MethodHook {
                 chatRoomBean.setOwner(values.getAsString("roomowner"));
                 chatRoomBean.setWechatId(getToken());
 
-                handleMessageCreateChatroom(chatRoomBean);
+
+                Set set=new HashSet();
+                set.add(values.getAsString("chatroomname"));
+                List<ChatroomEntity> list = WechatDb.getInstance().selectChatroomss(set);
+                XposedBridge.log("创建群查找群资料和信息：："+list.toString());
+
+                UserEntity userEntity = WechatDb.getInstance().selectSelf();
+                String alias=userEntity.getAlias();
+                if (StringUtils.isBlank(alias)){
+                    alias=userEntity.getUserTalker();
+                }
+
+                handleMessageCreateChatroom(alias,new Gson().toJson(list.get(0)));
 
 
             }else{
@@ -84,17 +100,17 @@ public final class ChatroomChangedHook$hook$1 extends XC_MethodHook {
 
 
 
-    private void handleMessageCreateChatroom(ChatRoomBean chatRoomBean) {
-        OkGo.post(AppConfig.OUT_NETWORK+ NetApi.createchatroom).upJson(new Gson().toJson(chatRoomBean)).execute(new StringCallback() {
+    private void handleMessageCreateChatroom(String wxno,String chatroomEntitiesJson) {
+        OkGo.post(AppConfig.OUT_NETWORK+ NetApi.createchatroom+"/"+wxno).upJson(chatroomEntitiesJson).execute(new StringCallback() {
             @Override
             public void onSuccess(String s, Call call, Response response) {
-                XposedBridge.log("sssssss");
+                XposedBridge.log("同步创建群的消息成功："+s);
             }
 
 
             @Override
             public void onError(Call call, Response response, Exception e) {
-                XposedBridge.log("sssssss"+e.toString());
+                XposedBridge.log("同步创建群的消息失败"+e.toString());
             }
         });
     }

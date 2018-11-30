@@ -21,7 +21,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 4
-        versionName "1.1.0.20181123"
+        versionName "1.1.0.20181130"
 
 
 
